@@ -1,30 +1,25 @@
 ---
 layout: page
-title: About
+title: About Me
 ---
 
-<p class="message">
-  Hey there! This page is included as an example. Feel free to customize it for your own use upon downloading. Carry on!
-</p>
+![Matt Hamilton](/public/matt_headshot_small.jpg)
 
-In the novel, *The Strange Case of Dr. Jeykll and Mr. Hyde*, Mr. Poole is Dr. Jekyll's virtuous and loyal butler. Similarly, Poole is an upstanding and effective butler that helps you build Jekyll themes. It's made by [@mdo](https://twitter.com/mdo).
+Hi, I am Matt Hamilton, a technologist and developer based in Bristol, UK.
 
-There are currently two themes built on Poole:
+I have been involved in the internet, and web since it’s inception, and been an advocate of Open Source software for the past two decades.
 
-* [Hyde](http://hyde.getpoole.com)
-* [Lanyon](http://lanyon.getpoole.com)
+For fifteen years I was the Technical Director of [Netsight Internet Solutions](https://www.netsight.co.uk/), building large content management projects for clients based on the [Plone Content Management System](https://plone.org/).
 
-Learn more and contribute on [GitHub](https://github.com/poole).
+I’ve worked as a consultant for several large clients including Royal Bank of Scotland, NHS, Oxfam GB, Belron International, and University of Bristol. I’m particularly interested in performance optimisation and authentication for large and 
+complex sites. 
 
-## Setup
+I’ve served on the board of directors of the Plone Foundation, an international Open Source foundation for a number of years, holding any roles, including President. I’ve organised several large (300+ attendees, 30+ countries) international software conferences, as well as a number of smaller development sprints.
 
-Some fun facts about the setup of this project include:
+I am the maintainer of the Underscore new media mailing list, probably one of the longest continually running mailing lists on the internet with over 2000 designers, developers and artists in the Bristol and Bath region with over 10,000 posts per annum.
 
-* Built for [Jekyll](http://jekyllrb.com)
-* Developed on GitHub and hosted for free on [GitHub Pages](https://pages.github.com)
-* Coded with [Sublime Text 2](http://sublimetext.com), an amazing code editor
-* Designed and developed while listening to music like [Blood Bros Trilogy](https://soundcloud.com/maddecent/sets/blood-bros-series)
-
-Have questions or suggestions? Feel free to [open an issue on GitHub](https://github.com/poole/issues/new) or [ask me on Twitter](https://twitter.com/mdo).
+I am currently working with [enquos](https://www.enquos.com) to help them develop their mobile offering, and manage a team of iOS developers building apps for enquos.
 
 Thanks for reading!
+
+-Matt
