@@ -1,0 +1,22 @@
+@media (min-width: 48em) {
+  .theme-base-0b .sidebar {
+    background-color: #90a959;
+    background-image: url('/public/oak_tree_medium.png');
+    background-size: 350px;
+    background-position: bottom;
+    background-repeat: no-repeat;
+  }
+}
+
+/* About section */
+.sidebar-about h1 {
+  color: #fff;
+  margin-top: 0;
+  font-family: "Great Vibes", serif;
+  font-weight: normal;
+  font-size: 3.25rem;
+}
+
+.sidebar-about h1 a:hover {
+  text-decoration: none;
+}
