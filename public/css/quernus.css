@@ -1,9 +1,11 @@
-.theme-base-0b .sidebar {
-  background-color: #90a959;
-  background-image: url('/public/oak_tree_medium.png');
-  background-size: 350px;
-  background-position: bottom;
-  background-repeat: no-repeat;
+@media (min-width: 48em) {
+  .theme-base-0b .sidebar {
+    background-color: #90a959;
+    background-image: url('/public/oak_tree_medium.png');
+    background-size: 350px;
+    background-position: bottom;
+    background-repeat: no-repeat;
+  }  
 }
 
 /* About section */
