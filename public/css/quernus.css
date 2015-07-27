@@ -1,12 +1,34 @@
 @media (min-width: 48em) {
   .theme-base-0b .sidebar {
     background-color: #90a959;
+  }  
+
+  .theme-base-0b .sidebar:after {
+    content: ' ';
+    display: block;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -11;
+    opacity: 0.2;
     background-image: url('/public/oak_tree_medium.png');
+    background-repeat: no-repeat;
+    background-position: 50% 0;
+    -ms-background-size: cover;
+    -o-background-size: cover;
+    -moz-background-size: cover;
+    -webkit-background-size: cover;
+    background-size: cover;
     background-size: 350px;
     background-position: bottom;
-    background-repeat: no-repeat;
   }  
+
+
 }
+
+
 
 /* About section */
 .sidebar-about h1 {
