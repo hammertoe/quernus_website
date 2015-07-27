@@ -5,27 +5,45 @@ title: Home
 
 <div class="posts">
   {% for post in paginator.posts %}
+<<<<<<< HEAD
   <div class="post">
     <h1 class="post-title">
       <a href="{{ post.url }}">
+=======
+  <article class="post">
+    <h1 class="post-title">
+      <a href="{{ site.baseurl }}{{ post.url }}">
+>>>>>>> 1248e402c1db8faf2f43c4a64b730b6465b18787
         {{ post.title }}
       </a>
     </h1>
 
+<<<<<<< HEAD
     <span class="post-date">{{ post.date | date_to_string }}</span>
 
     {{ post.content }}
   </div>
+=======
+    <time datetime="{{ post.date | date_to_xmlschema }}" class="post-date">{{ post.date | date_to_string }}</time>
+
+    {{ post.content }}
+  </article>
+>>>>>>> 1248e402c1db8faf2f43c4a64b730b6465b18787
   {% endfor %}
 </div>
 
 <div class="pagination">
   {% if paginator.next_page %}
+<<<<<<< HEAD
     <a class="pagination-item older" href="{{ site.baseurl }}page{{paginator.next_page}}">Older</a>
+=======
+    <a class="pagination-item older" href="{{ paginator.next_page_path | prepend: site.baseurl }}">Older</a>
+>>>>>>> 1248e402c1db8faf2f43c4a64b730b6465b18787
   {% else %}
     <span class="pagination-item older">Older</span>
   {% endif %}
   {% if paginator.previous_page %}
+<<<<<<< HEAD
     {% if paginator.page == 2 %}
       <a class="pagination-item newer" href="{{ site.baseurl }}">Newer</a>
     {% else %}
@@ -35,3 +53,10 @@ title: Home
     <span class="pagination-item newer">Newer</span>
   {% endif %}
 </div>
+=======
+    <a class="pagination-item newer" href="{{ paginator.previous_page_path | prepend: site.baseurl }}">Newer</a>
+  {% else %}
+    <span class="pagination-item newer">Newer</span>
+  {% endif %}
+</div>
+>>>>>>> 1248e402c1db8faf2f43c4a64b730b6465b18787

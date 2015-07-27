@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Dependencies
 markdown:         redcarpet
 highlighter:      pygments
@@ -20,3 +21,40 @@ author:
 paginate:         5
 
 
+=======
+# Permalinks
+#
+# Use of `relative_permalinks` ensures post links from the index work properly.
+permalink:           pretty
+relative_permalinks: true
+
+# Setup
+title:               Quernus
+tagline:             Matt Hamilton
+url:                 http://getpoole.com
+paginate:            1
+baseurl:             ""
+
+# Assets
+#
+# We specify the directory for Jekyll so we can use @imports.
+sass:
+  sass_dir:          _sass
+  style:            :compressed
+
+# About/contact
+author:
+  name:              Matt Hamilton
+  url:               https://twitter.com/hammertoe
+  email:             matt@quernus.co.uk
+
+# Custom vars
+version:             2.0.0
+github:
+  repo:              https://github.com/hammertoe/poole
+
+pages_list:       
+  About: '/about'
+  Archive: '/archive'
+  Feed: '/atom.xml'
+>>>>>>> 1248e402c1db8faf2f43c4a64b730b6465b18787
