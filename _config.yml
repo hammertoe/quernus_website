@@ -21,3 +21,7 @@ paginate:         5
 
 sass:
   style: compressed
+
+collections:
+  talks:
+    output: true
