@@ -7,7 +7,7 @@ tags: OpenBSD, FreeBSD, networking
 
 ## FreeBSD is a Great Server
 
-[FreeBSD](https://www.freebsd.org/) is a great OS. I use it for my office fileserver due to it's ZFS implementation, and general robustness as a fileserver and general office server.
+[FreeBSD](https://www.freebsd.org/) is a great OS. I use it for my office fileserver due to its ZFS implementation, and general robustness as a fileserver and general office server.
 
 However one thing I don’t like about FreeBSD is that even though it has had IPSEC baked into it for many many years, it is still not enabled by default in the `GENERIC` kernel. Most kernel options in FreeBSD can be loaded as loadable modules, but IPSEC is not one of them.
 
