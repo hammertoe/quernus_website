@@ -3,15 +3,18 @@
 
   {% include head.html %}
 
-  <body class="theme-base-0b">
+  <body class="theme-base-0b layout-reverse">
 
     {% include sidebar.html %}
 
     <div class="content container">
+
       {{ content }}
 
       {% include comments.html %}
     </div>
+
+  {% include my_email.html %}
 
   </body>
 </html>
