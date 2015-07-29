@@ -9,7 +9,7 @@ relative_permalinks: true
 # Setup
 title:            Quernus
 tagline:          'Matt Hamilton'
-description:      'Matt Hamilton. A web technologist, specialising in Python web development, iOS deployment and testing, networking, and BSD-based operating systems.'
+description:      'Matt Hamilton. An Internet technologist, interested in Python web development, iOS deployment and testing, wearables, networking and operating systems.'
 url:              https://www.quernus.co.uk
 baseurl:          /
 
