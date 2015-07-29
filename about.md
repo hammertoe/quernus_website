@@ -3,7 +3,26 @@ layout: page
 title: About Me
 ---
 
-![Matt Hamilton](/public/matt_headshot_small.jpg)
+<div>
+<div style="float:left; width: 50%">
+<img src="/public/matt_headshot_small.jpg" alt="Matt Hamilton">
+</div>
+<div style="float:left; width: 50%">
+<p style="text-align:right">
+Quernus Ltd.<br />
+49b Easton Business Centre<br />
+Felix Road<br />
+Easton<br />
+Bristol<br />
+BS5 0HE<br />
+</p>
+<p style="text-align:right">
+tel: +44 117 325 3025<br />
+email: <a href="#"><span class="my-email">please enable javascript to view</span></a><br />
+</p>
+</div>
+<div style="clear:both"></div>
+</div>
 
 Hi, I am Matt Hamilton, a technologist and developer based in Bristol, UK.
 

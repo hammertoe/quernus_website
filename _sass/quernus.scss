@@ -48,4 +48,17 @@ div.post img {
   -webkit-box-shadow: 5px 5px 20px 0px rgba(0,0,0,0.3);
   -moz-box-shadow: 5px 5px 20px 0px rgba(0,0,0,0.3);
   box-shadow: 5px 5px 20px 0px rgba(0,0,0,0.3);
+
+.sidebar-about h2 {
+  opacity: 0.8;
+}
+
+.desc {
+  font-size: 1 rem;
+}
+
+.lead-image {
+  height:75px; 
+  float: left; 
+  margin-right: 1em;
 }
