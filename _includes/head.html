@@ -25,6 +25,15 @@
   <!-- RSS -->
   <link rel="alternate" type="application/rss+xml" title="RSS" href="/atom.xml">
 
+  <!-- Opengraph -->
+  <meta property="og:url" content="{{ site.url }}{{ page.url }}" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="{{ page.title }} &middot; {{ site.title }}" />
+<!--
+  <meta property="og:description" content="What is machine learning? See how it works with our animated data visualization." />
+  <meta property="og:image" content="http://www.r2d3.us/static/pages/decision-trees-part-1/preview.png" />
+-->
+
   {% include google_analytics.html %}
 
 </head>
