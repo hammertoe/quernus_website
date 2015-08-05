@@ -68,7 +68,7 @@ Yesterday we were working on polishing up a number of aspects of an app we are w
 
 * 8:55am
 
-    I get my daughter into the bike trailer and cycle off to drop her at summer camp for the day and head to the office. a great start to the day so far!
+    I get my daughter into the bike trailer and cycle off to drop her at summer camp for the day and head to the office. a great start to the day so far! The new app build is there waiting for Nicole when she wakes up in a few hours.
 
 
 
