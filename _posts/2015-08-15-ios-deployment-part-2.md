@@ -11,11 +11,11 @@ tags: iOS, iPhone, apple
 
 ## The Deployment Process
 
-One of the first things I noticed when I first started getting involve in the development of an iOS application is just how insanely complex the deployment process is to a newcomer. Even regardless of my having to get my head around new programming languages (Objective C and Swift) and new APIs, the bigger hurdle was Xcode itself.
+One of the first things I noticed when I first started getting involved in the development of an iOS application is just how insanely complex the deployment process is to a newcomer. Even regardless of me having to get my head around new programming languages (Objective C and Swift) and new APIs, the bigger hurdle was Xcode itself.
 
-At first I was the liaison with the outsources mobile app development agency. Every few weeks the agency would do a ‘Testflight’ build for us to try out. We’d give feedback and that would be rolled into their development as they went along. For speaking with them, the actual process of testing, building and deploying a release would take one of their developers most of an afternoon to do. Trying to get the releases more frequent would just tie up a valuable developer for longer.
+At first I was the liaison with the outsourced mobile app development agency. Every few weeks the agency would do a ‘Testflight’ build for us to try out. We’d give feedback and that would be rolled into their development as they went along. Speaking to them, the actual process of testing, building and deploying a release would take one of their developers most of an afternoon to do. Trying to get the releases more frequent would just tie up a valuable developer for longer.
 
-Eventually we moved the development of the app in-house. We recruited our own developer to work on the project. I was now more involved in the actual day-to-day management of the development process. And this was when I started to realised just how complex the deployment can be. The developer was fantastic and helped me to understand things a great deal, but the process of actually deploying the app was cumbersome. 
+Eventually we moved the development of the app in-house. We recruited a developer to work on the project. I was now more involved in the actual day-to-day management of the development process. And this was when I started to realised just how complex the deployment can be. The developer was fantastic and helped me to understand things a great deal, but the process of actually deploying the app was cumbersome. 
 
 I tried to do a build myself from Xcode. This required me to have the right certificates, keys, and provisioning profiles to work. Several times Xcode would come up with some error about the provisioning profile and just ask me if I wanted it to ‘fix it’. If I hit the button to fix it, it just went away and did it’s magic. I had no idea what it was actually doing. I just pressed an hoped. Sometimes it worked, sometimes it didn’t. In talking to other iOS developers this seemed like ‘normal’ behaviour. Most of them didn’t really know what was going on. They just hit the button in Xcode and hopes for the best. Kudos to Apple for hiding all the details and letting people get on with the task at hand, developing software, but when things went wrong it is hard to work out.
 
@@ -25,7 +25,7 @@ The time came for us to start hiring more developers, and soon we had a team of 
 
 ## What we needed
 
-We needed a deployment mechanism. We needed an automated way for the builds to happen independent of any one developer. We needed to ensure we didn’t need to distribute our company distribution key to everyone involved. And it would be great if the process could happen automatically and frequently so that anyone could test out a build. This is not like the world of web development, where you can simply allow anyone with a browser to your dev/staging server. In order for someone to test a build they need to be able to access a properly signed app with their device’s UDID encoded in the provisioning profile.
+We needed a deployment mechanism. We needed an automated way for the builds to happen independent of any one developer. We needed to ensure we didn’t need to distribute our company distribution key to everyone involved. It would be great if the process could happen automatically and frequently so that anyone could test out a build. This is not like the world of web development, where you can simply allow anyone with a browser to your dev/staging server. In order for someone to test a build they need to be able to access a properly signed app with their device’s UDID encoded in the provisioning profile.
 
 The previous incarnation of the app had very little in the way of unit tests, and this was something I wanted to change too. All the developers we hired had a very strong interest in testing, and I needed to make it as easy as possible for their tests to be run.
 
@@ -33,19 +33,19 @@ We bought a small Mac Mini to sit in the office and act as our build server. In 
 
 ## Tools we used
 
-- Github
+- [Github](https://github.com/)
 
     This is where all out code it stored. It is a number of private Github repos. At one point we were evaluating Github Enterprise, which was one of the reasons I wanted to have more control over the build server, rather than use one of the nascent cloud-based iOS build services.
 
-- Fastlane
+- [Fastlane](https://fastlane.tools/)
 
     Fastlane is a set of tools to interact with Apple’s developer services via the command line. I first heard about it from a talk by the author of the tools, Felix Krause, at NSConf 7 in Leicester, UK. He has done a remarkable job of making sane ways to interact with the App store process in a automatable way.
 
-- Jenkins
+- [Jenkins](https://jenkins-ci.org/)
 
     Jenkins is an Continuos Integration (CI) tool. I was familiar with it from previous projects I’d worked on, such as Plone. Jenkins can monitor Github and when code is pushed to github it can check it out and run automated tests on the code. In our case we wanted to take it further, and not just run the tests, but actually build and deploy the app.
 
-- Hockey / Testflight
+- [Hockey](http://hockeyapp.net/) / [Testflight](https://developer.apple.com/testflight/)
 
     Hockey and TestFlight are two services that allow you to do deployments of apps to testers. Hockey (derived from the term ‘adhoc’ as one of the three types of provisioning profile Apple allow) is a 3rd party service. It also allows you to capture crash reports from devices. If the app crashes on a user’s phone then the next time they start the app it sends the crash report to Hockey. Hockey allows you to then browse the stack trace and other crash debugging information.
 
@@ -89,7 +89,7 @@ We bought a small Mac Mini to sit in the office and act as our build server. In 
 </table>
 
 
-- Slack
+- [Slack](https://slack.com/)
 
     Slack is our internal communications tool. When a build happens on Jenkins the status of the tests and build and the link to the download are posted to Slack for the team to see.
 
