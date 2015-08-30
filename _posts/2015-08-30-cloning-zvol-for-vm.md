@@ -6,7 +6,7 @@ comments: True
 
 I am using bhyve as a VM system for OpenBSD, Linux and FreeBSD guests running on a FreeBSD host.
 
-I wanted to create a new OpenBSD VM to set up a local mail server VM. And realised I could probably clone one of my existing OpenBSD VM's filesystem and just start with that. I'm using ZFS zvols for the underlying data store for the VM.
+I wanted to create a new OpenBSD VM to set up a local mail server VM. And realised I could probably clone one of my existing OpenBSD VM's filesystem and just start with that. [I'm using ZFS zvols for the underlying data store for the VM](https://www.geeklan.co.uk/?p=1521).
 
 So, firstly I took a snapshot of the running OpenBSD VM:
 
