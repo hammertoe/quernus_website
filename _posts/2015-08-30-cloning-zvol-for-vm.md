@@ -2,6 +2,8 @@
 layout: post
 title: Cloning a ZVol for a new VM
 comments: True
+tags: FreeBSD, ZFS
+summary: How to clone ZFS zvols to replicate VMs
 ---
 
 I am using bhyve as a VM system for OpenBSD, Linux and FreeBSD guests running on a FreeBSD host.

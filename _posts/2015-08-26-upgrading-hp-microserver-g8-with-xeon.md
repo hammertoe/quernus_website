@@ -3,6 +3,7 @@ layout: post
 title: Upgrading HP Microserver G8 with a Xeon
 comments: True
 tags: FreeBSD, Hardware
+summary: A cheap and simple CPU upgrade to a HP Microserver for many more cores and virtualisation features
 ---
 
 I've got a small HP Microserver G8 in my office as a general office fileserver, VM host for software projects, network server etc.
