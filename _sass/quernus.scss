@@ -75,3 +75,36 @@ div.post img {
 .sidebar-nav-item {
   line-height: 1.2em;
 }
+
+div.page div.date, div.related div.date {
+  display: block;
+  float: left;
+  width: 120px;
+  text-align: right;
+  font-size: 0.8em;
+  color: #90a959;
+}
+
+div.page div.title, div.related div.title {
+  display: block;
+  margin-left: 140px;
+  margin-bottom: 1em;
+  line-height: 1em;
+}
+
+div.page div.title a, div.related div.title a {
+  color: black;
+}
+
+div.posts div.post h1.post-title a, h1.post-title a:hover {
+  color: black;
+  text-decoration: none;  
+}
+
+.post-date {
+  color: #90a959;
+}
+
+div.title span.summary {
+  font-size: 0.8em;
+}
