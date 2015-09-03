@@ -3,7 +3,7 @@ layout: post
 title: iOS Deployment and Provisioning - Part I - Terminology
 comments: True
 tags: iOS, iPhone, apple
-summary: The first problem I had coming into iOS development was working out how all the parts related: certs, profiles, keys, schemes, etc
+summary: The first problem I had coming into iOS development was working out how all the parts related - certs, profiles, keys, schemes, etc
 ---
 
 <p class="message">
