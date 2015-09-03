@@ -3,6 +3,7 @@ layout: post
 title: iOS Deployment and Provisioning - Part II - Rational
 comments: True
 tags: iOS, iPhone, apple
+summary: The reasoning behind our build process, how it solves the problems of building and signing builds with a distributed team
 ---
 
 <p class="message">

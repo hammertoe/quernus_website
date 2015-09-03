@@ -2,6 +2,8 @@
 layout: post
 title: I Love our Build System
 comments: True
+tags: iOS, apple
+summary: It's 7:30am, a director has reported a problem with our app whilst at a trade show. Help! How our build system saved the day.
 ---
 
 <p class="message">

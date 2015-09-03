@@ -3,6 +3,7 @@ layout: post
 title: iOS Deployment and Provisioning - Part III - Tools in Detail - Fastlane
 comments: True
 tags: iOS, iPhone, apple
+summary: Details of the specific fastlane configuration we use and how we arrange alpha and release builds
 ---
 
 <p class="message">

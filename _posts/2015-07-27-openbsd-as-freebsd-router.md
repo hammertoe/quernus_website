@@ -3,6 +3,7 @@ layout: post
 title: Using OpenBSD as a FreeBSD Router
 comments: True
 tags: OpenBSD, FreeBSD, networking
+summary: FreeBSD is a great general server, OpenBSD is great at networking and security. This is how I run a virtual router using OpenBSD and bhyve on a FreeBSD host
 ---
 
 ## FreeBSD is a Great Server
