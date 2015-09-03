@@ -2,7 +2,7 @@
 layout: post
 title: Adding Photos to iOS Simulator
 comments: True
-tags: ios, apple, fastlane, snapshot
+tags: iOS, apple, fastlane, snapshot
 summary: A simple way for scripting the adding of photos to the iOS simulator when using snapshot to take photos of your app
 ---
 
