@@ -5,7 +5,7 @@ title: About Me
 
 <div>
 <div style="float:left; width: 50%">
-<img src="/public/matt_office_headshot_small.jpg" alt="Matt Hamilton">
+<img src="/public/matt_office_headshot_cropped_small.jpg" alt="Matt Hamilton">
 </div>
 <div style="float:left; width: 50%">
 <p style="text-align:right">
