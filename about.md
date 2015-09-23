@@ -5,12 +5,12 @@ title: About Me
 
 <div>
 <div style="float:left; width: 50%">
-<img src="/public/matt_headshot_small.jpg" alt="Matt Hamilton">
+<img src="/public/matt_office_headshot_small.jpg" alt="Matt Hamilton">
 </div>
 <div style="float:left; width: 50%">
 <p style="text-align:right">
 Quernus Ltd.<br />
-49b Easton Business Centre<br />
+Easton Business Centre<br />
 Felix Road<br />
 Easton<br />
 Bristol<br />
