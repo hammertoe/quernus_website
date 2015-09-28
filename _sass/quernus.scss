@@ -108,3 +108,13 @@ div.posts div.post h1.post-title a, h1.post-title a:hover {
 div.title span.summary {
   font-size: 0.8em;
 }
+
+pre code {
+    padding: 0;
+    font-size: 100%;
+    color: inherit;
+    background-color: transparent;
+    overflow: auto;
+    word-wrap: normal;
+    white-space: pre;
+}
