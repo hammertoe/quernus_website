@@ -2,7 +2,7 @@
 layout: post
 title: Plone Conference 2015 - Bucharest
 comments: True
-tags: plone, ios, ploneconf
+tags: plone, ios, ploneconf, community
 summary: The Plone Conference 2015 happened in Bucharest, Romania. Once again, an awesome event! Great keynotes on the state of Plone and accessibility.  
 ---
 
