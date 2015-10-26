@@ -3,7 +3,7 @@ layout: post
 title: NSScotland 2015 Conference
 comments: True
 tags: iOS, conference, community
-summary: 
+summary: A write up of some of the talks I found interesting at the NSScotland conference in Edinburgh. Dealing with maps; Building a mental health app; Working with distributed teams; and a 30-year old calculator codebase
 ---
 
 ![Photo of talks at NSScotland](/public/nsscotland_talks.jpg)
