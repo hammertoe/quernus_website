@@ -42,3 +42,5 @@ Open data: Singapore already publishes a large amount of Open Data at [https://d
 Extending their further mantra: "Because we did... we know we can".
 
 I managed to get a chance to talk to Steve at the end of the talk. Turns out his office is the other side of the road of the school I attended when I grew up in Singapore. One day I'll get back there to see how much Singapore has changed since I left. Certainly a lot of the skyline photos are un-recognisable.
+
+More details on the [Smart Nation Singapore project can be found on their website](http://www.smartnation-forbes.com/).
