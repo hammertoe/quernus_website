@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Quernus, Matt Hamilton. An Internet technologist, interested in Python web development, iOS deployment and testing, wearables, networking and operating systems.">
+
+
+        <title>iOS Deployment and Provisioning - Part I - Terminology // Quernus // Matt Hamilton. An Internet technologist, interested in Python web development, iOS deployment and testing, wearables, networking and operating systems.</title>
+
+
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.3.0/pure-min.css">
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Great+Vibes">  
+    <link rel="stylesheet" href="./theme/css/pure.css">
+    <link rel="stylesheet" href="./theme/css/pygments.css">
+
+    <script src="https://use.fontawesome.com/d373dd2436.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/fitvids/1.0.1/jquery.fitvids.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            $(".content").fitVids();
+        });
+    </script>
+</head>
+
+<body>
+    <div class="pure-g-r" id="layout">
+        <div class="sidebar pure-u">
+            <div class="cover-img" style="background: none repeat scroll 0% 0% #90a959">
+                <div class="cover-body">
+                    <header class="header">
+                        <hgroup>
+<!--                            <h1 class="brand-main"><a href=".">Quernus</a></h1> -->
+                            <img class="avatar" src="/theme/matt_head_bucharest.jpg">
+                            <p class="tagline">Matt Hamilton. An Internet technologist, interested in Python web development, iOS deployment and testing, wearables, networking and operating systems.</p>
+                                <p class="links"><a href="./pages/my-super-post">My super title</a></p>
+                                <p class="social">
+                                    <a href="https://twitter.com/hammertoe">
+                                        <i class="fa fa-twitter fa-3x"></i>
+                                    </a>
+                                    <a href="https://www.linkedin.com/in/matthamilton77">
+                                        <i class="fa fa-linkedin fa-3x"></i>
+                                    </a>
+                                    <a href="https://www.slideshare.net/hammertoe">
+                                        <i class="fa fa-slideshare fa-3x"></i>
+                                    </a>
+                                    <a href="https://github.com/hammertoe">
+                                        <i class="fa fa-github fa-3x"></i>
+                                    </a>
+                                </p>
+                        </hgroup>
+                    </header>
+                </div>
+            </div>
+        </div>
+    <div class="pure-u">
+        <div class="content">
+            <section class="post">
+                <header class="post-header">
+                    <h1>iOS Deployment and Provisioning - Part I - Terminology</h1>
+                        <p class="post-meta">
+                            // under                                 <a class="post-category" href="./tag/ios.html">iOS</a>
+                                <a class="post-category" href="./tag/iphone.html">iPhone</a>
+                                <a class="post-category" href="./tag/apple.html">apple</a>
+                        </p>
+                </header>
+            </section>
+            <p class="message">
+  This is the first in a series of blog posts about iOS deployment and experiences setting up a continuous testing and build server for iOS apps. These posts are of interest to individual developers wanting to understand more, but mainly targeting small development teams trying to manage their development, testing and deployment process.
+</p>
+
+<h2>Terminology</h2>
+<p>One of the first things that hit me when I first stepped into the world of iOS development was the terminology around the deployment process. Apple have developed a system such that only cryptographically signed binaries can run on iPhones &amp; iPads. However the whole process by which this is done seems at first completely arcane and bewildering. So here is, hopefully, some clarification based upon what I've learnt over the past few months.</p>
+<h3>Certificate</h3>
+<p>This is the basic piece of information that is used to sign the resultant binary of your app. If the binary is not signed by a certificate then it won't run on your device. End of story. </p>
+<p>There are two types of certificate:</p>
+<ul>
+<li>
+<p>Development certificate</p>
+<p>This is a certificate issued to you personally as a developer when you signed up to Apple's development program. This is the certificate that is used to sign the apps when you create something in Xcode and deploy it locally to your iPhone plugged into the USB port. Typically, each developer in your team would have one of these.</p>
+</li>
+<li>
+<p>Distribution certificate</p>
+<p>This is a certificate used by Apple to distribute your app to other people. This can be via the official Apple App store or via adhoc means such as <a href="http://hockeyapp.net/">HockeyApp</a>. Typically this would be for an organisation, not an individual. You can have two of these at a time, so you can manage rolling renewals of them. Whilst this cert is for the <em>organisation</em>, the certificate and it's corresponding key have to live <em>somewhere</em>. Typically this is on the computer of the developer that set it up (in their keychain) and only that developer can deploy apps. This soon becomes difficult to manage, as I'll explain later.</p>
+</li>
+</ul>
+<h3>Key</h3>
+<p>The private part of the certificate. This is needed to cryptographically validate that you are the owner of the certificate. It is needed in order to sign a binary with the certificate. Again, this key is usually in a developer's keychain. </p>
+<p><img alt="Keychain screenshot showing certificate and key" src="/public/keychain-screenshot.png" /></p>
+<p>The person that has the key has the sole ability to sign apps for that organisation. This is where the headache begins. The key is on Bob's computer. Bob is on holiday. Jane needs to do a release. Now what?</p>
+<h3>BundleID / AppID</h3>
+<p>There are two strings that are used to identify apps and what they can do. They are the 'Bundle ID' and the 'App ID'. Just to confuse things, the Bundle ID is the unique identifier for an app, not the App ID.</p>
+<p>A very thorough explanation can be found on this stackoverflow post:</p>
+<ul>
+<li><a href="http://stackoverflow.com/questions/4271884/what-is-the-difference-between-the-app-id-and-the-bundle-id-where-is-the-app-i#answer-20557213">What is the difference between the app ID and the bundle ID ? Where is the app ID in the Xcode project?</a></li>
+</ul>
+<p>But in short, the Bundle ID is used to uniquely identify the app. The App ID is used to associate an app with a provisioning profile. You can have wildcard App IDs. e.g. an App ID of <code>com.enquos.*</code> would match an app with the Bundle ID of <code>com.enquos.fitness</code>.</p>
+<p>The App ID is created in the Apple Developer Center (Xcode can do this for you) and specifies what 'entitlements' the app has. e.g. Access to HealthKit data, or VPN control. Hence whilst a wildcard App ID is great in the general case, you will want different App IDs later on when you want apps to have different entitlements.</p>
+<h3>Provisioning Profile</h3>
+<p>The provisioning profile is the piece of 'glue' metadata that associates a device with a certificate and App ID.</p>
+<p>There are three types of provisioning profile:</p>
+<ul>
+<li>
+<p>Adhoc</p>
+<p>This profile is the one used to distribute an app for testing by a <em>known</em> set of developers. This profile has a list of Unique Device Ids (UDIDs) encoded in it. In order for someone to install an app using this profile, the UDID of their device needs to be in this profile. Adding devices to a profile is done in the Apple Developer Centre. This kind of profile is used when distributing via 3rd party services such as HockeyApp.</p>
+</li>
+<li>
+<p>Store</p>
+<p>The store provisioning profile is used when an app is submitted to Apple for submission to the App Store. It is also used for builds that are submitted to Apple for testing under their 'TestFlight' service. This used to be a 3rd party service, but has recently been bought and integrated into Apple's processes.</p>
+</li>
+<li>
+<p>Enterprise</p>
+<p>If you are a large enterprise and looking to distribute apps <em>within</em> your organisation you can sign up to the Apple Developer Enterprise Program. This allows you to sign the apps as though you were Apple itself and you don't need to have all the UDIDs encoded into the app. It means you can distribute your apps via whatever means you want. E.g. putting them on an intranet.</p>
+</li>
+</ul>
+<p>Typically, when developing with Xcode, it will manage the provisioning profiles for you and select the appropriate one at the right time. However as we will see in later posts in this series there are times when we will want to manually select one.</p>
+<p>Xcode will use the Bundle ID of the app you are working on and look it up in the Apple Developer Center to find the provisioning profile with an App ID that is compatible with the Bundle ID.</p>
+<h3>UDIDs</h3>
+<p>The UDID is the unique device id. Each Apple device has one, and they are used to identify a particular device. </p>
+<p>In order to deploy an app via an adhoc profile you need to add the UDID of the device you want to deploy to into the provisioning profile. This is done in the Apple Developer Center. </p>
+<p><img alt="Screenshot of added UDIDs to a provisioning profile in ADC" src="/public/adc_udid_add_screenshot.png" /></p>
+<p>One thing to note, is that the provisioning profile is <em>bundled</em> into the app when it is distributed. Hence once a version of an app had been distributed, you cannot add additional devices to that adhoc deployment. You need to add the new device in ADC, regenerate the provisioning profile, then re-build and re-distribute the app.</p>
+<p>This is only an issue for <em>adhoc</em> profiles and distribution. If you are using Apple's TestFlight service then you use a <em>store</em> provisioning profile and you can add additional testers at any point. Even after a release has been uploaded to TestFlight. I'll talk about different distributions methods in a later post in this series.</p>
+<h3>Scheme</h3>
+<p>Two elements used to have different build behaviours: schemes and configurations. Apple's docs describe this best:</p>
+<blockquote>
+<p>An Xcode scheme defines a collection of targets to build, a configuration to use when building, and a collection of tests to execute.</p>
+<p>You can have as many schemes as you want, but only one can be active at a time. You can specify whether a scheme should be stored in a project—in which case it’s available in every workspace that includes that project, or in the workspace—in which case it’s available only in that workspace. When you select an active scheme, you also select a run destination (that is, the architecture of the hardware for which the products are built).</p>
+</blockquote>
+<h3>Configurations</h3>
+<p>When you start a new project in Xcode there are two configurations <code>debug</code> and <code>release</code>. They mainly differ in that they set different levels of compiler optimisation and debugging  information. You can create more configurations if you want, such as to set different icons or app titles. The scheme selects the configuration.</p>
+<p><img alt="Custom configurations in Xcode" src="https://developer.apple.com/library/ios/recipes/xcode_help-project_editor/Art/project_editor-build_configurations_2x.png" /></p>
+<h2>Conclusion</h2>
+<p>I hope this helps to understand some of the parts of the development process. Much of this is handled automatically by Xcode for you, but in the subsequent posts in this series it will help to understand what is going on under the covers.</p>
+<p>This is all based upon my experience of the past few months, if anyone spots anything I've got wrong, let me know in the comments below!</p>
+            <a href="#" class="go-top">Go Top</a>
+<footer class="footer">
+    <p>&copy; Matt Hamilton &ndash;
+        Built with <a href="https://github.com/PurePelicanTheme/pure-single">Pure Theme</a>
+        for <a href="http://blog.getpelican.com/">Pelican</a>
+    </p>
+</footer>        </div>
+    </div>
+    </div>
+    <script>
+        var $top = $('.go-top');
+
+        // Show or hide the sticky footer button
+        $(window).scroll(function() {
+            if ($(this).scrollTop() > 200) {
+                $top.fadeIn(200);
+            } else {
+                $top.fadeOut(200);
+            }
+        });
+
+        // Animate the scroll to top
+        $top.click(function(event) {
+            event.preventDefault();
+            $('html, body').animate({scrollTop: 0}, 300);
+        })
+
+        // Makes sure that the href="#" attached to the <a> elements
+        // don't scroll you back up the page.
+        $('body').on('click', 'a[href="#"]', function(event) {
+            event.preventDefault();
+        });
+    </script>
+
+</body>
+</html>

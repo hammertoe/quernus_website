@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Quernus, Matt Hamilton. An Internet technologist, interested in Python web development, iOS deployment and testing, wearables, networking and operating systems.">
+
+
+        <title>Upgrading HP Microserver G8 with a Xeon // Quernus // Matt Hamilton. An Internet technologist, interested in Python web development, iOS deployment and testing, wearables, networking and operating systems.</title>
+
+    <link href="/theme/favicon.ico" rel="icon">
+
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.3.0/pure-min.css">
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Great+Vibes">  
+    <link rel="stylesheet" href="../../../../theme/css/pure.css">
+    <link rel="stylesheet" href="../../../../theme/css/pygments.css">
+
+    <script src="https://use.fontawesome.com/d373dd2436.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/fitvids/1.0.1/jquery.fitvids.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            $(".content").fitVids();
+        });
+    </script>
+
+    <!-- Opengraph -->
+    <meta property="og:url" content="https://www.quernus.co.uk/2015/08/26/upgrading-hp-microserver-g8-with-xeon/" />
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="Upgrading HP Microserver G8 with a Xeon" />
+    <meta property="og:description" content="A cheap and simple CPU upgrade to a HP Microserver for many more cores and virtualisation features" />
+    <meta property="og:image" content="https://www.quernus.co.uk/theme/matt_head_bucharest.jpg" />
+
+
+
+</head>
+
+<body>
+    <div class="pure-g-r" id="layout">
+        <div class="sidebar pure-u">
+            <div class="cover-img" style="background: none repeat scroll 0% 0% #90a959">
+                <div class="cover-body">
+                    <header class="header">
+                        <hgroup>
+<!--                            <h1 class="brand-main"><a href="../../../..">Quernus</a></h1> -->
+                            <img class="avatar" src="/theme/matt_head_bucharest.jpg">
+                            <p class="tagline">Matt Hamilton. An Internet technologist, interested in Python web development, iOS deployment and testing, wearables, networking and operating systems.</p>
+                            <ul class="menu">
+                                <li class="links"><a href="/">Home</a></li>
+                                <li class="links"><a href="/category/talks.html">Talks</a></li>
+                                <li class="links"><a href="/archives.html">Archives</a></li>
+                                <li class="links"><a href="../../../../about">About Me / Contact</a></li>
+                            </ul>
+                                <p class="social">
+                                    <a href="https://twitter.com/hammertoe">
+                                        <i class="fa fa-twitter fa-3x"></i>
+                                    </a>
+                                    <a href="https://www.linkedin.com/in/matthamilton77">
+                                        <i class="fa fa-linkedin fa-3x"></i>
+                                    </a>
+                                    <a href="https://www.slideshare.net/hammertoe">
+                                        <i class="fa fa-slideshare fa-3x"></i>
+                                    </a>
+                                    <a href="https://github.com/hammertoe">
+                                        <i class="fa fa-github fa-3x"></i>
+                                    </a>
+                                </p>
+                        </hgroup>
+                    </header>
+                </div>
+            </div>
+        </div>
+    <div class="pure-u">
+        <div class="content">
+            <section class="post">
+                <header class="post-header">
+                    <h1>Upgrading HP Microserver G8 with a Xeon</h1>
+                        <p class="post-meta">
+                            // under                                 <a class="post-category" href="../../../../tag/freebsd.html">FreeBSD</a>
+                                <a class="post-category" href="../../../../tag/hardware.html">Hardware</a>
+                        </p>
+                </header>
+            </section>
+            <p>I've got a small HP Microserver G8 in my office as a general office fileserver, VM host for software projects, network server etc.</p>
+<p><img alt="HP Microserver G8" src="/public/hp_microserver.jpg" /></p>
+<p>It originally came with a 2.3 Ghz dual core Xeon. This server was insanely good value for money, at only £179 (inc VAT) for the bare server with a Celeron G1610T processor and 2GB RAM. I spent a further £350 on 4 x WD Red 4GB disks and £110 on a 16GB memory kit for it.</p>
+<p>The way I have the server set up, it boots from an internal SD Card into FreeBSD and starts the internal network interfaces. The majority of the actual data is then on a 4-disk ZFS raidz2 with each disk being a GELI encrypted filesystem:</p>
+<div class="highlight"><pre><span></span>root@jenna:~ # zpool list -v
+NAME             SIZE  ALLOC   FREE  EXPANDSZ   FRAG    CAP  DEDUP  HEALTH  ALTROOT
+storage         10.9T   384G  10.5T         -     1%     3%  1.00x  ONLINE  -
+  raidz2        10.9T   384G  10.5T         -     1%     3%
+    ada0p2.eli      -      -      -         -      -      -
+    ada1p2.eli      -      -      -         -      -      -
+    ada2p2.eli      -      -      -         -      -      -
+    ada3p2.eli      -      -      -         -      -      -
+  da0             58G   656K  58.0G         -     0%     0%
+</pre></div>
+
+
+<p>On boot, I SSH into the server from my desktop and manually run a script mount the main storage:</p>
+<div class="highlight"><pre><span></span>root@jenna:~ # cat mountstorage.sh
+geli attach -k /root/storage.key ada0p2 || exit 
+geli attach -k /root/storage.key ada1p2 || exit
+geli attach -k /root/storage.key ada2p2 || exit
+geli attach -k /root/storage.key ada3p2 || exit
+zfs mount -a
+</pre></div>
+
+
+<p>I then run a script to start all the guest VMs (including <a href="/2015/07/27/openbsd-as-freebsd-router/">The OpenBSD virtual router</a>). This way if the server is ever stolen, the data is at least secure.</p>
+<p>A while back I bought a more powerful CPU for it. After doing some searching around I found that an Intel BX80637E31230V2 processor at £181 should be a drop in replacement. It should run cool enough to still be OK in the small case of the server. This is a Xeon class processor which has some more virtualisation features:</p>
+<ul>
+<li>Intel Turbo Boost Technology 2.0</li>
+<li>Intel vPro Technology</li>
+<li>Intel Hyper-Threading Technology</li>
+<li>Intel Virtualization Technology (VT-x)</li>
+<li>Intel Virtualization Technology for Directed I/O (VT-d)</li>
+</ul>
+<p>Having VT-d means I can do PCI passthru on bhyve and pass PCI devices, such as network ports directly through to a guest OS on the VM. It also features AES-NI meaning it can do the AES crypto for the filesystem in hardware. I'm not entirely sure I trust onboard crypto these days, maybe me just being paranoid.</p>
+<p>One great thing about this little server, is that it has an ethernet-based ILO port which gives you remote console access. When I replaced the CPU I was never expecting it to 'just work' first time. Inevitably <em>something</em> was going to cause trouble. I was expecting some kind of 'New CPU detected, Press F1'-type message on the console. But as it was it just booted up straight away without even needing me to go into the ILO console.</p>
+<p>Physically replacing the CPU was dead simple, and pretty much tool-less. Just a couple of thumb-screws on the back to get the case off. Then unplug about five cables from the motherboard and slide the motherboard tray out the back of the chassis. Then unbolting the CPU was a case of just undo-ing 4 torx bolts holding the heatsink on using the supplied torx wrench. Swap the CPU, then put it back together, and voila. Back and running about 10 minutes later.</p>
+<p>But anyway, here is the relevent bits of dmesg output before and after the upgrade:</p>
+<p>Before:</p>
+<div class="highlight"><pre><span></span><span class="n">CPU</span><span class="o">:</span> <span class="n">Intel</span><span class="o">(</span><span class="n">R</span><span class="o">)</span> <span class="n">Celeron</span><span class="o">(</span><span class="n">R</span><span class="o">)</span> <span class="n">CPU</span> <span class="n">G1610T</span> <span class="err">@</span> <span class="mf">2.30</span><span class="n">GHz</span> <span class="o">(</span><span class="mf">2294.84</span><span class="o">-</span><span class="n">MHz</span> <span class="n">K8</span><span class="o">-</span><span class="kd">class</span> <span class="n">CPU</span><span class="o">)</span>
+  <span class="n">Origin</span> <span class="o">=</span> <span class="s2">&quot;GenuineIntel&quot;</span>  <span class="n">Id</span> <span class="o">=</span> <span class="mh">0x306a9</span>  <span class="n">Family</span> <span class="o">=</span> <span class="mh">0x6</span>  <span class="n">Model</span> <span class="o">=</span> <span class="mh">0x3a</span>  <span class="n">Stepping</span> <span class="o">=</span> <span class="mi">9</span>
+  <span class="n">Features</span><span class="o">=</span><span class="mh">0xbfebfbff</span><span class="o">&lt;</span><span class="n">FPU</span><span class="o">,</span><span class="n">VME</span><span class="o">,</span><span class="n">DE</span><span class="o">,</span><span class="n">PSE</span><span class="o">,</span><span class="n">TSC</span><span class="o">,</span><span class="n">MSR</span><span class="o">,</span><span class="n">PAE</span><span class="o">,</span><span class="n">MCE</span><span class="o">,</span><span class="n">CX8</span><span class="o">,</span><span class="n">APIC</span><span class="o">,</span><span class="n">SEP</span><span class="o">,</span><span class="n">MTRR</span><span class="o">,</span><span class="n">PGE</span><span class="o">,</span><span class="n">MCA</span><span class="o">,</span><span class="n">CMOV</span><span class="o">,</span><span class="n">PAT</span><span class="o">,</span><span class="n">PSE36</span><span class="o">,</span><span class="n">CLFLUSH</span><span class="o">,</span><span class="n">DTS</span><span class="o">,</span><span class="n">ACPI</span><span class="o">,</span><span class="n">MMX</span><span class="o">,</span><span class="n">FXSR</span><span class="o">,</span><span class="n">SSE</span><span class="o">,</span><span class="n">SSE2</span><span class="o">,</span><span class="n">SS</span><span class="o">,</span><span class="n">HTT</span><span class="o">,</span><span class="n">TM</span><span class="o">,</span><span class="n">PBE</span><span class="o">&gt;</span>
+  <span class="n">Features2</span><span class="o">=</span><span class="mh">0xd9ae3bf</span><span class="o">&lt;</span><span class="n">SSE3</span><span class="o">,</span><span class="n">PCLMULQDQ</span><span class="o">,</span><span class="n">DTES64</span><span class="o">,</span><span class="n">MON</span><span class="o">,</span><span class="n">DS_CPL</span><span class="o">,</span><span class="n">VMX</span><span class="o">,</span><span class="n">EST</span><span class="o">,</span><span class="n">TM2</span><span class="o">,</span><span class="n">SSSE3</span><span class="o">,</span><span class="n">CX16</span><span class="o">,</span><span class="n">xTPR</span><span class="o">,</span><span class="n">PDCM</span><span class="o">,</span><span class="n">PCID</span><span class="o">,</span><span class="n">SSE4</span><span class="o">.</span><span class="mi">1</span><span class="o">,</span><span class="n">SSE4</span><span class="o">.</span><span class="mi">2</span><span class="o">,</span><span class="n">POPCNT</span><span class="o">,</span><span class="n">TSCDLT</span><span class="o">,</span><span class="n">XSAVE</span><span class="o">,</span><span class="n">OSXSAVE</span><span class="o">&gt;</span>
+  <span class="n">AMD</span> <span class="n">Features</span><span class="o">=</span><span class="mh">0x28100800</span><span class="o">&lt;</span><span class="n">SYSCALL</span><span class="o">,</span><span class="n">NX</span><span class="o">,</span><span class="n">RDTSCP</span><span class="o">,</span><span class="n">LM</span><span class="o">&gt;</span>
+  <span class="n">AMD</span> <span class="n">Features2</span><span class="o">=</span><span class="mh">0x1</span><span class="o">&lt;</span><span class="n">LAHF</span><span class="o">&gt;</span>
+  <span class="n">Structured</span> <span class="n">Extended</span> <span class="n">Features</span><span class="o">=</span><span class="mh">0x281</span><span class="o">&lt;</span><span class="n">FSGSBASE</span><span class="o">,</span><span class="n">SMEP</span><span class="o">,</span><span class="n">ERMS</span><span class="o">&gt;</span>
+  <span class="n">VT</span><span class="o">-</span><span class="n">x</span><span class="o">:</span> <span class="n">PAT</span><span class="o">,</span><span class="n">HLT</span><span class="o">,</span><span class="n">MTF</span><span class="o">,</span><span class="n">PAUSE</span><span class="o">,</span><span class="n">EPT</span><span class="o">,</span><span class="n">UG</span><span class="o">,</span><span class="n">VPID</span>
+  <span class="n">TSC</span><span class="o">:</span> <span class="n">P</span><span class="o">-</span><span class="n">state</span> <span class="n">invariant</span><span class="o">,</span> <span class="n">performance</span> <span class="n">statistics</span>
+
+<span class="o">...</span>
+<span class="n">FreeBSD</span><span class="o">/</span><span class="n">SMP</span><span class="o">:</span> <span class="n">Multiprocessor</span> <span class="n">System</span> <span class="n">Detected</span><span class="o">:</span> <span class="mi">2</span> <span class="n">CPUs</span>
+<span class="n">FreeBSD</span><span class="o">/</span><span class="n">SMP</span><span class="o">:</span> <span class="mi">1</span> <span class="kd">package</span><span class="o">(</span><span class="n">s</span><span class="o">)</span> <span class="n">x</span> <span class="mi">2</span> <span class="n">core</span><span class="o">(</span><span class="n">s</span><span class="o">)</span>
+ <span class="n">cpu0</span> <span class="o">(</span><span class="n">BSP</span><span class="o">):</span> <span class="n">APIC</span> <span class="n">ID</span><span class="o">:</span>  <span class="mi">0</span>
+ <span class="n">cpu1</span> <span class="o">(</span><span class="n">AP</span><span class="o">):</span> <span class="n">APIC</span> <span class="n">ID</span><span class="o">:</span>  <span class="mi">2</span>
+<span class="n">ioapic0</span><span class="o">:</span> <span class="n">Changing</span> <span class="n">APIC</span> <span class="n">ID</span> <span class="n">to</span> <span class="mi">8</span>
+<span class="n">ioapic0</span> <span class="o">&lt;</span><span class="n">Version</span> <span class="mf">2.0</span><span class="o">&gt;</span> <span class="n">irqs</span> <span class="mi">0</span><span class="o">-</span><span class="mi">23</span> <span class="n">on</span> <span class="n">motherboard</span>
+<span class="n">random</span><span class="o">:</span> <span class="o">&lt;</span><span class="n">Software</span><span class="o">,</span> <span class="n">Yarrow</span><span class="o">&gt;</span> <span class="n">initialized</span>
+<span class="n">kbd1</span> <span class="n">at</span> <span class="n">kbdmux0</span>
+<span class="n">cryptosoft0</span><span class="o">:</span> <span class="o">&lt;</span><span class="n">software</span> <span class="n">crypto</span><span class="o">&gt;</span> <span class="n">on</span> <span class="n">motherboard</span>
+<span class="n">acpi0</span><span class="o">:</span> <span class="o">&lt;</span><span class="n">HP</span> <span class="n">ProLiant</span><span class="o">&gt;</span> <span class="n">on</span> <span class="n">motherboard</span>
+<span class="n">acpi0</span><span class="o">:</span> <span class="n">Power</span> <span class="n">Button</span> <span class="o">(</span><span class="n">fixed</span><span class="o">)</span>
+<span class="n">cpu0</span><span class="o">:</span> <span class="o">&lt;</span><span class="n">ACPI</span> <span class="n">CPU</span><span class="o">&gt;</span> <span class="n">on</span> <span class="n">acpi0</span>
+<span class="n">cpu1</span><span class="o">:</span> <span class="o">&lt;</span><span class="n">ACPI</span> <span class="n">CPU</span><span class="o">&gt;</span> <span class="n">on</span> <span class="n">acpi0</span>
+</pre></div>
+
+
+<p>After:</p>
+<div class="highlight"><pre><span></span><span class="n">CPU</span><span class="o">:</span> <span class="n">Intel</span><span class="o">(</span><span class="n">R</span><span class="o">)</span> <span class="n">Xeon</span><span class="o">(</span><span class="n">R</span><span class="o">)</span> <span class="n">CPU</span> <span class="n">E3</span><span class="o">-</span><span class="mi">1230</span> <span class="n">V2</span> <span class="err">@</span> <span class="mf">3.30</span><span class="n">GHz</span> <span class="o">(</span><span class="mf">3292.59</span><span class="o">-</span><span class="n">MHz</span> <span class="n">K8</span><span class="o">-</span><span class="kd">class</span> <span class="n">CPU</span><span class="o">)</span>
+  <span class="n">Origin</span><span class="o">=</span><span class="s2">&quot;GenuineIntel&quot;</span>  <span class="n">Id</span><span class="o">=</span><span class="mh">0x306a9</span>  <span class="n">Family</span><span class="o">=</span><span class="mh">0x6</span>  <span class="n">Model</span><span class="o">=</span><span class="mh">0x3a</span>  <span class="n">Stepping</span><span class="o">=</span><span class="mi">9</span>
+  <span class="n">Features</span><span class="o">=</span><span class="mh">0xbfebfbff</span><span class="o">&lt;</span><span class="n">FPU</span><span class="o">,</span><span class="n">VME</span><span class="o">,</span><span class="n">DE</span><span class="o">,</span><span class="n">PSE</span><span class="o">,</span><span class="n">TSC</span><span class="o">,</span><span class="n">MSR</span><span class="o">,</span><span class="n">PAE</span><span class="o">,</span><span class="n">MCE</span><span class="o">,</span><span class="n">CX8</span><span class="o">,</span><span class="n">APIC</span><span class="o">,</span><span class="n">SEP</span><span class="o">,</span><span class="n">MTRR</span><span class="o">,</span><span class="n">PGE</span><span class="o">,</span><span class="n">MCA</span><span class="o">,</span><span class="n">CMOV</span><span class="o">,</span><span class="n">PAT</span><span class="o">,</span><span class="n">PSE36</span><span class="o">,</span><span class="n">CLFLUSH</span><span class="o">,</span><span class="n">DTS</span><span class="o">,</span><span class="n">ACPI</span><span class="o">,</span><span class="n">MMX</span><span class="o">,</span><span class="n">FXSR</span><span class="o">,</span><span class="n">SSE</span><span class="o">,</span><span class="n">SSE2</span><span class="o">,</span><span class="n">SS</span><span class="o">,</span><span class="n">HTT</span><span class="o">,</span><span class="n">TM</span><span class="o">,</span><span class="n">PBE</span><span class="o">&gt;</span>
+  <span class="n">Features2</span><span class="o">=</span><span class="mh">0x7fbae3ff</span><span class="o">&lt;</span><span class="n">SSE3</span><span class="o">,</span><span class="n">PCLMULQDQ</span><span class="o">,</span><span class="n">DTES64</span><span class="o">,</span><span class="n">MON</span><span class="o">,</span><span class="n">DS_CPL</span><span class="o">,</span><span class="n">VMX</span><span class="o">,</span><span class="n">SMX</span><span class="o">,</span><span class="n">EST</span><span class="o">,</span><span class="n">TM2</span><span class="o">,</span><span class="n">SSSE3</span><span class="o">,</span><span class="n">CX16</span><span class="o">,</span><span class="n">xTPR</span><span class="o">,</span><span class="n">PDCM</span><span class="o">,</span><span class="n">PCID</span><span class="o">,</span><span class="n">SSE4</span><span class="o">.</span><span class="mi">1</span><span class="o">,</span><span class="n">SSE4</span><span class="o">.</span><span class="mi">2</span><span class="o">,</span><span class="n">x2APIC</span><span class="o">,</span><span class="n">POPCNT</span><span class="o">,</span><span class="n">TSCDLT</span><span class="o">,</span><span class="n">AESNI</span><span class="o">,</span><span class="n">XSAVE</span><span class="o">\</span>
+<span class="o">,</span><span class="n">OSXSAVE</span><span class="o">,</span><span class="n">AVX</span><span class="o">,</span><span class="n">F16C</span><span class="o">,</span><span class="n">RDRAND</span><span class="o">&gt;</span>
+  <span class="n">AMD</span> <span class="n">Features</span><span class="o">=</span><span class="mh">0x28100800</span><span class="o">&lt;</span><span class="n">SYSCALL</span><span class="o">,</span><span class="n">NX</span><span class="o">,</span><span class="n">RDTSCP</span><span class="o">,</span><span class="n">LM</span><span class="o">&gt;</span>
+  <span class="n">AMD</span> <span class="n">Features2</span><span class="o">=</span><span class="mh">0x1</span><span class="o">&lt;</span><span class="n">LAHF</span><span class="o">&gt;</span>
+  <span class="n">Structured</span> <span class="n">Extended</span> <span class="n">Features</span><span class="o">=</span><span class="mh">0x281</span><span class="o">&lt;</span><span class="n">FSGSBASE</span><span class="o">,</span><span class="n">SMEP</span><span class="o">,</span><span class="n">ERMS</span><span class="o">&gt;</span>
+  <span class="n">XSAVE</span> <span class="n">Features</span><span class="o">=</span><span class="mh">0x1</span><span class="o">&lt;</span><span class="n">XSAVEOPT</span><span class="o">&gt;</span>
+  <span class="n">VT</span><span class="o">-</span><span class="n">x</span><span class="o">:</span> <span class="n">PAT</span><span class="o">,</span><span class="n">HLT</span><span class="o">,</span><span class="n">MTF</span><span class="o">,</span><span class="n">PAUSE</span><span class="o">,</span><span class="n">EPT</span><span class="o">,</span><span class="n">UG</span><span class="o">,</span><span class="n">VPID</span>
+  <span class="n">TSC</span><span class="o">:</span> <span class="n">P</span><span class="o">-</span><span class="n">state</span> <span class="n">invariant</span><span class="o">,</span> <span class="n">performance</span> <span class="n">statistics</span>
+
+<span class="n">FreeBSD</span><span class="o">/</span><span class="n">SMP</span><span class="o">:</span> <span class="n">Multiprocessor</span> <span class="n">System</span> <span class="n">Detected</span><span class="o">:</span> <span class="mi">8</span> <span class="n">CPUs</span>
+<span class="n">FreeBSD</span><span class="o">/</span><span class="n">SMP</span><span class="o">:</span> <span class="mi">1</span> <span class="kd">package</span><span class="o">(</span><span class="n">s</span><span class="o">)</span> <span class="n">x</span> <span class="mi">4</span> <span class="n">core</span><span class="o">(</span><span class="n">s</span><span class="o">)</span> <span class="n">x</span> <span class="mi">2</span> <span class="n">SMT</span> <span class="n">threads</span>
+ <span class="n">cpu0</span> <span class="o">(</span><span class="n">BSP</span><span class="o">):</span> <span class="n">APIC</span> <span class="n">ID</span><span class="o">:</span>  <span class="mi">0</span>
+ <span class="n">cpu1</span> <span class="o">(</span><span class="n">AP</span><span class="o">):</span> <span class="n">APIC</span> <span class="n">ID</span><span class="o">:</span>  <span class="mi">1</span>
+ <span class="n">cpu2</span> <span class="o">(</span><span class="n">AP</span><span class="o">):</span> <span class="n">APIC</span> <span class="n">ID</span><span class="o">:</span>  <span class="mi">2</span>
+ <span class="n">cpu3</span> <span class="o">(</span><span class="n">AP</span><span class="o">):</span> <span class="n">APIC</span> <span class="n">ID</span><span class="o">:</span>  <span class="mi">3</span>
+ <span class="n">cpu4</span> <span class="o">(</span><span class="n">AP</span><span class="o">):</span> <span class="n">APIC</span> <span class="n">ID</span><span class="o">:</span>  <span class="mi">4</span>
+ <span class="n">cpu5</span> <span class="o">(</span><span class="n">AP</span><span class="o">):</span> <span class="n">APIC</span> <span class="n">ID</span><span class="o">:</span>  <span class="mi">5</span>
+ <span class="n">cpu6</span> <span class="o">(</span><span class="n">AP</span><span class="o">):</span> <span class="n">APIC</span> <span class="n">ID</span><span class="o">:</span>  <span class="mi">6</span>
+ <span class="n">cpu7</span> <span class="o">(</span><span class="n">AP</span><span class="o">):</span> <span class="n">APIC</span> <span class="n">ID</span><span class="o">:</span>  <span class="mi">7</span>
+</pre></div>
+
+
+<p>Checking the IPMI sensors, and the processor is running at 40 degrees C at the moment, when fairly idle:</p>
+<div class="highlight"><pre><span></span>root@jenna:~ # ipmitool sensor
+UID Light        | 0x0        | discrete   | 0x0080| na        | na        | na        | na        | na        | na        
+Health LED       | 0x0        | discrete   | 0x0080| na        | na        | na        | na        | na        | na        
+Power Supply 1   | 0x0        | discrete   | 0x0180| na        | na        | na        | na        | na        | na        
+Fan 1            | 12.544     | percent    | ok    | na        | na        | na        | na        | na        | na        
+01-Inlet Ambient | 22.000     | degrees C  | ok    | na        | na        | na        | na        | 42.000    | 46.000    
+02-CPU           | 40.000     | degrees C  | ok    | na        | na        | na        | na        | 70.000    | 0.000     
+03-P1 DIMM 1-2   | 37.000     | degrees C  | ok    | na        | na        | na        | na        | 87.000    | 0.000     
+04-HD Max        | na         |            | na    | na        | na        | na        | na        | 60.000    | 0.000     
+05-Chipset       | 59.000     | degrees C  | ok    | na        | na        | na        | na        | 105.000   | 0.000     
+06-Chipset Zone  | 46.000     | degrees C  | ok    | na        | na        | na        | na        | 68.000    | 73.000    
+07-VR P1 Zone    | 52.000     | degrees C  | ok    | na        | na        | na        | na        | 93.000    | 98.000    
+08-Supercap Max  | na         |            | na    | na        | na        | na        | na        | 65.000    | 0.000     
+09-iLO Zone      | 47.000     | degrees C  | ok    | na        | na        | na        | na        | 72.000    | 77.000    
+10-PCI 1         | na         |            | na    | na        | na        | na        | na        | 100.000   | 0.000     
+11-PCI 1 Zone    | 37.000     | degrees C  | ok    | na        | na        | na        | na        | 64.000    | 69.000    
+12-Sys Exhaust   | 50.000     | degrees C  | ok    | na        | na        | na        | na        | 68.000    | 73.000    
+13-LOM           | na         |            | na    | na        | na        | na        | na        | 100.000   | 0.000     
+Memory           | 0x0        | discrete   | 0x4080| na        | na        | na        | na        | na        | na        
+</pre></div>
+
+
+<p>Any questions, then let me know in the comments below.</p>
+            <a href="#" class="go-top">Go Top</a>
+<footer class="footer">
+    <p>&copy; Matt Hamilton &ndash;
+        Built with <a href="https://github.com/PurePelicanTheme/pure-single">Pure Theme</a>
+        for <a href="http://blog.getpelican.com/">Pelican</a>
+    </p>
+</footer>        </div>
+    </div>
+    </div>
+    <script>
+        var $top = $('.go-top');
+
+        // Show or hide the sticky footer button
+        $(window).scroll(function() {
+            if ($(this).scrollTop() > 200) {
+                $top.fadeIn(200);
+            } else {
+                $top.fadeOut(200);
+            }
+        });
+
+        // Animate the scroll to top
+        $top.click(function(event) {
+            event.preventDefault();
+            $('html, body').animate({scrollTop: 0}, 300);
+        })
+
+        // Makes sure that the href="#" attached to the <a> elements
+        // don't scroll you back up the page.
+        $('body').on('click', 'a[href="#"]', function(event) {
+            event.preventDefault();
+        });
+    </script>
+    <script type="text/javascript">
+        var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+        document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+    <script type="text/javascript">
+        try {
+            var pageTracker = _gat._getTracker("UA-65654046-1");
+            pageTracker._trackPageview();
+            } catch(err) {}
+    </script>
+
+</body>
+</html>

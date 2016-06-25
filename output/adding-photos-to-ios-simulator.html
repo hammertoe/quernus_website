@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Quernus, Matt Hamilton. An Internet technologist, interested in Python web development, iOS deployment and testing, wearables, networking and operating systems.">
+
+
+        <title>Adding Photos to iOS Simulator // Quernus // Matt Hamilton. An Internet technologist, interested in Python web development, iOS deployment and testing, wearables, networking and operating systems.</title>
+
+
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.3.0/pure-min.css">
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Great+Vibes">  
+    <link rel="stylesheet" href="./theme/css/pure.css">
+    <link rel="stylesheet" href="./theme/css/pygments.css">
+
+    <script src="https://use.fontawesome.com/d373dd2436.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/fitvids/1.0.1/jquery.fitvids.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            $(".content").fitVids();
+        });
+    </script>
+</head>
+
+<body>
+    <div class="pure-g-r" id="layout">
+        <div class="sidebar pure-u">
+            <div class="cover-img" style="background: none repeat scroll 0% 0% #90a959">
+                <div class="cover-body">
+                    <header class="header">
+                        <hgroup>
+<!--                            <h1 class="brand-main"><a href=".">Quernus</a></h1> -->
+                            <img class="avatar" src="/theme/matt_head_bucharest.jpg">
+                            <p class="tagline">Matt Hamilton. An Internet technologist, interested in Python web development, iOS deployment and testing, wearables, networking and operating systems.</p>
+                                <p class="links"><a href="./pages/my-super-post">My super title</a></p>
+                                <p class="social">
+                                    <a href="https://twitter.com/hammertoe">
+                                        <i class="fa fa-twitter fa-3x"></i>
+                                    </a>
+                                    <a href="https://www.linkedin.com/in/matthamilton77">
+                                        <i class="fa fa-linkedin fa-3x"></i>
+                                    </a>
+                                    <a href="https://www.slideshare.net/hammertoe">
+                                        <i class="fa fa-slideshare fa-3x"></i>
+                                    </a>
+                                    <a href="https://github.com/hammertoe">
+                                        <i class="fa fa-github fa-3x"></i>
+                                    </a>
+                                </p>
+                        </hgroup>
+                    </header>
+                </div>
+            </div>
+        </div>
+    <div class="pure-u">
+        <div class="content">
+            <section class="post">
+                <header class="post-header">
+                    <h1>Adding Photos to iOS Simulator</h1>
+                        <p class="post-meta">
+                            // under                                 <a class="post-category" href="./tag/ios.html">iOS</a>
+                                <a class="post-category" href="./tag/apple.html">apple</a>
+                                <a class="post-category" href="./tag/fastlane.html">fastlane</a>
+                                <a class="post-category" href="./tag/snapshot.html">snapshot</a>
+                        </p>
+                </header>
+            </section>
+            <p>I'm currently using <a href="https://github.com/KrauseFx/snapshot">Snapshot</a>, part of Fastlane to automate the testing and screenshot capture of our app.</p>
+<p>The problem I had, is that a part of our app involves capturing a photo from the camera or photo library for display in the app. And to do the screenshots justice I needed to use a specific image as opposed to the images shipped with the simulators. You can't use the camera on the simulator (obviously!).</p>
+<p>You can simply just drag an image onto the simulator and it will put it into the Photos app on the device. But I needed to script the addition of the photos as the simulators are reset at the start of each run.</p>
+<p>Well, I found a way to do it using the hooks provided in Snapshot to prepare the simulator before run, and <code>simctl</code>.</p>
+<p>Just add the following callback to your <code>fastlane/Snapfile</code> file:</p>
+<div class="highlight"><pre><span></span><span class="n">setup_for_device_change</span> <span class="k">do</span> <span class="o">|</span><span class="n">device</span><span class="p">,</span> <span class="n">udid</span><span class="p">,</span> <span class="n">language</span><span class="o">|</span>
+    <span class="nb">puts</span> <span class="s2">&quot;Adding food photo to </span><span class="si">#{</span><span class="n">device</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="nb">system</span><span class="p">(</span><span class="s2">&quot;xcrun simctl boot </span><span class="si">#{</span><span class="n">udid</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">system</span><span class="p">(</span><span class="s2">&quot;xcrun simctl addphoto </span><span class="si">#{</span><span class="n">udid</span><span class="si">}</span><span class="s2"> kale_salad_photo.jpg&quot;</span><span class="p">)</span>
+<span class="k">end</span>
+</pre></div>
+
+
+<p>Obviously change the filename to the image you want to load. You could extend it to load all images from a directory if you wanted.</p>
+            <a href="#" class="go-top">Go Top</a>
+<footer class="footer">
+    <p>&copy; Matt Hamilton &ndash;
+        Built with <a href="https://github.com/PurePelicanTheme/pure-single">Pure Theme</a>
+        for <a href="http://blog.getpelican.com/">Pelican</a>
+    </p>
+</footer>        </div>
+    </div>
+    </div>
+    <script>
+        var $top = $('.go-top');
+
+        // Show or hide the sticky footer button
+        $(window).scroll(function() {
+            if ($(this).scrollTop() > 200) {
+                $top.fadeIn(200);
+            } else {
+                $top.fadeOut(200);
+            }
+        });
+
+        // Animate the scroll to top
+        $top.click(function(event) {
+            event.preventDefault();
+            $('html, body').animate({scrollTop: 0}, 300);
+        })
+
+        // Makes sure that the href="#" attached to the <a> elements
+        // don't scroll you back up the page.
+        $('body').on('click', 'a[href="#"]', function(event) {
+            event.preventDefault();
+        });
+    </script>
+
+</body>
+</html>

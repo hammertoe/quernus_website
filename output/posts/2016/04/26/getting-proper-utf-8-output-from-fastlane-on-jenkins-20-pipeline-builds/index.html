@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Quernus, Matt Hamilton. An Internet technologist, interested in Python web development, iOS deployment and testing, wearables, networking and operating systems.">
+
+
+        <title>Getting Proper UTF-8 Output From Fastlane on Jenkins 2.0 Pipeline builds // Quernus // Matt Hamilton. An Internet technologist, interested in Python web development, iOS deployment and testing, wearables, networking and operating systems.</title>
+
+
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.3.0/pure-min.css">
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Great+Vibes">  
+    <link rel="stylesheet" href="../../../../../theme/css/pure.css">
+    <link rel="stylesheet" href="../../../../../theme/css/pygments.css">
+
+    <script src="https://use.fontawesome.com/d373dd2436.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/fitvids/1.0.1/jquery.fitvids.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            $(".content").fitVids();
+        });
+    </script>
+</head>
+
+<body>
+    <div class="pure-g-r" id="layout">
+        <div class="sidebar pure-u">
+            <div class="cover-img" style="background: none repeat scroll 0% 0% #90a959">
+                <div class="cover-body">
+                    <header class="header">
+                        <hgroup>
+<!--                            <h1 class="brand-main"><a href="../../../../..">Quernus</a></h1> -->
+                            <img class="avatar" src="/theme/matt_head_bucharest.jpg">
+                            <p class="tagline">Matt Hamilton. An Internet technologist, interested in Python web development, iOS deployment and testing, wearables, networking and operating systems.</p>
+                                <p class="links"><a href="../../../../../pages/my-super-post">My super title</a></p>
+                                <p class="social">
+                                    <a href="https://twitter.com/hammertoe">
+                                        <i class="fa fa-twitter fa-3x"></i>
+                                    </a>
+                                    <a href="https://www.linkedin.com/in/matthamilton77">
+                                        <i class="fa fa-linkedin fa-3x"></i>
+                                    </a>
+                                    <a href="https://www.slideshare.net/hammertoe">
+                                        <i class="fa fa-slideshare fa-3x"></i>
+                                    </a>
+                                    <a href="https://github.com/hammertoe">
+                                        <i class="fa fa-github fa-3x"></i>
+                                    </a>
+                                </p>
+                        </hgroup>
+                    </header>
+                </div>
+            </div>
+        </div>
+    <div class="pure-u">
+        <div class="content">
+            <section class="post">
+                <header class="post-header">
+                    <h1>Getting Proper UTF-8 Output From Fastlane on Jenkins 2.0 Pipeline builds</h1>
+                        <p class="post-meta">
+                            // under                                 <a class="post-category" href="../../../../../tag/jenkins.html">jenkins</a>
+                                <a class="post-category" href="../../../../../tag/utf-8.html">utf-8</a>
+                                <a class="post-category" href="../../../../../tag/ios.html">ios</a>
+                                <a class="post-category" href="../../../../../tag/fastlane.html">fastlane</a>
+                        </p>
+                </header>
+            </section>
+            <p>I've just been upgrading our Jenkins 1.x server to Jenkins 2.0. I've been migrating our previous jobs to new Multibranch Pipeline Jobs.</p>
+<p>One of the snags I hit was that the previous nice ANSI sequences and UTF-8 symbols that we used to have were getting mangled and coming up as a series of escape characters and question marks.</p>
+<p><img alt="Screenshot of broken ANSI and UTF-8 in Jenkins 2.0 pipeline build jobs" src="/public/screenshot_utf8_ansi_broken.png" /></p>
+<p>There were actually two parts to fix this:</p>
+<ol>
+<li>The ANSI Color plugin needs to be called in the Pipeline code, you can't just select a checkbox</li>
+<li>The pipeline jobs start on the master and then get allocated a slave to run. So they take the locale of the <em>master</em> not the <em>slave</em></li>
+</ol>
+<p>So to fix:</p>
+<p>Call the ANSI color plugin using a wrap statement. e.g.:</p>
+<div class="highlight"><pre><span></span><span class="n">node</span><span class="o">(</span><span class="s1">&#39;xcode7&#39;</span><span class="o">)</span> <span class="o">{</span>
+   <span class="c1">// Manually set the workspace to deal with clang </span>
+   <span class="c1">// choking on %2f in the directory</span>
+   <span class="n">ws</span><span class="o">(</span><span class="n">getWorkspace</span><span class="o">())</span> <span class="o">{</span>
+     <span class="c1">// Wrap to enable ANSI escape sequences</span>
+     <span class="n">wrap</span><span class="o">([</span><span class="n">$class</span><span class="o">:</span> <span class="s1">&#39;AnsiColorBuildWrapper&#39;</span><span class="o">,</span> <span class="s1">&#39;colorMapName&#39;</span><span class="o">:</span> <span class="s1">&#39;XTerm&#39;</span><span class="o">,</span> <span class="s1">&#39;defaultFg&#39;</span><span class="o">:</span> <span class="mi">1</span><span class="o">,</span> <span class="s1">&#39;defaultBg&#39;</span><span class="o">:</span> <span class="mi">2</span><span class="o">])</span> <span class="o">{</span>
+       <span class="n">workspace</span> <span class="o">=</span> <span class="n">pwd</span><span class="o">()</span>
+       <span class="c1">// Mark the code checkout &#39;stage&#39;....</span>
+       <span class="n">stage</span> <span class="s1">&#39;Checkout&#39;</span>
+       <span class="c1">// Checkout code from repository</span>
+       <span class="n">checkout</span> <span class="n">scm</span>
+
+       <span class="o">...</span>
+     <span class="o">}</span>
+  <span class="o">}</span>
+<span class="o">}</span>   
+</pre></div>
+
+
+<p>Secondly, you need to ensure the master runs as UTF-8. To do this I passed in an argument to the start script for Jenkins:</p>
+<div class="highlight"><pre><span></span>-Dfile.encoding<span class="o">=</span>UTF-8
+</pre></div>
+
+
+<p>So, in my case on FreeBSD, the statements I have in <code>rc.conf</code> are:</p>
+<div class="highlight"><pre><span></span><span class="nv">jenkins_enable</span><span class="o">=</span><span class="s2">&quot;YES&quot;</span>
+<span class="nv">jenkins_args</span><span class="o">=</span><span class="s2">&quot;--webroot=/usr/local/jenkins/war --httpPort=8180&quot;</span>
+<span class="nv">jenkins_java_opts</span><span class="o">=</span><span class="s2">&quot;-Djava.net.preferIPv6Addresses=true -Dfile.encoding=UTF-8&quot;</span> 
+</pre></div>
+
+
+<p>Now it looks all pretty again and we get all the colouring and symbols from the output of Fastlane:</p>
+<p><img alt="Screenshot of working ANSI and UTF-8 in Jenkins 2.0 pipeline build jobs" src="/public/screenshot_utf8_ansi_working.png" /></p>
+            <a href="#" class="go-top">Go Top</a>
+<footer class="footer">
+    <p>&copy; Matt Hamilton &ndash;
+        Built with <a href="https://github.com/PurePelicanTheme/pure-single">Pure Theme</a>
+        for <a href="http://blog.getpelican.com/">Pelican</a>
+    </p>
+</footer>        </div>
+    </div>
+    </div>
+    <script>
+        var $top = $('.go-top');
+
+        // Show or hide the sticky footer button
+        $(window).scroll(function() {
+            if ($(this).scrollTop() > 200) {
+                $top.fadeIn(200);
+            } else {
+                $top.fadeOut(200);
+            }
+        });
+
+        // Animate the scroll to top
+        $top.click(function(event) {
+            event.preventDefault();
+            $('html, body').animate({scrollTop: 0}, 300);
+        })
+
+        // Makes sure that the href="#" attached to the <a> elements
+        // don't scroll you back up the page.
+        $('body').on('click', 'a[href="#"]', function(event) {
+            event.preventDefault();
+        });
+    </script>
+
+</body>
+</html>

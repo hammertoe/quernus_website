@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Quernus, Matt Hamilton. An Internet technologist, interested in Python web development, iOS deployment and testing, wearables, networking and operating systems.">
+
+
+        <title>iOS Deployment and Provisioning - Part II - Rational // Quernus // Matt Hamilton. An Internet technologist, interested in Python web development, iOS deployment and testing, wearables, networking and operating systems.</title>
+
+
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.3.0/pure-min.css">
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Great+Vibes">  
+    <link rel="stylesheet" href="../../../../../theme/css/pure.css">
+    <link rel="stylesheet" href="../../../../../theme/css/pygments.css">
+
+    <script src="https://use.fontawesome.com/d373dd2436.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/fitvids/1.0.1/jquery.fitvids.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            $(".content").fitVids();
+        });
+    </script>
+</head>
+
+<body>
+    <div class="pure-g-r" id="layout">
+        <div class="sidebar pure-u">
+            <div class="cover-img" style="background: none repeat scroll 0% 0% #90a959">
+                <div class="cover-body">
+                    <header class="header">
+                        <hgroup>
+<!--                            <h1 class="brand-main"><a href="../../../../..">Quernus</a></h1> -->
+                            <img class="avatar" src="/theme/matt_head_bucharest.jpg">
+                            <p class="tagline">Matt Hamilton. An Internet technologist, interested in Python web development, iOS deployment and testing, wearables, networking and operating systems.</p>
+                                <p class="links"><a href="../../../../../pages/my-super-post">My super title</a></p>
+                                <p class="social">
+                                    <a href="https://twitter.com/hammertoe">
+                                        <i class="fa fa-twitter fa-3x"></i>
+                                    </a>
+                                    <a href="https://www.linkedin.com/in/matthamilton77">
+                                        <i class="fa fa-linkedin fa-3x"></i>
+                                    </a>
+                                    <a href="https://www.slideshare.net/hammertoe">
+                                        <i class="fa fa-slideshare fa-3x"></i>
+                                    </a>
+                                    <a href="https://github.com/hammertoe">
+                                        <i class="fa fa-github fa-3x"></i>
+                                    </a>
+                                </p>
+                        </hgroup>
+                    </header>
+                </div>
+            </div>
+        </div>
+    <div class="pure-u">
+        <div class="content">
+            <section class="post">
+                <header class="post-header">
+                    <h1>iOS Deployment and Provisioning - Part II - Rational</h1>
+                        <p class="post-meta">
+                            // under                                 <a class="post-category" href="../../../../../tag/ios.html">iOS</a>
+                                <a class="post-category" href="../../../../../tag/iphone.html">iPhone</a>
+                                <a class="post-category" href="../../../../../tag/apple.html">apple</a>
+                        </p>
+                </header>
+            </section>
+            <p class="message">
+  This is the third in a series of blog posts about iOS deployment and experiences setting up a continuous testing and build server for iOS apps. These posts are of interest to individual developers wanting to understand more, but mainly targeting small development teams trying to manage their development, testing and deployment process.
+</p>
+
+<h2>The Deployment Process</h2>
+<p>One of the first things I noticed when I first started getting involved in the development of an iOS application is just how insanely complex the deployment process is to a newcomer. Even regardless of me having to get my head around new programming languages (Objective C and Swift) and new APIs, the bigger hurdle was Xcode itself.</p>
+<p>At first I was the liaison with the outsourced mobile app development agency. Every few weeks the agency would do a ‘Testflight’ build for us to try out. We’d give feedback and that would be rolled into their development as they went along. Speaking to them, the actual process of testing, building and deploying a release would take one of their developers most of an afternoon to do. Trying to get the releases more frequent would just tie up a valuable developer for longer.</p>
+<p>Eventually we moved the development of the app in-house. We recruited a developer to work on the project. I was now more involved in the actual day-to-day management of the development process. And this was when I started to realised just how complex the deployment can be. The developer was fantastic and helped me to understand things a great deal, but the process of actually deploying the app was cumbersome. </p>
+<p>I tried to do a build myself from Xcode. This required me to have the right certificates, keys, and provisioning profiles to work. Several times Xcode would come up with some error about the provisioning profile and just ask me if I wanted it to ‘fix it’. If I hit the button to fix it, it just went away and did it’s magic. I had no idea what it was actually doing. I just pressed an hoped. Sometimes it worked, sometimes it didn’t. In talking to other iOS developers this seemed like ‘normal’ behaviour. Most of them didn’t really know what was going on. They just hit the button in Xcode and hopes for the best. Kudos to Apple for hiding all the details and letting people get on with the task at hand, developing software, but when things went wrong it is hard to work out.</p>
+<p>One of the main issues was that often a build would work on our developer’s machine, but not on mine. Or it would work on my desktop, but not my laptop. They should work the same. They had the same code checked out from Github, but alas one would work and one would not.</p>
+<p>The time came for us to start hiring more developers, and soon we had a team of four developers working on the app, plus myself, a UX person, and a graphic designer. How would be handle the deployment process? In order to build the app we had to ensure that they keys and certificates required were on the machine the develop building it was using. Not only that, but we were developing in Swift, which takes forever to compile. A build could take up to half an hour to build on a modern machine. That is time that a developer is sat there with their machine ground to a halt compiling.</p>
+<h2>What we needed</h2>
+<p>We needed a deployment mechanism. We needed an automated way for the builds to happen independent of any one developer. We needed to ensure we didn’t need to distribute our company distribution key to everyone involved. It would be great if the process could happen automatically and frequently so that anyone could test out a build. This is not like the world of web development, where you can simply allow anyone with a browser to your dev/staging server. In order for someone to test a build they need to be able to access a properly signed app with their device’s UDID encoded in the provisioning profile.</p>
+<p>The previous incarnation of the app had very little in the way of unit tests, and this was something I wanted to change too. All the developers we hired had a very strong interest in testing, and I needed to make it as easy as possible for their tests to be run.</p>
+<p>We bought a small Mac Mini to sit in the office and act as our build server. In order to build iOS apps you need to be on a physical Mac. Alas you can’t use a VM or similar. We needed a way to automate the build process and so ended up assembling a number of tools to do so.</p>
+<h2>Tools we used</h2>
+<ul>
+<li>
+<p><a href="https://github.com/">Github</a></p>
+<p>This is where all out code it stored. It is a number of private Github repos. At one point we were evaluating Github Enterprise, which was one of the reasons I wanted to have more control over the build server, rather than use one of the nascent cloud-based iOS build services.</p>
+</li>
+<li>
+<p><a href="https://fastlane.tools/">Fastlane</a></p>
+<p>Fastlane is a set of tools to interact with Apple’s developer services via the command line. I first heard about it from a talk by the author of the tools, Felix Krause, at NSConf 7 in Leicester, UK. He has done a remarkable job of making sane ways to interact with the App store process in a automatable way.</p>
+</li>
+<li>
+<p><a href="https://jenkins-ci.org/">Jenkins</a></p>
+<p>Jenkins is an Continuos Integration (CI) tool. I was familiar with it from previous projects I’d worked on, such as Plone. Jenkins can monitor Github and when code is pushed to github it can check it out and run automated tests on the code. In our case we wanted to take it further, and not just run the tests, but actually build and deploy the app.</p>
+</li>
+<li>
+<p><a href="http://hockeyapp.net/">Hockey</a> / <a href="https://developer.apple.com/testflight/">Testflight</a></p>
+<p>Hockey and TestFlight are two services that allow you to do deployments of apps to testers. Hockey (derived from the term ‘adhoc’ as one of the three types of provisioning profile Apple allow) is a 3rd party service. It also allows you to capture crash reports from devices. If the app crashes on a user’s phone then the next time they start the app it sends the crash report to Hockey. Hockey allows you to then browse the stack trace and other crash debugging information.</p>
+<p>TestFlight is a similar service to Hockey, but now owned by Apple themselves. Rather then using an ‘adhoc’ provisioning profile, you actually use a ‘store’ profile and upload the app to iTunes Connect in a similar way to if you were submitting a final app to Apple for the App Store. By marking the app as ‘beta’ in the upload process it allows you to distribute the pre-release app to testers.</p>
+</li>
+</ul>
+<table style="margin-left: 40px">
+<tr><th></th><th>Testflight</th><th>Hockey</th></tr>
+<tr><td>Pros</td><td>
+<!-- Testflight pros -->
+<ul>
+<li>Uses an Appstore provisioning profile</li>
+<li>Profile not tied to specific UDIDs</li>
+<li>Ability to submit app to Apple for external beta review allowing up to 2000 external beta reviewers</li>
+</ul>
+</td>
+<td>
+<!-- Hockey pros -->
+<ul>
+<li>Rich API, allowing creation of multiple distinct apps easily (ie. one per feature branch of code)</li>
+<li>Apps available for download immediately after upload</li>
+</ul>
+</td></tr>
+<tr><td>Cons</td><td>
+<!-- Testflight cons -->
+<ul>
+<li>Slow to process uploaded apps. Usually 30 minutes, may be hours</li>
+<li>Cumbersome to create multiple apps</li>
+<li>API changing regularly</li>
+</ul>
+</td>
+<td>
+<!-- Hockey cons -->
+<ul>
+<li>Can only use Adhoc profiles, so restricted to users/devices added into profile via Apple Developer Portal</li>
+<li>Not the exact same binary that you would then release</li>
+</ul>
+</td></tr>
+
+</table>
+
+<ul>
+<li>
+<p><a href="https://slack.com/">Slack</a></p>
+<p>Slack is our internal communications tool. When a build happens on Jenkins the status of the tests and build and the link to the download are posted to Slack for the team to see.</p>
+</li>
+</ul>
+<p>In the next post I’ll go into more detail about Fastlane.</p>
+            <a href="#" class="go-top">Go Top</a>
+<footer class="footer">
+    <p>&copy; Matt Hamilton &ndash;
+        Built with <a href="https://github.com/PurePelicanTheme/pure-single">Pure Theme</a>
+        for <a href="http://blog.getpelican.com/">Pelican</a>
+    </p>
+</footer>        </div>
+    </div>
+    </div>
+    <script>
+        var $top = $('.go-top');
+
+        // Show or hide the sticky footer button
+        $(window).scroll(function() {
+            if ($(this).scrollTop() > 200) {
+                $top.fadeIn(200);
+            } else {
+                $top.fadeOut(200);
+            }
+        });
+
+        // Animate the scroll to top
+        $top.click(function(event) {
+            event.preventDefault();
+            $('html, body').animate({scrollTop: 0}, 300);
+        })
+
+        // Makes sure that the href="#" attached to the <a> elements
+        // don't scroll you back up the page.
+        $('body').on('click', 'a[href="#"]', function(event) {
+            event.preventDefault();
+        });
+    </script>
+
+</body>
+</html>

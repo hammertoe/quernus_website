@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Quernus, Matt Hamilton. An Internet technologist, interested in Python web development, iOS deployment and testing, wearables, networking and operating systems.">
+
+
+        <title>Using OpenBSD as a FreeBSD Router // Quernus // Matt Hamilton. An Internet technologist, interested in Python web development, iOS deployment and testing, wearables, networking and operating systems.</title>
+
+
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.3.0/pure-min.css">
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Great+Vibes">  
+    <link rel="stylesheet" href="../../../../theme/css/pure.css">
+    <link rel="stylesheet" href="../../../../theme/css/pygments.css">
+
+    <script src="https://use.fontawesome.com/d373dd2436.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/fitvids/1.0.1/jquery.fitvids.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            $(".content").fitVids();
+        });
+    </script>
+</head>
+
+<body>
+    <div class="pure-g-r" id="layout">
+        <div class="sidebar pure-u">
+            <div class="cover-img" style="background: none repeat scroll 0% 0% #90a959">
+                <div class="cover-body">
+                    <header class="header">
+                        <hgroup>
+<!--                            <h1 class="brand-main"><a href="../../../..">Quernus</a></h1> -->
+                            <img class="avatar" src="/theme/matt_head_bucharest.jpg">
+                            <p class="tagline">Matt Hamilton. An Internet technologist, interested in Python web development, iOS deployment and testing, wearables, networking and operating systems.</p>
+                                <p class="links"><a href="../../../../pages/my-super-post">My super title</a></p>
+                                <p class="social">
+                                    <a href="https://twitter.com/hammertoe">
+                                        <i class="fa fa-twitter fa-3x"></i>
+                                    </a>
+                                    <a href="https://www.linkedin.com/in/matthamilton77">
+                                        <i class="fa fa-linkedin fa-3x"></i>
+                                    </a>
+                                    <a href="https://www.slideshare.net/hammertoe">
+                                        <i class="fa fa-slideshare fa-3x"></i>
+                                    </a>
+                                    <a href="https://github.com/hammertoe">
+                                        <i class="fa fa-github fa-3x"></i>
+                                    </a>
+                                </p>
+                        </hgroup>
+                    </header>
+                </div>
+            </div>
+        </div>
+    <div class="pure-u">
+        <div class="content">
+            <section class="post">
+                <header class="post-header">
+                    <h1>Using OpenBSD as a FreeBSD Router</h1>
+                        <p class="post-meta">
+                            // under                                 <a class="post-category" href="../../../../tag/openbsd.html">OpenBSD</a>
+                                <a class="post-category" href="../../../../tag/freebsd.html">FreeBSD</a>
+                                <a class="post-category" href="../../../../tag/networking.html">networking</a>
+                        </p>
+                </header>
+            </section>
+            <h2>FreeBSD is a Great Server</h2>
+<p><a href="https://www.freebsd.org/">FreeBSD</a> is a great OS. I use it for my office fileserver due to its ZFS implementation, and general robustness as a fileserver and general office server.</p>
+<p>However one thing I don’t like about FreeBSD is that even though it has had IPSEC baked into it for many many years, it is still not enabled by default in the <code>GENERIC</code> kernel. Most kernel options in FreeBSD can be loaded as loadable modules, but IPSEC is not one of them.</p>
+<p>I’ve been using FreeBSD <a href="http://marc.info/?l=freebsd-bugs&amp;m=103030758511075&amp;w=2">since 1996</a> and used to sit there leaving it running a <code>make kernel</code> overnight to build new kernel on my little 386sx-16 that I had at the time. In those days, any changes or options required compiling your own custom kernel. But this is 2015 now, and to be frank, I just don’t have the inclination or patience to do that any more. Even if hardware improvements mean what used to take 8 hours, takes minutes to do.</p>
+<p>But more importantly FreeBSD now has a <a href="https://www.freebsd.org/doc/handbook/updating-upgrading-freebsdupdate.html">binary updates system</a> which means that interim binary security patches can be applied without needing to do a ‘build world’. But if I’ve compiled my own kernel to get IPSEC, this is no longer an option. It seemed FreeBSD update will clobber those changes. This what what I found updating my FreeBSD 10.1 office server using <code>freebsd-update</code> when suddenly my IPSEC VPN from home to office stopped working.</p>
+<h2>OpenBSD is a Great Router</h2>
+<p>In 2004, whilst at <a href="https://www.netsight.co.uk">Netsight</a>, <a href="http://marc.info/?l=openbsd-misc&amp;m=110261323606356&amp;w=2">I started looking</a> at using <a href="http://www.openbsd.org/">OpenBSD</a> for routing. We were using big Cisco 5505 switches with Route Switch Modules in to provide routing. The problem was, they soon became quite slow. They were great if you wanted to do very simple routing, and they could do Layer 3 switching in silicon on the linecards. But as soon as you started to do access lists then they had to route the packets on the main CPU. Not only that, but Cisco’s ACL syntax quickly became very cumbersome as you had no way of doing any kind of macros or variables in the language.</p>
+<p>OpenBSD on the other hand comes with the amazing <code>pf</code> packet filter. This is a fantastic stateful packet filter that is extremely fast, and with a very nice expressive language to write firewall rules.</p>
+<p>At Netsight’s datacentre we soon ended up with a pair of x86 boxes running as OpenBSD firewalls. They were configured with pf and <a href="http://www.openbsd.org/faq/pf/carp.html">CARP</a> to provide redundancy. These two boxes protected the entire datacentre network and acted as a main filter and choke point to sanitise our traffic. They ensured that spoofed packets were not leaving our network from any customers and that we could quickly and easily help protect against any attacks on the network.</p>
+<p>After not long we replaced all the Cisco routers with OpenBSD boxes as they turned out to be extremely reliable, flexible and fast for gigabit-level L3 intra-vlan routing.</p>
+<h2>FreeBSD <em>and</em> OpenBSD?!</h2>
+<p>FreeBSD has it’s own Hypervisor, <a href="http://bhyve.org/">bhvye</a>, allowing you to run FreeBSD, OpenBSD, or Linux guests as virtual machines on a FreeBSD host.</p>
+<p>So could I potentially have my cake <em>and</em> eat it? Could I have a FreeBSD host and run an OpenBSD guest to do the IPSEC termination? Well, virtualised routers have started to become quite a hot topic with the increase of virtualisation on servers. If you are virtualising a number or servers, why not virtualise the networking infrastructure too? You can leverage the redundancy you have in the VM cluster and also move the network functions closer to the hosts they are supporting.</p>
+<p>As it turns out <a href="https://forums.freebsd.org/threads/howto-bhyve-using-openbsd-as-main-firewall-in-freebsd.50470/">someone else has already done something similar</a>. They are using PCI passthru that allows you to pass a PCI device to a guest and have them control it completely. I was not able to do that due to not having a processor with the required VT-d feature to do this. But also, my external network interface is actually a USB ethernet adapter. My server is a HP Microserver G8 with two built in gigabit ports. I wanted to use both those ports for internal connections — one to my desktop, an iMac and one to a Mac Mini iOS build server. In order to do passthru, I’d have to pass the entire USB hub through to the guest. In reality this would probably not be an issue, as there are four different USB hubs on the server, and so I could pass a USB 2.0 hub to the guest, and keep a USB 3.0 hub for the host to use for transferring data to/from USB sticks.</p>
+<p>But for now I can achieve the same effect by bridging the physical interface on the host with the virtual interface to the guest. In fact I’ve got two bridges, one representing the ‘inside’ of the network, and one the ‘outside’.</p>
+<h2>The Actual Configs</h2>
+<p>So to boot the vm itself, I have a script that starts the OpenBSD VM and configures the devices for it. Due to needing GRUB to boot it, you need the <code>grub-bhyve</code> packages and a custom script such as below:</p>
+<div class="highlight"><pre><span></span>matt@jenna:~root % cat startvm.sh
+<span class="nb">cd</span> /storage/vms
+grub-bhyve -m /storage/vms/obsd.map -r cd0 -M 256M obsd57 &lt; obsd57.in
+bhyve -m 256M -A -H -P -s 0:0,amd_hostbridge -s 1:0,lpc -s 3:0,virtio-net,tap0 -s 4:0,virtio-blk,/dev/zvol/storage/vms/openbsd -s 5:0,virtio-net,tap1 -l com1,stdio -W obsd57
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>matt@jenna:~root % cat /storage/vms/obsd57.in 
+kopenbsd -h com0 -r sd0a <span class="o">(</span>hd0,openbsd1<span class="o">)</span>/bsd
+boot
+</pre></div>
+
+
+<p>In the bhyve command above you can see I have configured two virtual ethernet adapters bound to <code>tap0</code> and <code>tap1</code> on the host FreeBSD server. </p>
+<p>I have this as a manual script I run, as my server uses GELI to encrypt my main storage, a ZFS array over 4 disks. When my server boots, it boots to a minimal system with none of the ZFS mounted. I need to SSH in and start the ZFS array from another script and supply the passphrase to decrypt the disks. Once the ZFS array is up, I can run the script above to start the OpenBSD server and get connectivity to the outside world.</p>
+<p>My complete <code>/etc/rc.conf</code> file to set up the networking. Note I also have a wifi adapter and the server acts as a base station in the office for my phone and laptop. I also have two vlans to the iMac: a high MTU one for direct data between the iMac and the server, and a regular MTU one for external data and bridging to the wifi.</p>
+<div class="highlight"><pre><span></span>matt@jenna:~root % cat /etc/rc.conf
+<span class="nv">hostname</span><span class="o">=</span>“jenna”
+<span class="nv">keymap</span><span class="o">=</span>“uk.iso-ctrl.kbd”
+
+<span class="c1"># Configure wifi interface</span>
+<span class="nv">wlans_run0</span><span class="o">=</span>“wlan0”
+<span class="nv">create_args_wlan0</span><span class="o">=</span>“wlanmode hostap country GB”
+<span class="nv">ifconfig_wlan0</span><span class="o">=</span>“ssid quernus indoor mode 11a channel 100”
+<span class="nv">hostapd_enable</span><span class="o">=</span>“YES”
+
+<span class="c1"># Configure physcial interfaces</span>
+<span class="nv">ifconfig_bge0</span><span class="o">=</span>“mtu <span class="m">1500</span> up”
+<span class="nv">ifconfig_bge1</span><span class="o">=</span>“mtu <span class="m">9000</span> up”
+<span class="nv">ifconfig_ue0</span><span class="o">=</span>“up”
+
+<span class="c1"># bring up vlans on bge1 link to iMac</span>
+<span class="nv">vlans_bge1</span><span class="o">=</span>“1 2”
+<span class="nv">ifconfig_bge1_1</span><span class="o">=</span>“inet 192.168.66.1 netmask 255.255.255.0 mtu 9000”
+<span class="nv">ifconfig_bge1_2</span><span class="o">=</span>“up mtu 1500”
+
+<span class="c1"># Create cloned interfaces</span>
+<span class="nv">cloned_interfaces</span><span class="o">=</span>“bridge0 bridge1 tap0 tap1”
+
+<span class="c1"># Configure tap interfaces for OpenBSD router VM to use</span>
+<span class="nv">ifconfig_tap0</span><span class="o">=</span>“up”
+<span class="nv">ifconfig_tap1</span><span class="o">=</span>“up”
+
+<span class="c1"># Bring up bridges</span>
+<span class="c1"># bridge0 is internal facing bridge</span>
+<span class="nv">ifconfig_bridge0</span><span class="o">=</span>“inet 192.168.64.2 netmask 255.255.255.0 addm wlan0 addm bge0 addm tap0 addm bge1.2”
+<span class="c1"># bridge1 is external facing bridge</span>
+<span class="nv">ifconfig_bridge1</span><span class="o">=</span>“addm ue0 addm tap1”
+
+<span class="c1"># Route all traffic to OpenBSD VM</span>
+<span class="nv">defaultrouter</span><span class="o">=</span>“192.168.64.1”
+
+<span class="c1"># Configure services and ZFS</span>
+<span class="nv">sshd_enable</span><span class="o">=</span>“YES”
+<span class="nv">ntpd_enable</span><span class="o">=</span>“YES”
+<span class="nv">powerd_enable</span><span class="o">=</span>“YES”
+<span class="nv">dumpdev</span><span class="o">=</span>“AUTO”
+<span class="nv">zfs_enable</span><span class="o">=</span>“YES”
+<span class="nv">samba_server_enable</span><span class="o">=</span>“YES”
+<span class="nv">rsyncd_enable</span><span class="o">=</span>“YES”
+<span class="nv">avahi_daemon_enable</span><span class="o">=</span>“YES”
+</pre></div>
+
+
+<p>One thing in particular to note, is that we are <em>not</em> forwarding packet at all on the FreeBSD host:</p>
+<div class="highlight"><pre><span></span>root@jenna:~ <span class="c1"># sysctl net.inet.ip.forwarding</span>
+net.inet.ip.forwarding: 0
+</pre></div>
+
+
+<p>That is because <em>all</em> of the routing is happening on the OpenBSD box itself.</p>
+<p>So lets look at the OpenBSD router VM. Firstly see that is has two virtual network interfaces as per the <code>bhyve</code> command we ran to create it:</p>
+<div class="highlight"><pre><span></span>$ dmesg <span class="p">|</span> grep virtio
+virtio0 at pci0 dev <span class="m">3</span> <span class="k">function</span> <span class="m">0</span> “Qumranet Virtio Network” rev 0x00: Virtio Network Device
+vio0 at virtio0: address 00:a0:98:52:db:56
+virtio0: msi
+virtio1 at pci0 dev <span class="m">4</span> <span class="k">function</span> <span class="m">0</span> “Qumranet Virtio Storage” rev 0x00: Virtio Block Device
+vioblk0 at virtio1
+virtio1: msi
+virtio2 at pci0 dev <span class="m">5</span> <span class="k">function</span> <span class="m">0</span> “Qumranet Virtio Network” rev 0x00: Virtio Network Device
+vio1 at virtio2: address 00:a0:98:e9:8d:9c
+virtio2: msi
+</pre></div>
+
+
+<p>I have configured the two virtual interfaces, one with an internal IP address, and one with my public static external address assigned to me by my upstream provider:</p>
+<div class="highlight"><pre><span></span>$ cat /etc/hostname.vio0                                                                                                                                       
+inet 192.168.64.1 255.255.255.0
+$ cat /etc/hostname.vio1 
+inet 31.210.128.9 255.255.255.224
+$ cat /etc/mygate                                                                                                                                              
+31.210.128.1
+$ cat /etc/sysctl.conf                                                                                                                                         
+net.inet.ip.forwarding<span class="o">=</span>1
+ddb.panic<span class="o">=</span>0
+</pre></div>
+
+
+<p>I have configured <code>pf</code> to do the NAT for me, and allow in some servers such as SSH. It also allows in IPSEC traffic from my home router. I also run a SIP proxy on here to allow my SIP client on my desktop to connect to my VOIP provider.</p>
+<div class="highlight"><pre><span></span><span class="c1"># cat /etc/pf.conf</span>
+<span class="nv">ext_if</span><span class="o">=</span>“vio1”
+<span class="nv">int_if</span><span class="o">=</span>“vio0”
+<span class="nv">home_ip</span><span class="o">=</span>“x.x.x.x”
+
+<span class="nb">set</span> skip on lo
+<span class="nb">set</span> skip on <span class="nv">$int_if</span>
+
+match out on <span class="nv">$ext_if</span> from 192.168.0.0/16 to any nat-to <span class="o">(</span>egress:0<span class="o">)</span>
+
+block in log
+pass out        <span class="c1"># establish keep-state</span>
+
+
+<span class="c1"># Allow ping etc</span>
+pass in on <span class="nv">$ext_if</span> proto icmp from any to any
+
+<span class="c1"># Allow ssh</span>
+pass in on <span class="nv">$ext_if</span> proto tcp from any to port 22
+
+<span class="c1"># Allow in IPSEC VPN traffic</span>
+pass in on <span class="nv">$ext_if</span> proto esp from <span class="nv">$home_ip</span> to <span class="o">(</span>egress:0<span class="o">)</span>
+pass in on enc0
+
+<span class="c1"># Allow in SIP traffic</span>
+pass in on <span class="nv">$ext_if</span> proto udp from any to port <span class="o">{</span> 5060, 7070:7080 <span class="o">}</span>
+</pre></div>
+
+
+<p>Looking at the output from <code>ifconfig -a</code> we can see the two interfaces </p>
+<div class="highlight"><pre><span></span>$ ifconfig -a  
+lo0: <span class="nv">flags</span><span class="o">=</span>8049&lt;UP,LOOPBACK,RUNNING,MULTICAST&gt; mtu 32768
+        priority: 0
+        groups: lo
+        inet6 fe80::1%lo0 prefixlen <span class="m">64</span> scopeid 0x4
+        inet6 ::1 prefixlen 128
+        inet 127.0.0.1 netmask 0xff000000
+vio0: <span class="nv">flags</span><span class="o">=</span>8b43&lt;UP,BROADCAST,RUNNING,PROMISC,ALLMULTI,SIMPLEX,MULTICAST&gt; mtu 1500
+        lladdr 00:a0:98:52:db:56
+        priority: 0
+        media: Ethernet autoselect
+        status: active
+        inet 192.168.64.1 net mask 0xffffff00 broadcast 192.168.64.255
+vio1: <span class="nv">flags</span><span class="o">=</span>8b43&lt;UP,BROADCAST,RUNNING,PROMISC,ALLMULTI,SIMPLEX,MULTICAST&gt; mtu 1500
+        lladdr 00:a0:98:e9:8d:9c
+        priority: 0
+        groups: egress
+        media: Ethernet autoselect
+        status: active
+        inet 31.210.128.9 net mask 0xffffffe0 broadcast 31.210.128.31
+enc0: <span class="nv">flags</span><span class="o">=</span>0&lt;&gt;
+        priority: 0
+        groups: enc
+        status: active
+pflog0: <span class="nv">flags</span><span class="o">=</span>141&lt;UP,RUNNING,PROMISC&gt; mtu 33144
+        priority: 0
+        groups: pflog
+</pre></div>
+
+
+<p>As for the actual IPSEC setup itself. This was a breeze on OpenBSD and detail in various places:</p>
+<ul>
+<li><a href="http://www.symantec.com/connect/articles/zero-ipsec-4-minutes">Zero to IPSec in 4 minutes</a></li>
+<li><a href="http://www.kernel-panic.it/openbsd/vpn/vpn3.html">Building VPNs on OpenBSD</a> </li>
+</ul>
+<p>My <code>/etc/ipsec.conf</code> file is shown below. The remote end of this connection is a Draytek Vigor 2860 router at home.</p>
+<div class="highlight"><pre><span></span><span class="c1"># more ipsec.conf                                                                                                                                              </span>
+ike dynamic  esp from 192.168.64.0/22 to 192.168.1.0/24 <span class="nb">local</span> 31.210.128.9 peer x.x.x.x <span class="se">\</span>
+         main auth hmac-sha1  enc aes group modp1024 <span class="se">\</span>
+         quick auth hmac-sha1 enc aes <span class="se">\</span>
+         srcid 31.210.128.9 dstid x.x.x.x <span class="se">\</span>
+         psk MYSECRET
+</pre></div>
+
+
+<h2>Conclusion</h2>
+<p>So, a few weeks on, and this is all working really well. Not had any issues with stability or performance with the network at all. I’ve since been able to set up OpenBSDs fantastic <code>relayd</code> to proxy incoming HTTPS traffic to the Mac Mini build server in the office. </p>
+<p>At some point I might try the PCI passthru route. I do have a new CPU sat on my desk with VT-d to plug into the server, but not got around to it yet. But for now the bridging route works well and also gives me an additional point at which to run <code>tcpdump</code> to test anything.</p>
+<p>Any questions, then let me know in the comments below.</p>
+            <a href="#" class="go-top">Go Top</a>
+<footer class="footer">
+    <p>&copy; Matt Hamilton &ndash;
+        Built with <a href="https://github.com/PurePelicanTheme/pure-single">Pure Theme</a>
+        for <a href="http://blog.getpelican.com/">Pelican</a>
+    </p>
+</footer>        </div>
+    </div>
+    </div>
+    <script>
+        var $top = $('.go-top');
+
+        // Show or hide the sticky footer button
+        $(window).scroll(function() {
+            if ($(this).scrollTop() > 200) {
+                $top.fadeIn(200);
+            } else {
+                $top.fadeOut(200);
+            }
+        });
+
+        // Animate the scroll to top
+        $top.click(function(event) {
+            event.preventDefault();
+            $('html, body').animate({scrollTop: 0}, 300);
+        })
+
+        // Makes sure that the href="#" attached to the <a> elements
+        // don't scroll you back up the page.
+        $('body').on('click', 'a[href="#"]', function(event) {
+            event.preventDefault();
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Quernus, Matt Hamilton. An Internet technologist, interested in Python web development, iOS deployment and testing, wearables, networking and operating systems.">
+
+
+        <title>I Love our Build System // Quernus // Matt Hamilton. An Internet technologist, interested in Python web development, iOS deployment and testing, wearables, networking and operating systems.</title>
+
+
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.3.0/pure-min.css">
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Great+Vibes">  
+    <link rel="stylesheet" href="../../../../../theme/css/pure.css">
+    <link rel="stylesheet" href="../../../../../theme/css/pygments.css">
+
+    <script src="https://use.fontawesome.com/d373dd2436.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/fitvids/1.0.1/jquery.fitvids.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            $(".content").fitVids();
+        });
+    </script>
+</head>
+
+<body>
+    <div class="pure-g-r" id="layout">
+        <div class="sidebar pure-u">
+            <div class="cover-img" style="background: none repeat scroll 0% 0% #90a959">
+                <div class="cover-body">
+                    <header class="header">
+                        <hgroup>
+<!--                            <h1 class="brand-main"><a href="../../../../..">Quernus</a></h1> -->
+                            <img class="avatar" src="/theme/matt_head_bucharest.jpg">
+                            <p class="tagline">Matt Hamilton. An Internet technologist, interested in Python web development, iOS deployment and testing, wearables, networking and operating systems.</p>
+                                <p class="links"><a href="../../../../../pages/my-super-post">My super title</a></p>
+                                <p class="social">
+                                    <a href="https://twitter.com/hammertoe">
+                                        <i class="fa fa-twitter fa-3x"></i>
+                                    </a>
+                                    <a href="https://www.linkedin.com/in/matthamilton77">
+                                        <i class="fa fa-linkedin fa-3x"></i>
+                                    </a>
+                                    <a href="https://www.slideshare.net/hammertoe">
+                                        <i class="fa fa-slideshare fa-3x"></i>
+                                    </a>
+                                    <a href="https://github.com/hammertoe">
+                                        <i class="fa fa-github fa-3x"></i>
+                                    </a>
+                                </p>
+                        </hgroup>
+                    </header>
+                </div>
+            </div>
+        </div>
+    <div class="pure-u">
+        <div class="content">
+            <section class="post">
+                <header class="post-header">
+                    <h1>I Love our Build System</h1>
+                        <p class="post-meta">
+                            // under                                 <a class="post-category" href="../../../../../tag/ios.html">iOS</a>
+                                <a class="post-category" href="../../../../../tag/apple.html">apple</a>
+                        </p>
+                </header>
+            </section>
+            <p class="message">
+  This is part of a series of blog posts about iOS deployment and experiences setting up a continuous testing and build server for iOS apps. These posts are of interest to individual developers wanting to understand more, but mainly targeting small development teams trying to manage their development, testing and deployment process.
+</p>
+
+<h2>Wednesday Morning, 7:30am</h2>
+<p>I love our build system. Yes, I'm biased as I was the one the put it together (using awesome software written by others of course). And in this series I will be detailing how it was built. But I can't help but interject with this interlude as it just shows <em>why</em> it is so awesome.</p>
+<p>Yesterday we were working on polishing up a number of aspects of an app we are working on. One of our directors, Nicole, is at a trade show in New Orleans and will be wanting to show off the work-in-progress app. So we have been polishing up what is there and testing it all. Last night I pushed a build of the app to Apple's TestFlight service so Nicole can install it on her iPhone. For some unknown reason TestFlight was being slow in processing apps. As I was tucking up into bed last night, TestFlight had only just processed the app.</p>
+<ul>
+<li>
+<p>7:30am</p>
+<p>Wake up (my daughter is on school holiday, so a luxury of extra hour in bed), roll over and grab my iPhone to check Slack for any updates and feedback from Nicole. </p>
+<p>There is a message from her. "There is an error in the app. Some of the numbers displayed are not correct". I check the app and sure enough, two of the numbers have been transposed in the display.</p>
+</li>
+<li>
+<p>7:37am</p>
+<p>Due to TestFlight being slow last night, I want to get on this issue as soon as possible. It needs to be fixed before Nicole wakes up in a timezone 7 hours behind me. She needs the updated app before the trade show starts. </p>
+<p>I file a bug in our Pivotal Tracker, and tag two of our developers on a message on Slack about it:</p>
+<blockquote>
+<p>@pablo or @marc whichever of you gets in first today could you please take the above ticket. Once fixed merge to master and it should start a new Testflight build. Hopefully will process quicker than last night's one.</p>
+</blockquote>
+</li>
+<li>
+<p>7:48am</p>
+<p>Marc replies on Slack that he is on it. He is in a timezone an hour ahead of me and already started working. I jump into the shower.</p>
+</li>
+<li>
+<p>8:04am</p>
+<p>Marc has found and fixed the bug. Seems just a display issue, rather than underlying data problem. Two labels transposed. He wonders why no-one has spotted it yet. This is why we have continuous builds, so the people with domain-specific knowledge in our team can spot things like this quicker... and we can deploy new, fixed, builds quicker.</p>
+</li>
+<li>
+<p>8:09am</p>
+<p>Marc marks the bug finished in Pivotal. He pushes the feature branch he fixed this in to Github (note: I guess should be a fix/ branch rather than feature/ one? Oh well, does the same job). He issues a pull request for one of the other developers to check.</p>
+</li>
+<li>
+<p>8:18am</p>
+<p>I'm now out of the shower, dressed, and brushing my teeth. Marc asks if he should go ahead and merge the pull request himself for a minor change. I tap on the link in Slack, and Github opens. I can see that the commit really is just transposing two labels and very low risk. Just as I'm about to reply, our build server sends a message on Slack:</p>
+<p><img alt="Slack notification of build by Jenkins / Fastlane" src="/public/fastlane_slack_notification.png" /></p>
+<p>The build server saw the push of the feature branch by Marc and went ahead and built it, signed it, created a new app for it in Hockey, and uploaded the binary.</p>
+<p>I tap on the link and the app downloads and installs on my iPhone. I check it out and see that the numbers are now in the correct place.</p>
+<p>I reply to Marc to tell him it looks good, to merge the pull request himself.</p>
+<p>I rinse off my toothbrush and put it down.</p>
+</li>
+<li>
+<p>8:29am</p>
+<p>Marc confirms he has merged the PR into the develop/ branch. I tell him to go ahead and merge to master/. This will trigger our build server to do a beta build and upload it to TestFlight so Nicole can get it.</p>
+<p>I finish getting dressed, head downstairs to get breakfast and help get my daughter ready for Summer Camp today.</p>
+</li>
+<li>
+<p>8:53am</p>
+<p>I get an email from Apple saying that there is a new version of our app in TestFlight and available for download:</p>
+<p><img alt="Email from Apple iTunes Store about updated beta of app" src="/public/itunes_testflight_notification.png" /></p>
+</li>
+<li>
+<p>8:55am</p>
+<p>I get my daughter into the bike trailer and cycle off to drop her at summer camp for the day and head to the office. a great start to the day so far! The new app build is there waiting for Nicole when she wakes up in a few hours.</p>
+</li>
+</ul>
+            <a href="#" class="go-top">Go Top</a>
+<footer class="footer">
+    <p>&copy; Matt Hamilton &ndash;
+        Built with <a href="https://github.com/PurePelicanTheme/pure-single">Pure Theme</a>
+        for <a href="http://blog.getpelican.com/">Pelican</a>
+    </p>
+</footer>        </div>
+    </div>
+    </div>
+    <script>
+        var $top = $('.go-top');
+
+        // Show or hide the sticky footer button
+        $(window).scroll(function() {
+            if ($(this).scrollTop() > 200) {
+                $top.fadeIn(200);
+            } else {
+                $top.fadeOut(200);
+            }
+        });
+
+        // Animate the scroll to top
+        $top.click(function(event) {
+            event.preventDefault();
+            $('html, body').animate({scrollTop: 0}, 300);
+        })
+
+        // Makes sure that the href="#" attached to the <a> elements
+        // don't scroll you back up the page.
+        $('body').on('click', 'a[href="#"]', function(event) {
+            event.preventDefault();
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Quernus, Matt Hamilton. An Internet technologist, interested in Python web development, iOS deployment and testing, wearables, networking and operating systems.">
+
+
+        <title>IPv6 Privacy Addresses // Quernus // Matt Hamilton. An Internet technologist, interested in Python web development, iOS deployment and testing, wearables, networking and operating systems.</title>
+
+    <link href="/theme/favicon.ico" rel="icon">
+
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.3.0/pure-min.css">
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Great+Vibes">  
+    <link rel="stylesheet" href="../../../../theme/css/pure.css">
+    <link rel="stylesheet" href="../../../../theme/css/pygments.css">
+
+    <script src="https://use.fontawesome.com/d373dd2436.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/fitvids/1.0.1/jquery.fitvids.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            $(".content").fitVids();
+        });
+    </script>
+
+    <!-- Opengraph -->
+    <meta property="og:url" content="https://www.quernus.co.uk/2015/09/22/ipv6-privacy-addresses/" />
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="IPv6 Privacy Addresses" />
+    <meta property="og:description" content="IPv6 has a mechanism for generating random addresses to maintain some privacy for hosts" />
+    <meta property="og:image" content="https://www.quernus.co.uk/theme/matt_head_bucharest.jpg" />
+
+
+
+</head>
+
+<body>
+    <div class="pure-g-r" id="layout">
+        <div class="sidebar pure-u">
+            <div class="cover-img" style="background: none repeat scroll 0% 0% #90a959">
+                <div class="cover-body">
+                    <header class="header">
+                        <hgroup>
+<!--                            <h1 class="brand-main"><a href="../../../..">Quernus</a></h1> -->
+                            <img class="avatar" src="/theme/matt_head_bucharest.jpg">
+                            <p class="tagline">Matt Hamilton. An Internet technologist, interested in Python web development, iOS deployment and testing, wearables, networking and operating systems.</p>
+                            <ul class="menu">
+                                <li class="links"><a href="/">Home</a></li>
+                                <li class="links"><a href="/category/talks.html">Talks</a></li>
+                                <li class="links"><a href="/archives.html">Archives</a></li>
+                                <li class="links"><a href="../../../../about">About Me / Contact</a></li>
+                            </ul>
+                                <p class="social">
+                                    <a href="https://twitter.com/hammertoe">
+                                        <i class="fa fa-twitter fa-3x"></i>
+                                    </a>
+                                    <a href="https://www.linkedin.com/in/matthamilton77">
+                                        <i class="fa fa-linkedin fa-3x"></i>
+                                    </a>
+                                    <a href="https://www.slideshare.net/hammertoe">
+                                        <i class="fa fa-slideshare fa-3x"></i>
+                                    </a>
+                                    <a href="https://github.com/hammertoe">
+                                        <i class="fa fa-github fa-3x"></i>
+                                    </a>
+                                </p>
+                        </hgroup>
+                    </header>
+                </div>
+            </div>
+        </div>
+    <div class="pure-u">
+        <div class="content">
+            <section class="post">
+                <header class="post-header">
+                    <h1>IPv6 Privacy Addresses</h1>
+                        <p class="post-meta">
+                            // under                                 <a class="post-category" href="../../../../tag/ipv6.html">ipv6</a>
+                        </p>
+                </header>
+            </section>
+            <p>I'm starting to play with IPv6 at home and in the office. I'll be detailing some of what I've learnt here. </p>
+<p>One thing I noticed, was that once configured I ended up with <em>two</em> IPv6 addresses on my interfaces:</p>
+<div class="highlight"><pre><span></span><span class="n">en0</span><span class="o">:</span> <span class="n">flags</span><span class="o">=</span><span class="mi">8863</span><span class="o">&lt;</span><span class="n">UP</span><span class="o">,</span><span class="n">BROADCAST</span><span class="o">,</span><span class="n">SMART</span><span class="o">,</span><span class="n">RUNNING</span><span class="o">,</span><span class="n">SIMPLEX</span><span class="o">,</span><span class="n">MULTICAST</span><span class="o">&gt;</span> <span class="n">mtu</span> <span class="mi">1500</span>
+    <span class="n">ether</span> <span class="mi">04</span><span class="o">:</span><span class="mi">0</span><span class="n">c</span><span class="o">:</span><span class="n">ce</span><span class="o">:</span><span class="n">e1</span><span class="o">:</span><span class="mi">3</span><span class="n">a</span><span class="o">:</span><span class="mi">7</span><span class="n">b</span> 
+    <span class="n">inet6</span> <span class="n">fe80</span><span class="o">::</span><span class="mi">60</span><span class="n">c</span><span class="o">:</span><span class="n">ceff</span><span class="o">:</span><span class="n">fee1</span><span class="o">:</span><span class="mi">3</span><span class="n">a9a</span><span class="o">%</span><span class="n">en0</span> <span class="n">prefixlen</span> <span class="mi">64</span> <span class="n">scopeid</span> <span class="mh">0x4</span> 
+    <span class="n">inet</span> <span class="mf">192.168</span><span class="o">.</span><span class="mf">1.19</span> <span class="n">net</span> <span class="n">mask</span> <span class="mh">0xffffff00</span> <span class="n">broadcast</span> <span class="mf">192.168</span><span class="o">.</span><span class="mf">1.255</span>
+    <span class="n">inet6</span> <span class="n">en0</span><span class="o">:</span> <span class="n">flags</span><span class="o">=</span><span class="mi">8863</span><span class="o">&lt;</span><span class="n">UP</span><span class="o">,</span><span class="n">BROADCAST</span><span class="o">,</span><span class="n">SMART</span><span class="o">,</span><span class="n">RUNNING</span><span class="o">,</span><span class="n">SIMPLEX</span><span class="o">,</span><span class="n">MULTICAST</span><span class="o">&gt;</span> <span class="n">mtu</span> <span class="mi">1500</span>
+    <span class="n">ether</span> <span class="mi">04</span><span class="o">:</span><span class="mi">0</span><span class="n">c</span><span class="o">:</span><span class="n">ce</span><span class="o">:</span><span class="n">e1</span><span class="o">:</span><span class="mi">3</span><span class="n">a</span><span class="o">:</span><span class="mi">9</span><span class="n">a</span> 
+    <span class="n">inet6</span> <span class="n">fe80</span><span class="o">::</span><span class="mi">60</span><span class="n">c</span><span class="o">:</span><span class="n">ceff</span><span class="o">:</span><span class="n">fee1</span><span class="o">:</span><span class="mi">3</span><span class="n">a9a</span><span class="o">%</span><span class="n">en0</span> <span class="n">prefixlen</span> <span class="mi">64</span> <span class="n">scopeid</span> <span class="mh">0x4</span> 
+    <span class="n">inet</span> <span class="mf">192.168</span><span class="o">.</span><span class="mf">1.19</span> <span class="n">netmask</span> <span class="mh">0xffffff00</span> <span class="n">broadcast</span> <span class="mf">192.168</span><span class="o">.</span><span class="mf">1.255</span>
+    <span class="n">inet6</span> <span class="mi">2001</span><span class="o">:</span><span class="mi">470</span><span class="o">:</span><span class="mi">1</span><span class="n">f1d</span><span class="o">:</span><span class="mi">33</span><span class="n">a</span><span class="o">:</span><span class="mi">60</span><span class="n">c</span><span class="o">:</span><span class="n">ceff</span><span class="o">:</span><span class="n">fee1</span><span class="o">:</span><span class="mi">3</span><span class="n">a9a</span> <span class="n">prefixlen</span> <span class="mi">64</span> <span class="n">autoconf</span> 
+    <span class="n">inet6</span> <span class="mi">2001</span><span class="o">:</span><span class="mi">470</span><span class="o">:</span><span class="mi">1</span><span class="n">f1d</span><span class="o">:</span><span class="mi">33</span><span class="n">a</span><span class="o">:</span><span class="mi">3826</span><span class="o">:</span><span class="mi">36</span><span class="n">d7</span><span class="o">:</span><span class="n">fbd6</span><span class="o">:</span><span class="mi">16</span><span class="n">f</span> <span class="n">prefixlen</span> <span class="mi">64</span> <span class="n">autoconf</span> <span class="n">temporary</span> 
+    <span class="n">nd6</span> <span class="n">options</span><span class="o">=</span><span class="mi">1</span><span class="o">&lt;</span><span class="n">PERFORMNUD</span><span class="o">&gt;</span>
+    <span class="n">media</span><span class="o">:</span> <span class="n">autoselect</span>
+    <span class="n">status</span><span class="o">:</span> <span class="n">active</span>
+ <span class="n">prefixlen</span> <span class="mi">64</span> <span class="n">autoconf</span> 
+    <span class="n">inet6</span> <span class="mi">2001</span><span class="o">:</span><span class="mi">470</span><span class="o">:</span><span class="mi">1</span><span class="n">f1d</span><span class="o">:</span><span class="mi">33</span><span class="n">a</span><span class="o">:</span><span class="mi">3826</span><span class="o">:</span><span class="mi">36</span><span class="n">d7</span><span class="o">:</span><span class="n">fbd6</span><span class="o">:</span><span class="mi">16</span><span class="n">f</span> <span class="n">prefixlen</span> <span class="mi">64</span> <span class="n">autoconf</span> <span class="n">temporary</span> 
+    <span class="n">nd6</span> <span class="n">options</span><span class="o">=</span><span class="mi">1</span><span class="o">&lt;</span><span class="n">PERFORMNUD</span><span class="o">&gt;</span>
+    <span class="n">media</span><span class="o">:</span> <span class="n">autoselect</span>
+    <span class="n">status</span><span class="o">:</span> <span class="n">active</span>
+</pre></div>
+
+
+<p>The first IPv6 address <code>2001:470:1f1d:33a:60c:ceff:fee1:3a9a</code> has been auto configured and includes the MAC address of the interface <code>04:0c:ce:e1:3a:9a</code> encoded in it using the <a href="https://en.wikipedia.org/wiki/IPv6_address#Modified_EUI-64">Modified EUI-64 format</a>. But this means that the publicly visible source address of my connections can be tied directly to my hardware.</p>
+<p>The second IPv6 address <code>2001:470:1f1d:33a:3826:36d7:fbd6:16f</code> has been generated randomly by the OS and router and has the <code>temporary</code> keyword attached. It is this address that the OS uses by default for outbound connections to that tracking is much harder.</p>
+<p>The full detail of these privacy extensions are detailed in <a href="https://tools.ietf.org/html/rfc4941">RFC4941 - Privacy Extensions for Stateless Address Autoconfiguration in IPv6</a>.</p>
+            <a href="#" class="go-top">Go Top</a>
+<footer class="footer">
+    <p>&copy; Matt Hamilton &ndash;
+        Built with <a href="https://github.com/PurePelicanTheme/pure-single">Pure Theme</a>
+        for <a href="http://blog.getpelican.com/">Pelican</a>
+    </p>
+</footer>        </div>
+    </div>
+    </div>
+    <script>
+        var $top = $('.go-top');
+
+        // Show or hide the sticky footer button
+        $(window).scroll(function() {
+            if ($(this).scrollTop() > 200) {
+                $top.fadeIn(200);
+            } else {
+                $top.fadeOut(200);
+            }
+        });
+
+        // Animate the scroll to top
+        $top.click(function(event) {
+            event.preventDefault();
+            $('html, body').animate({scrollTop: 0}, 300);
+        })
+
+        // Makes sure that the href="#" attached to the <a> elements
+        // don't scroll you back up the page.
+        $('body').on('click', 'a[href="#"]', function(event) {
+            event.preventDefault();
+        });
+    </script>
+    <script type="text/javascript">
+        var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+        document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+    <script type="text/javascript">
+        try {
+            var pageTracker = _gat._getTracker("UA-65654046-1");
+            pageTracker._trackPageview();
+            } catch(err) {}
+    </script>
+
+</body>
+</html>

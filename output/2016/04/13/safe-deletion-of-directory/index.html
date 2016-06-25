@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Quernus, Matt Hamilton. An Internet technologist, interested in Python web development, iOS deployment and testing, wearables, networking and operating systems.">
+
+
+        <title>Safer deleting of a directory // Quernus // Matt Hamilton. An Internet technologist, interested in Python web development, iOS deployment and testing, wearables, networking and operating systems.</title>
+
+    <link href="/theme/favicon.ico" rel="icon">
+
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.3.0/pure-min.css">
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Great+Vibes">  
+    <link rel="stylesheet" href="../../../../theme/css/pure.css">
+    <link rel="stylesheet" href="../../../../theme/css/pygments.css">
+
+    <script src="https://use.fontawesome.com/d373dd2436.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/fitvids/1.0.1/jquery.fitvids.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            $(".content").fitVids();
+        });
+    </script>
+
+    <!-- Opengraph -->
+    <meta property="og:url" content="https://www.quernus.co.uk/2016/04/13/safe-deletion-of-directory/" />
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="Safer deleting of a directory" />
+    <meta property="og:description" content="A safer alternative to rm -rf for use in scripts" />
+    <meta property="og:image" content="https://www.quernus.co.uk/theme/matt_head_bucharest.jpg" />
+
+
+
+</head>
+
+<body>
+    <div class="pure-g-r" id="layout">
+        <div class="sidebar pure-u">
+            <div class="cover-img" style="background: none repeat scroll 0% 0% #90a959">
+                <div class="cover-body">
+                    <header class="header">
+                        <hgroup>
+<!--                            <h1 class="brand-main"><a href="../../../..">Quernus</a></h1> -->
+                            <img class="avatar" src="/theme/matt_head_bucharest.jpg">
+                            <p class="tagline">Matt Hamilton. An Internet technologist, interested in Python web development, iOS deployment and testing, wearables, networking and operating systems.</p>
+                            <ul class="menu">
+                                <li class="links"><a href="/">Home</a></li>
+                                <li class="links"><a href="/category/talks.html">Talks</a></li>
+                                <li class="links"><a href="/archives.html">Archives</a></li>
+                                <li class="links"><a href="../../../../about">About Me / Contact</a></li>
+                            </ul>
+                                <p class="social">
+                                    <a href="https://twitter.com/hammertoe">
+                                        <i class="fa fa-twitter fa-3x"></i>
+                                    </a>
+                                    <a href="https://www.linkedin.com/in/matthamilton77">
+                                        <i class="fa fa-linkedin fa-3x"></i>
+                                    </a>
+                                    <a href="https://www.slideshare.net/hammertoe">
+                                        <i class="fa fa-slideshare fa-3x"></i>
+                                    </a>
+                                    <a href="https://github.com/hammertoe">
+                                        <i class="fa fa-github fa-3x"></i>
+                                    </a>
+                                </p>
+                        </hgroup>
+                    </header>
+                </div>
+            </div>
+        </div>
+    <div class="pure-u">
+        <div class="content">
+            <section class="post">
+                <header class="post-header">
+                    <h1>Safer deleting of a directory</h1>
+                        <p class="post-meta">
+                            // under                                 <a class="post-category" href="../../../../tag/unix.html">unix</a>
+                                <a class="post-category" href="../../../../tag/tips.html">tips</a>
+                                <a class="post-category" href="../../../../tag/sysadmin.html">sysadmin</a>
+                        </p>
+                </header>
+            </section>
+            <p>I have just been refactoring our build servers and need to wipe out a directory as part of the build script. This is something Jenkins used to be able to do itself, but can't be used now as part of the Multibranch Pipeline builds they have introduced.</p>
+<p>So I needed a way to delete the contents of a directory. I needed to keep the directory itself, but wanted to remove the contents of the directory (including subdirectories).</p>
+<p>The usual way to do this, assuming the directory was <code>/home/jenkins/workspaces/foo</code> would be to do:</p>
+<p><code>rm -rf /home/jenkins/workspaces/foo</code></p>
+<p>But that would remove the directory itself. You could do:</p>
+<p><code>rm -rf /home/jenkins/workspaces/foo/*</code></p>
+<p>...but that would leave any dotfiles in the directory.</p>
+<p>Also, we will be passing the path in as a variable, e.g.</p>
+<p><code>rm -rf ${workspace}</code></p>
+<p>And if somehow the <code>workspace</code> variable was set to <code>/</code> then it would cause the entire server to be wiped. Given there has recently been a couple of <a href="http://www.independent.co.uk/life-style/gadgets-and-tech/news/man-accidentally-deletes-his-entire-company-with-one-line-of-bad-code-a6984256.html">very high profile cases of exactly this in the media recently</a> I was keen not to add yet another.</p>
+<p>I happened to ask my friend, Stewie, if he had any better ideas, and he came with with a great one using <code>find</code>:</p>
+<p><code>find "${workspace}" -mindepth 4 -depth -delete</code></p>
+<p>The great thing here is the <code>mindepth</code> argument, that would prevent an accidental value of <code>/</code> or in fact any path with less than 4 path elements from being deleted. This greatly reduces the change of accidental damage due to a bad script.</p>
+<p>The double quotes around the argument also help protect it a bit from any malicious input that might attempt to inject extra arguments in the variable. This script is not intended to take input from untrusted sources, but it always pays to be as careful as you can and assume the worst.</p>
+<p>In fact we can make this even safer, as we know the root in which the workspaces are, so can pass that in as a hardcoded <code>path</code> argument to find, e.g.:</p>
+<p><code>find "${workspace}" -path /home/jenkins/workspaces -mindepth 4 -depth -delete</code></p>
+<p>So the worst that could now happen is that <em>all</em> of the workspaces could be deleted. Better than the entire server ;)</p>
+            <a href="#" class="go-top">Go Top</a>
+<footer class="footer">
+    <p>&copy; Matt Hamilton &ndash;
+        Built with <a href="https://github.com/PurePelicanTheme/pure-single">Pure Theme</a>
+        for <a href="http://blog.getpelican.com/">Pelican</a>
+    </p>
+</footer>        </div>
+    </div>
+    </div>
+    <script>
+        var $top = $('.go-top');
+
+        // Show or hide the sticky footer button
+        $(window).scroll(function() {
+            if ($(this).scrollTop() > 200) {
+                $top.fadeIn(200);
+            } else {
+                $top.fadeOut(200);
+            }
+        });
+
+        // Animate the scroll to top
+        $top.click(function(event) {
+            event.preventDefault();
+            $('html, body').animate({scrollTop: 0}, 300);
+        })
+
+        // Makes sure that the href="#" attached to the <a> elements
+        // don't scroll you back up the page.
+        $('body').on('click', 'a[href="#"]', function(event) {
+            event.preventDefault();
+        });
+    </script>
+    <script type="text/javascript">
+        var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+        document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+    <script type="text/javascript">
+        try {
+            var pageTracker = _gat._getTracker("UA-65654046-1");
+            pageTracker._trackPageview();
+            } catch(err) {}
+    </script>
+
+</body>
+</html>
