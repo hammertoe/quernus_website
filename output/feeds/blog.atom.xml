@@ -1,0 +1,1241 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Quernus</title><link href="https://www.quernus.co.uk/" rel="alternate"></link><link href="https://www.quernus.co.uk/feeds/blog.atom.xml" rel="self"></link><id>https://www.quernus.co.uk/</id><updated>2016-04-26T00:00:00+01:00</updated><entry><title>Getting Proper UTF-8 Output From Fastlane on Jenkins 2.0 Pipeline builds</title><link href="https://www.quernus.co.uk/2016/04/26/jenkins-utf8-pipeline-fastlane/" rel="alternate"></link><published>2016-04-26T00:00:00+01:00</published><author><name>Matt Hamilton</name></author><id>tag:www.quernus.co.uk,2016-04-26:2016/04/26/jenkins-utf8-pipeline-fastlane/</id><summary type="html">&lt;p&gt;I've just been upgrading our Jenkins 1.x server to Jenkins 2.0. I've been migrating our previous jobs to new Multibranch Pipeline Jobs.&lt;/p&gt;
+&lt;p&gt;One of the snags I hit was that the previous nice ANSI sequences and UTF-8 symbols that we used to have were getting mangled and coming up as a series of escape characters and question marks.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Screenshot of broken ANSI and UTF-8 in Jenkins 2.0 pipeline build jobs" src="/public/screenshot_utf8_ansi_broken.png" /&gt;&lt;/p&gt;
+&lt;p&gt;There were actually two parts to fix this:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;The ANSI Color plugin needs to be called in the Pipeline code, you can't just select a checkbox&lt;/li&gt;
+&lt;li&gt;The pipeline jobs start on the master and then get allocated a slave to run. So they take the locale of the &lt;em&gt;master&lt;/em&gt; not the &lt;em&gt;slave&lt;/em&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;So to fix:&lt;/p&gt;
+&lt;p&gt;Call the ANSI color plugin using a wrap statement. e.g.:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;node&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;xcode7&amp;#39;&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+   &lt;span class="c1"&gt;// Manually set the workspace to deal with clang &lt;/span&gt;
+   &lt;span class="c1"&gt;// choking on %2f in the directory&lt;/span&gt;
+   &lt;span class="n"&gt;ws&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;getWorkspace&lt;/span&gt;&lt;span class="o"&gt;())&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+     &lt;span class="c1"&gt;// Wrap to enable ANSI escape sequences&lt;/span&gt;
+     &lt;span class="n"&gt;wrap&lt;/span&gt;&lt;span class="o"&gt;([&lt;/span&gt;&lt;span class="n"&gt;$class&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;AnsiColorBuildWrapper&amp;#39;&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;colorMapName&amp;#39;&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;XTerm&amp;#39;&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;defaultFg&amp;#39;&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;defaultBg&amp;#39;&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="o"&gt;])&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+       &lt;span class="n"&gt;workspace&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;pwd&lt;/span&gt;&lt;span class="o"&gt;()&lt;/span&gt;
+       &lt;span class="c1"&gt;// Mark the code checkout &amp;#39;stage&amp;#39;....&lt;/span&gt;
+       &lt;span class="n"&gt;stage&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;Checkout&amp;#39;&lt;/span&gt;
+       &lt;span class="c1"&gt;// Checkout code from repository&lt;/span&gt;
+       &lt;span class="n"&gt;checkout&lt;/span&gt; &lt;span class="n"&gt;scm&lt;/span&gt;
+
+       &lt;span class="o"&gt;...&lt;/span&gt;
+     &lt;span class="o"&gt;}&lt;/span&gt;
+  &lt;span class="o"&gt;}&lt;/span&gt;
+&lt;span class="o"&gt;}&lt;/span&gt;   
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Secondly, you need to ensure the master runs as UTF-8. To do this I passed in an argument to the start script for Jenkins:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;-Dfile.encoding&lt;span class="o"&gt;=&lt;/span&gt;UTF-8
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;So, in my case on FreeBSD, the statements I have in &lt;code&gt;rc.conf&lt;/code&gt; are:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nv"&gt;jenkins_enable&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;YES&amp;quot;&lt;/span&gt;
+&lt;span class="nv"&gt;jenkins_args&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;--webroot=/usr/local/jenkins/war --httpPort=8180&amp;quot;&lt;/span&gt;
+&lt;span class="nv"&gt;jenkins_java_opts&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;-Djava.net.preferIPv6Addresses=true -Dfile.encoding=UTF-8&amp;quot;&lt;/span&gt; 
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Now it looks all pretty again and we get all the colouring and symbols from the output of Fastlane:&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Screenshot of working ANSI and UTF-8 in Jenkins 2.0 pipeline build jobs" src="/public/screenshot_utf8_ansi_working.png" /&gt;&lt;/p&gt;</summary><category term="jenkins"></category><category term="utf-8"></category><category term="ios"></category><category term="fastlane"></category></entry><entry><title>Safer deleting of a directory</title><link href="https://www.quernus.co.uk/2016/04/13/safe-deletion-of-directory/" rel="alternate"></link><published>2016-04-13T00:00:00+01:00</published><author><name>Matt Hamilton</name></author><id>tag:www.quernus.co.uk,2016-04-13:2016/04/13/safe-deletion-of-directory/</id><summary type="html">&lt;p&gt;I have just been refactoring our build servers and need to wipe out a directory as part of the build script. This is something Jenkins used to be able to do itself, but can't be used now as part of the Multibranch Pipeline builds they have introduced.&lt;/p&gt;
+&lt;p&gt;So I needed a way to delete the contents of a directory. I needed to keep the directory itself, but wanted to remove the contents of the directory (including subdirectories).&lt;/p&gt;
+&lt;p&gt;The usual way to do this, assuming the directory was &lt;code&gt;/home/jenkins/workspaces/foo&lt;/code&gt; would be to do:&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;rm -rf /home/jenkins/workspaces/foo&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;But that would remove the directory itself. You could do:&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;rm -rf /home/jenkins/workspaces/foo/*&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;...but that would leave any dotfiles in the directory.&lt;/p&gt;
+&lt;p&gt;Also, we will be passing the path in as a variable, e.g.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;rm -rf ${workspace}&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;And if somehow the &lt;code&gt;workspace&lt;/code&gt; variable was set to &lt;code&gt;/&lt;/code&gt; then it would cause the entire server to be wiped. Given there has recently been a couple of &lt;a href="http://www.independent.co.uk/life-style/gadgets-and-tech/news/man-accidentally-deletes-his-entire-company-with-one-line-of-bad-code-a6984256.html"&gt;very high profile cases of exactly this in the media recently&lt;/a&gt; I was keen not to add yet another.&lt;/p&gt;
+&lt;p&gt;I happened to ask my friend, Stewie, if he had any better ideas, and he came with with a great one using &lt;code&gt;find&lt;/code&gt;:&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;find "${workspace}" -mindepth 4 -depth -delete&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;The great thing here is the &lt;code&gt;mindepth&lt;/code&gt; argument, that would prevent an accidental value of &lt;code&gt;/&lt;/code&gt; or in fact any path with less than 4 path elements from being deleted. This greatly reduces the change of accidental damage due to a bad script.&lt;/p&gt;
+&lt;p&gt;The double quotes around the argument also help protect it a bit from any malicious input that might attempt to inject extra arguments in the variable. This script is not intended to take input from untrusted sources, but it always pays to be as careful as you can and assume the worst.&lt;/p&gt;
+&lt;p&gt;In fact we can make this even safer, as we know the root in which the workspaces are, so can pass that in as a hardcoded &lt;code&gt;path&lt;/code&gt; argument to find, e.g.:&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;find "${workspace}" -path /home/jenkins/workspaces -mindepth 4 -depth -delete&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;So the worst that could now happen is that &lt;em&gt;all&lt;/em&gt; of the workspaces could be deleted. Better than the entire server ;)&lt;/p&gt;</summary><category term="unix"></category><category term="tips"></category><category term="sysadmin"></category></entry><entry><title>Jenkins, Github, and IPv6</title><link href="https://www.quernus.co.uk/2015/12/14/jenkins-github-ipv6/" rel="alternate"></link><published>2015-12-14T00:00:00+00:00</published><author><name>Matt Hamilton</name></author><id>tag:www.quernus.co.uk,2015-12-14:2015/12/14/jenkins-github-ipv6/</id><summary type="html">&lt;p&gt;I've been setting up my local network to be IPv6 for as much of things as I can. I've even been trying to achieve the holy grail in terms of future-proofing the networking by making some of the hosts IPv6 only.&lt;/p&gt;</summary><category term="technology"></category><category term="jenkins"></category><category term="github"></category><category term="ipv6"></category><category term="openbsd"></category><category term="networking"></category><category term="DNS64"></category><category term="NAT64"></category></entry><entry><title>Smart Nation Singapore - Bristol Festival of Ideas - Festival of the Future City</title><link href="https://www.quernus.co.uk/2015/11/14/smart-nation-singapore/" rel="alternate"></link><published>2015-11-14T00:00:00+00:00</published><author><name>Matt Hamilton</name></author><id>tag:www.quernus.co.uk,2015-11-14:2015/11/14/smart-nation-singapore/</id><summary type="html">&lt;p&gt;&lt;img alt="Photo of Steve Leonard presenting" src="/public/smart_nation_singapore1.jpg" /&gt;&lt;/p&gt;
+&lt;p&gt;Thirty eight years ago I was born in Singapore. I grew up there and went to school there, and left in around 1990 to come to boarding school in England. Alas, in the 25 years since I left, I've never had a chance to go back to visit my stomping grounds.&lt;/p&gt;
+&lt;p&gt;Today, as part of the &lt;a href="http://www.ideasfestival.co.uk/"&gt;Bristol Festival of Ideas&lt;/a&gt;, I attended a talk by &lt;a href="http://www.ideasfestival.co.uk/events/steve-leonard/"&gt;Steve Leonard on Smart Nation Singapore&lt;/a&gt;. Steve is the CEO of  the Infocomm Development Authority, whom are the technology arm of the Singaporean Government.&lt;/p&gt;
+&lt;p&gt;Just to set the scene, Singapore is a country that is only 50 years old. It was taken from 'mud flats to metropolis' in in a single generation, mostly under the leadership of Prime Minister Lee Kuan Yew. It has also grown in size about 20% due to land reclamation projects.&lt;/p&gt;
+&lt;p&gt;Some of my notes on the talk below.&lt;/p&gt;
+&lt;p&gt;One of the main mantra of Singapore was 'We had to... so we did'. They've had to deal with issues of housing, water, and general infrastructure to grow. That was not an option, these were necessities. As an example, I lived in Singapore when the underground system, the MRT (Mass Rapid Transit) first opened with two lines and 20 stations. It now has 5 lines, and 113 stations. The majority of it build underneath an existing city.&lt;/p&gt;
+&lt;p&gt;Today, the mega-trends facing Singapore (as with many other countries) are an ageing population and urban mobility. With limited space available they are looking at ideas, such as a layered approach to space utilisation. Singapore is the 3rd most densely populated nation and with one of the largest ageing populations. By 2030 the number of elderly people aged 65 and above in Singapore is expected to triple to 900,000 (1 in 5).&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Diagram showing layered approach to services in Singapore" src="/public/smart_nation_singapore2.jpg" /&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Green open space on the top. Singapore already has a lot of green space, but by returning area used by roads back to green space this could be increased even more.&lt;/li&gt;
+&lt;li&gt;Last mile transport. Singapore are looking at integrated transport with buses and cars able to serve the 'last mile'&lt;/li&gt;
+&lt;li&gt;Goods distribution. Current models create pressure at certain times of the day with goods distribution. They are looking at using with the MRT and also autonomous vehicles for goods distribution.&lt;/li&gt;
+&lt;li&gt;MRT - The Mass Rapid Transit system.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Connectivity is a key feature, and their mantra is 'Everyone, Everything, Everywhere, All the time'. Currently 100% of the population is served by gigabit fibre connectivity. They are looking to increase ubiquitous mobile and wifi coverage across the city too. There is a current project allowing citizens to voluntarily run and app on their phone to report back coverage stats so that the government can increase coverage. This is not just open space coverage, but coverage in train tunnels, underground, lift shafts, etc.&lt;/p&gt;
+&lt;p&gt;Looking at things like remote healthcare and monitoring, they don't want lack of connectivity to be an issue.&lt;/p&gt;
+&lt;p&gt;The Singaporean financial authority are funding $225M for innovation in FinTech services.&lt;/p&gt;
+&lt;p&gt;Open data: Singapore already publishes a large amount of Open Data at &lt;a href="https://data.gov.sg/"&gt;https://data.gov.sg/&lt;/a&gt;. They are engaging citizens to collect further data (e.g. connectivity as described above).&lt;/p&gt;
+&lt;p&gt;"No one left behind". Equipping the silver age. If you can't afford a phone, etc the govt will fund one for you. They are looking into how you create and foster the 'kampong spirit' in an urban environment.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Steve answering questions at the end" src="/public/smart_nation_singapore3.jpg" /&gt;&lt;/p&gt;
+&lt;p&gt;Extending their further mantra: "Because we did... we know we can".&lt;/p&gt;
+&lt;p&gt;I managed to get a chance to talk to Steve at the end of the talk. Turns out his office is the other side of the road of the school I attended when I grew up in Singapore. One day I'll get back there to see how much Singapore has changed since I left. Certainly a lot of the skyline photos are un-recognisable.&lt;/p&gt;
+&lt;p&gt;More details on the &lt;a href="http://www.smartnation-forbes.com/"&gt;Smart Nation Singapore project can be found on their website&lt;/a&gt;.&lt;/p&gt;</summary><category term="technology"></category><category term="cities"></category><category term="singapore"></category><category term="connected health"></category></entry><entry><title>NSScotland 2015 Conference</title><link href="https://www.quernus.co.uk/2015/10/25/NSScotland-conference/" rel="alternate"></link><published>2015-10-25T00:00:00+01:00</published><author><name>Matt Hamilton</name></author><id>tag:www.quernus.co.uk,2015-10-25:2015/10/25/NSScotland-conference/</id><summary type="html">&lt;p&gt;&lt;img alt="Photo of talks at NSScotland" src="/public/nsscotland_talks.jpg" /&gt;&lt;/p&gt;
+&lt;p&gt;This weekend I attended the &lt;a href="http://nsscotland.com/"&gt;NSScotland conference&lt;/a&gt; in Edinburgh. A friendly small conference for iOS and Mac developers with a focus on chatting to people and the 'hallway tracks'. It was also a great chance to meet up in person with some of my colleagues in Edinburgh.&lt;/p&gt;
+&lt;p&gt;Below is a write up of some of the talks that caught my attention specifically.&lt;/p&gt;
+&lt;h2&gt;Top Ten Tips for Building Apps with Maps - Rachel Hyman, VOKAL Interactive&lt;/h2&gt;
+&lt;p&gt;This is the sort of talk I love at a conference. You can see the battle scars of what has been tried and tested. What worked and what failed. Rachel talked about various tips and approaches for working with maps and mapping in iOS. &lt;/p&gt;
+&lt;p&gt;&lt;a href="https://github.com/rachelhyman/nsscotland"&gt;Her slides are up on Github&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;But some specific tips I found useful:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Encapsulate obtaining permission and getting location in one method.
+Don’t assume you always have permission, a use can at any time disable permissions for your app to use the location info. This is actually good advice for any permission stuff in iOS, e.g. accessing the camera or photo library. A user can switch that permission off at any time, so your app needs to be able to handle this gracefully in the future.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;MKMapCamera.heading != CLLocation.heading necessarily. There are two headings you might get. One is from the compass in the device. The other is based on the direction you are heading. They may be different. Think: sitting backwards in a moving taxi.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Use gpx routes to simulate routes. You can record a GPX track with an app such as MapMyWalk and then import that GPX track into Xcode to use when testing an app in the iOS Simulator. Apple provide a few sample routes, but sometimes you want to get your own.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;PCalc Through the Ages - James Thomson&lt;/h2&gt;
+&lt;p&gt;This talk was way more entertaining than any talk about a 30 year old code base on a scientific calculator app has any right to be.&lt;/p&gt;
+&lt;p&gt;James talked about the original app writen by himself whilst a student and wanting a scientific calculator. It was written in Pascal and then over time bits an pieces have been wrapped and re-writen in various languages. I can't do justice in a blog post to his presentation, so I hope the video will be out soon and I'll link that here.&lt;/p&gt;
+&lt;h2&gt;Building an ecosystem for mental wellbeing apps and why Heathkit is missing a trick - Kate Ho - Product Manager - Health and Social Care Integration, Scottish Government&lt;/h2&gt;
+&lt;p&gt;This talk was originally titled "Touch Interfaces (and the Watch)", but actually ended up mainly being a history and status of the &lt;a href="https://www.ginsberg.io/"&gt;Ginsberg Project&lt;/a&gt;. Ginsberg is a project funded and run by the Scottish government to produce mood tracking app for mental health wellbeing. It is similar to enquos in terms of it's ability to integrate with a number of different other data sources, but focusses exclusively on mental health. Their motto is "Creating an emotional web". They had a look at what other 'mood tracker' apps there are on the app store, and in fact their are loads of them, but none of them took the holistic view that they wanted to take.&lt;/p&gt;
+&lt;iframe width="560" height="315" src="https://www.youtube.com/embed/VIsuXsseAdE" frameborder="0" allowfullscreen&gt;&lt;/iframe&gt;
+
+&lt;p&gt;Ginsberg is a non-judgemental app and intended to enable users to spot patterns in their mood and wellbeing.&lt;/p&gt;
+&lt;p&gt;It total the app was built over 18 months. This was the first app to be developed inside the Scottish Government itself. The first prototype was developed in about 3 months, and released to a group of about 12 people to test. It was scrapped and rebuilt again in about 2 months with the help of a psychologist. They originally started developing native apps for iOS and Android, but switched to Cordova to iterate quicker, but might switch back to native in the future.&lt;/p&gt;
+&lt;p&gt;One of the main issues they had was that most existing mood tracking apps just asked you to rate your mood on a scale of 1-10. But mood is much more fine grained than that. Ginsberg is instead based on the &lt;a href="http://www.healthscotland.com/scotlands-health/population/Measuring-positive-mental-health.aspx"&gt;Warwick-Edinburgh Mental Well Being Scale (WEMWBS)&lt;/a&gt;. They present the user a number of questions from a selection of 18 total questions such as "Do you feel connected to other people today?". One of the main complaints Kate has was that Apple's Healthkit does not yet take mental heath very seriously. It only has a single category for 'mood' at the moment.&lt;/p&gt;
+&lt;p&gt;They have found that users fall into one of three categories:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Externalisers - who want a place to write privately. A diary.&lt;/li&gt;
+&lt;li&gt;Pattern spotters - the 'data geeks'. They want to upload as much data as possible and be able to stop patterns in the data&lt;/li&gt;
+&lt;li&gt;Trouble shooters - They work on one thing at a time. They may use a tool to reach a goal and once reached, stop using it.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;I had a chance to have a great chat with Kate after the talk. It seems that some of the issue they are having regarding standardised scales for assessment are similar to what we are seeing tracking fitness and health data. For instance, one app might record sleep time as time you went to bed until time you got out of bed. Others might record time asleep. In most cases the most interesting bit of information is how long the person was in bed, but &lt;em&gt;not&lt;/em&gt; asleep. The project development is currently on hold whilst they seek further funding, but the app itself is still running.&lt;/p&gt;
+&lt;h2&gt;Managing Distributed Teams - Maria Gutierrez - Senior Director of Engineering, Living Social&lt;/h2&gt;
+&lt;p&gt;This was another talk I was looking forward to, as I am currently managing a distributed team of developers. What was interesting was that Living Social, and enquos's current selection of tools is near identical. We both use Slack for daily comms and Google Hangouts for daily stand-ups.&lt;/p&gt;
+&lt;p&gt;Her top key qualities to being an effective manager of distributed teams:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;being visible&lt;/li&gt;
+&lt;li&gt;being honest and open&lt;/li&gt;
+&lt;li&gt;being responsive&lt;/li&gt;
+&lt;li&gt;delivering&lt;/li&gt;
+&lt;li&gt;being consistent&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;So I am going to strive to keep these all in mind and make sure that I am doing them as much as possible. I think I am hitting most of them, but there are some I could always do with some more work on. I want to start doing more 1-to-1 hangouts with individuals on a weekly basis.&lt;/p&gt;
+&lt;p&gt;Her tips for distributed teams working together effectively:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;group devs with compatible timezones&lt;/li&gt;
+&lt;li&gt;agreement on "how we work"&lt;/li&gt;
+&lt;li&gt;consistent working hours&lt;/li&gt;
+&lt;li&gt;notify changes to plan&lt;/li&gt;
+&lt;li&gt;shared calendars&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;The last of these three points all concern with scheduling and making sure people know how and when they can expect colleagues to be around. We have a shared calendar with holidays and the likes marked on, but Living Social have a much better system I think, with more granularity than just 'here' or 'away':&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Living Social's team calendar showing when people are available" src="/public/livingsocial_calendar.jpg" /&gt;&lt;/p&gt;
+&lt;p&gt;Each day for each person on the team is colour coded with their availability. They code the availability as:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Working, business as usual&lt;/li&gt;
+&lt;li&gt;Working normally but remote&lt;/li&gt;
+&lt;li&gt;Working irregular times. Will check online often&lt;/li&gt;
+&lt;li&gt;PTO (personal time off). Not available, but will answer for an emergency&lt;/li&gt;
+&lt;li&gt;PTO. No chance you'll find me&lt;/li&gt;
+&lt;li&gt;Public holiday in my country&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;I really like this, as I personally work pretty flexibly. Most of the time I am in my office 9-5 in my timezone. But sometimes, for instance I might work from home looking after my daughter. It would be good to be able to distinguish this easily. Ie. I am around and working, but I might be distracted periodically. Or it is good to be able to distinguish between taking some time off to catch up on some personal errands around town, versus I'm camping on the top of the mountain and have no connectivity even if I wanted some.&lt;/p&gt;
+&lt;h2&gt;Kids at the conference&lt;/h2&gt;
+&lt;p&gt;There was childcare available at the event, which is a great idea for parents and allowing people that might not be able to addend a conference. Alas, this wasn't publicised as well as it could have been, and I didn't find out about it until the day before. Our 4 year old might have been too young for it though. The kids were doing some kind or art project, and at one point I spotted them dressed up being filmed... so I'm waiting to see the results as they seemed to be having a great time!&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Kids doing an art project at the conference" src="/public/nsscotland_kids.jpg" /&gt;&lt;/p&gt;
+&lt;h2&gt;Thanks&lt;/h2&gt;
+&lt;p&gt;Thanks to Alan for putting the conference on again, and hope the event continues to run and get even better.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Edinburgh at night" src="/public/edinburgh_night.jpg" /&gt;&lt;/p&gt;</summary><category term="iOS"></category><category term="conference"></category><category term="community"></category></entry><entry><title>Force git to use ssh instead of HTTPS</title><link href="https://www.quernus.co.uk/2015/10/22/force-git-to-use-ssh/" rel="alternate"></link><published>2015-10-22T00:00:00+01:00</published><author><name>Matt Hamilton</name></author><id>tag:www.quernus.co.uk,2015-10-22:2015/10/22/force-git-to-use-ssh/</id><summary type="html">&lt;p&gt;Sometimes you have tools that reference a github url with https and you want them to use ssh instead so your ssh key works.&lt;/p&gt;
+&lt;p&gt;In my case it is Cocoapods trying to clone a spec repo. Since I just enabled two-factor auth on my account it now stopped working:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;Matts-iMac:Nutrition matt$ pod install
+Cloning spec repo &lt;span class="sb"&gt;`&lt;/span&gt;enquos&lt;span class="sb"&gt;`&lt;/span&gt; from &lt;span class="sb"&gt;`&lt;/span&gt;https://github.com/enquos/mib.ios.pod.podspec&lt;span class="sb"&gt;`&lt;/span&gt;
+Username &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;https://github.com&amp;#39;&lt;/span&gt;: hammertoe
+Password &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;https://hammertoe@github.com&amp;#39;&lt;/span&gt;: 
+&lt;span class="o"&gt;[&lt;/span&gt;!&lt;span class="o"&gt;]&lt;/span&gt; Unable to add a &lt;span class="nb"&gt;source&lt;/span&gt; with url &lt;span class="sb"&gt;`&lt;/span&gt;https://github.com/enquos/mib.ios.pod.podspec&lt;span class="sb"&gt;`&lt;/span&gt; named &lt;span class="sb"&gt;`&lt;/span&gt;enquos&lt;span class="sb"&gt;`&lt;/span&gt;.
+You can try adding it manually in &lt;span class="sb"&gt;`&lt;/span&gt;~/.cocoapods/repos&lt;span class="sb"&gt;`&lt;/span&gt; or via &lt;span class="sb"&gt;`&lt;/span&gt;pod repo add&lt;span class="sb"&gt;`&lt;/span&gt;.
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;By putting the following in your &lt;code&gt;~/.gitconfig&lt;/code&gt; file you can force git to use SSH whenever it is asked to use a HTTPS url:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;[url &amp;quot;git@github.com:&amp;quot;]&lt;/span&gt;
+  &lt;span class="na"&gt;insteadOf&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;https://github.com/&lt;/span&gt;
+&lt;span class="k"&gt;[url &amp;quot;git@github.com:&amp;quot;]&lt;/span&gt;
+  &lt;span class="na"&gt;pushInsteadOf&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;git://github.com/&amp;quot;&lt;/span&gt;
+&lt;span class="k"&gt;[url &amp;quot;git@github.com:&amp;quot;]&lt;/span&gt;
+  &lt;span class="na"&gt;pushInsteadOf&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;https://github.com/&amp;quot;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;</summary><category term="ios"></category><category term="git"></category><category term="ssh"></category></entry><entry><title>Plone Conference 2015 - Bucharest</title><link href="https://www.quernus.co.uk/2015/10/19/plone-conference-2015-bucharest/" rel="alternate"></link><published>2015-10-19T00:00:00+01:00</published><author><name>Matt Hamilton</name></author><id>tag:www.quernus.co.uk,2015-10-19:2015/10/19/plone-conference-2015-bucharest/</id><summary type="html">&lt;h2&gt;You can check out any time, but you can never leave...&lt;/h2&gt;
+&lt;p&gt;I've not been involved in Plone much in the past year. After organising the annual Plone Conference in Bristol last year, and after leaving Netsight to work on something different, I needed a mental break for a bit. I've been involved with Plone for nearly 15 years now, and that is quite a long time working with the community and evangelising the wonders of Open Source content management.&lt;/p&gt;
+&lt;p&gt;So I wasn't going to be going to Plone Conference this year. My current main client, enquos, uses Plone for their online help centre, but it is not something I am directly involved with. So the justification of me going to the conference this year was not that strong...&lt;/p&gt;
+&lt;p&gt;...but...&lt;/p&gt;
+&lt;p&gt;The strangest thing happened a few months ago. My wife, Vik, who has been a 'Plone widow' for a number of years, putting up with me jetting off to far corners or the globe to attend Plone events saw a conversation between two Plone community members, Cris Ewing and Kim Nguyen talking about the upcoming conference in Bucharest. She has met a number of the community at events when I've dragged her along (OK, so not much dragging needed to get her to Sorrento for Plone Open Garden).&lt;/p&gt;
+&lt;p&gt;"I want to go to the Plone Conference" she said "I miss these people"&lt;/p&gt;
+&lt;p&gt;Stockholm Syndrome.&lt;/p&gt;
+&lt;p&gt;"Really? I we could go anywhere on holiday" I replied.
+"Yes, but I only see these people a few times a year and I like them"&lt;/p&gt;
+&lt;p&gt;So I thought I'd submit a talk for the conference, and that would decide if we go or not. It got accepted. So we booked flights and hotel to go to the conference with a view that it would be part conference and part holiday.&lt;/p&gt;
+&lt;p&gt;I think it certainly says a lot about a community that one's spouse misses them as much as you do. In fact, by the end of the conference the joke was that it was Vik that would be invited to the next conference, and perhaps Mr Vik would tag along too ;)&lt;/p&gt;
+&lt;p&gt;So a few weeks later we were driving to Luton airport to fly to Bucharest. Alas, no direct flights from Bristol to Bucharest. We could have flown to Budapest and then got the train, which would have been quite fun, but also take more time that I wanted to take off.&lt;/p&gt;
+&lt;p&gt;Bucharest is a beautiful city. There are so many impressive old buildings, and very welcoming people. We stayed at the Hotel Epoque, which was stunning and fantastic service.&lt;/p&gt;
+&lt;p&gt;Some observations and highlights, in no order:&lt;/p&gt;
+&lt;h2&gt;Eric Steele's keynote on the State of Plone&lt;/h2&gt;
+&lt;p&gt;&lt;img alt="Eric Steele's State of Plone keynote" src="/public/eric_steele_keynote_ploneconf.jpg" /&gt;&lt;/p&gt;
+&lt;p&gt;I've not been involved much with Plone in the past year... and WOW, has a lot happened. So many pieces of work that were underway when I last looked are now not only in Plone 5, but look like they properly belong there. Dexterity is now the default content type system, and the new Diazo theme editor makes creating themes even easier. The new base theme for Plone 5 is much easier to work with, and the new toolbar UI is a massive visual and functional refresh.&lt;/p&gt;
+&lt;p&gt;The best description of Plone 5 was Eric talking about the apocryphal story of 'My Grandfather's Axe' (also know as the &lt;a href="https://en.wikipedia.org/wiki/Ship_of_Theseus"&gt;Ship of Theseus&lt;/a&gt;). "This is my grandfather's axe. It has had the head replaced twice and the handle three times, but it is still my grandfather's axe". Plone has had many parts of it replaced and it feels fresh and modern, but it still retains the underlying feel and ethos of 'My Grandfather's Plone'. Those of you in the UK may remember &lt;a href="https://www.youtube.com/watch?v=BUl6PooveJE"&gt;Trigger's Broom&lt;/a&gt; in &lt;em&gt;Only Fools and Horses&lt;/em&gt;.&lt;/p&gt;
+&lt;p&gt;I was very pleased to see the stronger and more definitive stance taken on a few issues, both politically and technically. Plone.app.multilingual is now shipped with Plone by default. Plone has taken a strong stance on the future of Zope2 and is making bold moves to refactor the bits it needs.&lt;/p&gt;
+&lt;p&gt;Plone 5 also has fixed up a lot of accessibility issues that have crept in over time. 10 years ago Plone was a leader in accessibility for CMSes and I'm glad to say it looks like it is back in that spot again. One of the main mantras being:&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;All the content. All the time. For all the people.&lt;/em&gt;&lt;/p&gt;
+&lt;h2&gt;Max Nakane's Keynote on Accessibility &amp;amp; Open Space&lt;/h2&gt;
+&lt;p&gt;Whilst on the topic of accessibility, it was great to see the keynote of Max Nakane. Max is a Japanese developer who has been blind since he was a few years old. It is certainly humbling to see a keynote by someone for whom English is not their native language and whom has never even seen the slides they have written and are presenting to the audience.&lt;/p&gt;
+&lt;p&gt;I have some experience with working with the blind as my son lost the majority of his sight a few years ago. But it was great to hear from someone with absolutely no vision for, practically, their entire life and how they interface with the digital (and physical) world. He is also a FreeBSD advocate, so a good guy in my book ;)&lt;/p&gt;
+&lt;p&gt;Max talked about a number of practical issues around accessibility and gave a number of tips on helping provide access to information and processes to as wide an audience as possible.&lt;/p&gt;
+&lt;p&gt;Not only does he talk about people with disabilities, but also talked about 'situational disability' the context that someone might be impaired temporarily due to other factors. This is something I've been thinking about a lot recently working with mobile development. Unlike 'traditional' desk-based usage of applications and web sites, a mobile user is likely to be carrying an umbrella and a cup of coffee, walking down the street, trying to avoid other pedestrians, navigate to their destination &lt;em&gt;and&lt;/em&gt; use your app at the same time.&lt;/p&gt;
+&lt;p&gt;A good friend of mine, Oliver Humpage at Watershed, has written a great blog post on how they embedded text subtitles on a live streamed conference they were organising. One bit that really caught my attention was the reasoning &lt;em&gt;why&lt;/em&gt; they did the subtitles:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Well, people who are deaf or hard of hearing shouldn’t be excluded from your event. Pretty simple, really.&lt;/p&gt;
+&lt;p&gt;But it’s not just for them. Live captions benefit:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;viewers whose first language isn’t English (or whatever’s being spoken at your event): it’s much easier to follow a foreign tongue when you can read as well as hear&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;people who are watching in an environment – e.g. on public transport, or when getting a baby to sleep, or in bed, or in a huge number of other situations – where it’s more convenient to watch without the sound on.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;There are more people in that second category than you might think – we got many tweets from people grateful that the captions were there.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;a href="http://blogs.wcode.org/2015/10/live-streaming-captions/"&gt;His full write up on the technical details of how they did it&lt;/a&gt; is fascinating. And something I'd really like to see if could be implemented at future Plone Conferences. We have a very linguistically diverse audience at the Plone Conference, and I'm sure if you are, e.g., A Slovenian trying to understand a French person speaking English whilst in America... having live subtitles of the speaker would be useful.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Max Nakane demonstrating accessibility tools he uses" src="/public/max_nakane_openspace.jpg" /&gt;&lt;/p&gt;
+&lt;p&gt;Max lead an Open Space session the next day on his day-to-day use of accessibility technologies to give people a bit of an insight as to how he 'sees' the digital world and some of the challenges. Watching someone firsthand use a braille reader or text-to-speech to navigate certainly showed some of the issues faced. More importantly it was great to see the strategies that people relying on assistive tools use.&lt;/p&gt;
+&lt;h2&gt;Plone Internet Consortium&lt;/h2&gt;
+&lt;p&gt;The Plone Intranet Consortium had no less than six talks at the conference. Ranging from 'state of' talks from Guido Stevens to more technical talks such as the User Profile implementation talk by my former colleague at Netsight, Matthew Sital-Singh.&lt;/p&gt;
+&lt;p&gt;The Plone Intranet Consortium is an interesting model of funding development. It works on a number of member companies contributing to a central fund which in turn pays for some of the central skills used, such as the designer responsible for the coherent look and feel of all the parts.&lt;/p&gt;
+&lt;p&gt;The Plone Intranet Consortium was a project initially started whilst I was at Netsight as a collaboration between Netsight, Cosent and then bringing in a number of other Plone companies who develop intranets. It is fascinating to see how far it has come in the past year and how, not only the technical progress, but the concept as a whole. The project is not just trying to build software, but fundamentally analyse the way in which business culture and organisation affects the procurement, use, and adoption of enterprise software.&lt;/p&gt;
+&lt;p&gt;Guido also un-veiled the new name and branding of the project... Quaive. &lt;a href="http://quaive.com/"&gt;A new website for the Quaive project is now online&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Quaive's new website" src="/public/quaive_website2.png" /&gt;&lt;/p&gt;
+&lt;p&gt;One of the talks I specifically liked the format of was Matthew Sital-Singh's talk as mentioned above. The talk was about the user profile system in Plone Intranet. This is an area I've worked on a lot whilst I was at Netsight as I was usually responsible for the Authentication integration we did. Integrating with a corporate LDAP or Active Directory server for instance. These kind of things were always a bit bespoke as every project and client was slightly different in their technical setup and organisational arrangement.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Matthew Sital-Singh talking about ploneinternet.userfolder" src="/public/mattss_ploneconf.jpg" /&gt;&lt;/p&gt;
+&lt;p&gt;Matt's talk broke the functionality of the add-on into four specific areas: &lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Out-of-the-box&lt;/li&gt;
+&lt;li&gt;Customisation&lt;/li&gt;
+&lt;li&gt;Extension&lt;/li&gt;
+&lt;li&gt;Integration&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;i.e. here is what you can expect to get 'out of the box' when you first install the product. Here is what you get with a bit of customisation (i.e., selecting checkboxes in a config screen somewhere). Here is what you can do if you write some extension code and extend or change the behaviour of the product. And here is how this product integrates with other products out there and what additional products provide additional combined functionality.&lt;/p&gt;
+&lt;p&gt;This is a format I'd love to see for more presentations on Plone add-ons as it allows the user to see exactly what level of experience or skill (or cost) they will need to achieve certain changes in functionality.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="https://speakerdeck.com/mattss/a-flexible-user-solution-for-plone-intranet"&gt;ploneintranet.userprofile a flexible user solution for plone intranet - Matthew Sital Singh&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://www.slideshare.net/GuidoStevens/the-state-of-plone-intranet"&gt;The State of Plone Intranet - Guido Stevens&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://www.slideshare.net/GuidoStevens/plone-intranet-under-the-hood"&gt;Plone Intranet under the hood - Guido Stevens&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://www.slideshare.net/pilz/case-management-in-plone-intranet"&gt;Case Management in Plone Intranet - Alexander Pilz&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;Live Blogging by Maurits van Rees&lt;/h2&gt;
+&lt;p&gt;&lt;img alt="Maurits van Rees live blogging from Plone Conference 2015" src="/public/ploneconf_maurits_liveblogging.jpg" /&gt;
+Once again, Maurits van Rees was live blogging all the talks he was in. This was a fantastic resource, not only for those unable to attend, but also for when you ended up wanting to be in two talks at the same time. &lt;a href="http://maurits.vanrees.org/weblog/topics/ploneconf2015"&gt;Maurit's notes can be found on his blog&lt;/a&gt;.&lt;/p&gt;
+&lt;h2&gt;Adventures in Wonderland&lt;/h2&gt;
+&lt;p&gt;I gave a talk at the conference on my adventures in the past year in mobile app development. I talked about some of the skills and tools I'd learnt from Plone to iOS development.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="/2015/10/15/adventures-in-wonderland-a-plone-developers-year-in-ios/"&gt;Adventures in Wonderland - A Plone Developer's Year in iOS&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;Community&lt;/h2&gt;
+&lt;p&gt;As usual, the Plone Community is awesome. These are some of the most fantastic people I know. And as usual, I spent way too long in the evenings drinking and chatting with so many of them. There were some usual faces who couldn't make it, but conversely a lot of fresh new faces as well. I won't put all the incriminating evidence on here, but checkout out the link below to some of the photos on Flickr of the event.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="https://www.flickr.com/search/?q=ploneconf2015"&gt;Plone Conference 2015 Photos on Flickr&lt;/a&gt; &lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;Plone Conference 2016 - Boston&lt;/h2&gt;
+&lt;p&gt;Following on from the accidental pattern of so many Plone conferences recently being held in cities starting with a 'B' (Budapest, Bristol, Brasilia, Bucharest)... Plone Conference 2016 will be held in Boston. It is being organised by Cris Ewing, Sally Kleinfeldt and Kim Nguyen and will be held at Microsoft's Research Campus. I'm so glad to see a Plone Conference in North America again, as the last one, San Francisco in 2011 seems so long ago now.&lt;/p&gt;
+&lt;h2&gt;Thanks!&lt;/h2&gt;
+&lt;p&gt;&lt;img alt="Plone Conference 2015 Group Photo" src="/public/ploneconf2015_group_photo.jpg" /&gt;&lt;/p&gt;
+&lt;p&gt;So, thanks to Alec Ghica and the team at Eau de Web for organising a fantastic conference. I know how much time it can take, and they did a fantastic job. Thanks to all the event sponsors too and the community for making such an enjoyable event once again.&lt;/p&gt;</summary><category term="plone"></category><category term="ios"></category><category term="ploneconf"></category><category term="community"></category></entry><entry><title>Creating Custom PDF Filter on OS X</title><link href="https://www.quernus.co.uk/2015/10/01/creating-custom-pdf-filter-osx/" rel="alternate"></link><published>2015-10-01T00:00:00+01:00</published><author><name>Matt Hamilton</name></author><id>tag:www.quernus.co.uk,2015-10-01:2015/10/01/creating-custom-pdf-filter-osx/</id><summary type="html">&lt;p&gt;Each month I send an invoice to my clients. Included in that invoice are photos of any receipts for expenses incurred (taxis,etc.). I typically just take a photo of these recipes flat on my desk and then save them as PDFs and drag those PDFs into the main invoice PDF in Preview to create a single file with both the invoice and all the receipts.&lt;/p&gt;
+&lt;p&gt;This month, I went to send the invoice to the client and Gmail balked at me as the file size was too large. The PDF was 22MB, but I guess once Base64 encoded and S/Mime encrypted it was over the 40MB-ish limit it appears we have on Gmail.&lt;/p&gt;
+&lt;p&gt;I remember seeing a filter when saving a PDF from preview called 'Reduce File Size'. Sure enough, that reduced the file size down from 22MB to 250KB. But the images of receipts were so heavily compressed that you could not read some of the numbers on them.&lt;/p&gt;
+&lt;p&gt;Hunting around online I came across &lt;a href="http://hints.macworld.com/article.php?story=20120629091437274"&gt;this post from several years ago said you can create your own filters&lt;/a&gt;. I check on my Mac running Yosemite (10.10.5) and it still works!&lt;/p&gt;
+&lt;p&gt;The filters are found in &lt;code&gt;/System/Library/Filters&lt;/code&gt; and so I copied the 'Reduce File Size' one and increased the quality and max image resolution as per the post above:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;sudo cp Reduce\ File\ Size.qfilter Reduce\ File\ Size\ Best.qfilter
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;My filter contents:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="cp"&gt;&amp;lt;?xml version=&amp;quot;1.0&amp;quot; encoding=&amp;quot;UTF-8&amp;quot;?&amp;gt;&lt;/span&gt;
+&lt;span class="cp"&gt;&amp;lt;!DOCTYPE plist PUBLIC &amp;quot;-//Apple Computer//DTD PLIST 1.0//EN&amp;quot; &amp;quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&amp;quot;&amp;gt;&lt;/span&gt;
+&lt;span class="nt"&gt;&amp;lt;plist&lt;/span&gt; &lt;span class="na"&gt;version=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;1.0&amp;quot;&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="nt"&gt;&amp;lt;dict&amp;gt;&lt;/span&gt;
+    &lt;span class="nt"&gt;&amp;lt;key&amp;gt;&lt;/span&gt;Domains&lt;span class="nt"&gt;&amp;lt;/key&amp;gt;&lt;/span&gt;
+    &lt;span class="nt"&gt;&amp;lt;dict&amp;gt;&lt;/span&gt;
+        &lt;span class="nt"&gt;&amp;lt;key&amp;gt;&lt;/span&gt;Applications&lt;span class="nt"&gt;&amp;lt;/key&amp;gt;&lt;/span&gt;
+        &lt;span class="nt"&gt;&amp;lt;true/&amp;gt;&lt;/span&gt;
+        &lt;span class="nt"&gt;&amp;lt;key&amp;gt;&lt;/span&gt;Printing&lt;span class="nt"&gt;&amp;lt;/key&amp;gt;&lt;/span&gt;
+        &lt;span class="nt"&gt;&amp;lt;true/&amp;gt;&lt;/span&gt;
+    &lt;span class="nt"&gt;&amp;lt;/dict&amp;gt;&lt;/span&gt;
+    &lt;span class="nt"&gt;&amp;lt;key&amp;gt;&lt;/span&gt;FilterData&lt;span class="nt"&gt;&amp;lt;/key&amp;gt;&lt;/span&gt;
+    &lt;span class="nt"&gt;&amp;lt;dict&amp;gt;&lt;/span&gt;
+        &lt;span class="nt"&gt;&amp;lt;key&amp;gt;&lt;/span&gt;ColorSettings&lt;span class="nt"&gt;&amp;lt;/key&amp;gt;&lt;/span&gt;
+        &lt;span class="nt"&gt;&amp;lt;dict&amp;gt;&lt;/span&gt;
+            &lt;span class="nt"&gt;&amp;lt;key&amp;gt;&lt;/span&gt;DocumentColorSettings&lt;span class="nt"&gt;&amp;lt;/key&amp;gt;&lt;/span&gt;
+            &lt;span class="nt"&gt;&amp;lt;dict&amp;gt;&lt;/span&gt;
+                &lt;span class="nt"&gt;&amp;lt;key&amp;gt;&lt;/span&gt;CustomLHSCorrection&lt;span class="nt"&gt;&amp;lt;/key&amp;gt;&lt;/span&gt;
+                &lt;span class="nt"&gt;&amp;lt;array&amp;gt;&lt;/span&gt;
+                    &lt;span class="nt"&gt;&amp;lt;integer&amp;gt;&lt;/span&gt;8&lt;span class="nt"&gt;&amp;lt;/integer&amp;gt;&lt;/span&gt;
+                    &lt;span class="nt"&gt;&amp;lt;integer&amp;gt;&lt;/span&gt;8&lt;span class="nt"&gt;&amp;lt;/integer&amp;gt;&lt;/span&gt;
+                    &lt;span class="nt"&gt;&amp;lt;integer&amp;gt;&lt;/span&gt;8&lt;span class="nt"&gt;&amp;lt;/integer&amp;gt;&lt;/span&gt;
+                &lt;span class="nt"&gt;&amp;lt;/array&amp;gt;&lt;/span&gt;
+            &lt;span class="nt"&gt;&amp;lt;/dict&amp;gt;&lt;/span&gt;
+            &lt;span class="nt"&gt;&amp;lt;key&amp;gt;&lt;/span&gt;ImageSettings&lt;span class="nt"&gt;&amp;lt;/key&amp;gt;&lt;/span&gt;
+            &lt;span class="nt"&gt;&amp;lt;dict&amp;gt;&lt;/span&gt;
+                &lt;span class="nt"&gt;&amp;lt;key&amp;gt;&lt;/span&gt;Compression Quality&lt;span class="nt"&gt;&amp;lt;/key&amp;gt;&lt;/span&gt;
+                &lt;span class="nt"&gt;&amp;lt;real&amp;gt;&lt;/span&gt;0.75&lt;span class="nt"&gt;&amp;lt;/real&amp;gt;&lt;/span&gt;
+                &lt;span class="nt"&gt;&amp;lt;key&amp;gt;&lt;/span&gt;ImageCompression&lt;span class="nt"&gt;&amp;lt;/key&amp;gt;&lt;/span&gt;
+                &lt;span class="nt"&gt;&amp;lt;string&amp;gt;&lt;/span&gt;ImageJPEGCompress&lt;span class="nt"&gt;&amp;lt;/string&amp;gt;&lt;/span&gt;
+                &lt;span class="nt"&gt;&amp;lt;key&amp;gt;&lt;/span&gt;ImageScaleSettings&lt;span class="nt"&gt;&amp;lt;/key&amp;gt;&lt;/span&gt;
+                &lt;span class="nt"&gt;&amp;lt;dict&amp;gt;&lt;/span&gt;
+                    &lt;span class="nt"&gt;&amp;lt;key&amp;gt;&lt;/span&gt;ImageScaleFactor&lt;span class="nt"&gt;&amp;lt;/key&amp;gt;&lt;/span&gt;
+                    &lt;span class="nt"&gt;&amp;lt;real&amp;gt;&lt;/span&gt;0.5&lt;span class="nt"&gt;&amp;lt;/real&amp;gt;&lt;/span&gt;
+                    &lt;span class="nt"&gt;&amp;lt;key&amp;gt;&lt;/span&gt;ImageScaleInterpolate&lt;span class="nt"&gt;&amp;lt;/key&amp;gt;&lt;/span&gt;
+                    &lt;span class="nt"&gt;&amp;lt;true/&amp;gt;&lt;/span&gt;
+                    &lt;span class="nt"&gt;&amp;lt;key&amp;gt;&lt;/span&gt;ImageSizeMax&lt;span class="nt"&gt;&amp;lt;/key&amp;gt;&lt;/span&gt;
+                    &lt;span class="nt"&gt;&amp;lt;integer&amp;gt;&lt;/span&gt;3508&lt;span class="nt"&gt;&amp;lt;/integer&amp;gt;&lt;/span&gt;
+                    &lt;span class="nt"&gt;&amp;lt;key&amp;gt;&lt;/span&gt;ImageSizeMin&lt;span class="nt"&gt;&amp;lt;/key&amp;gt;&lt;/span&gt;
+                    &lt;span class="nt"&gt;&amp;lt;integer&amp;gt;&lt;/span&gt;128&lt;span class="nt"&gt;&amp;lt;/integer&amp;gt;&lt;/span&gt;
+                &lt;span class="nt"&gt;&amp;lt;/dict&amp;gt;&lt;/span&gt;
+            &lt;span class="nt"&gt;&amp;lt;/dict&amp;gt;&lt;/span&gt;
+        &lt;span class="nt"&gt;&amp;lt;/dict&amp;gt;&lt;/span&gt;
+    &lt;span class="nt"&gt;&amp;lt;/dict&amp;gt;&lt;/span&gt;
+    &lt;span class="nt"&gt;&amp;lt;key&amp;gt;&lt;/span&gt;FilterType&lt;span class="nt"&gt;&amp;lt;/key&amp;gt;&lt;/span&gt;
+    &lt;span class="nt"&gt;&amp;lt;integer&amp;gt;&lt;/span&gt;1&lt;span class="nt"&gt;&amp;lt;/integer&amp;gt;&lt;/span&gt;
+    &lt;span class="nt"&gt;&amp;lt;key&amp;gt;&lt;/span&gt;Name&lt;span class="nt"&gt;&amp;lt;/key&amp;gt;&lt;/span&gt;
+    &lt;span class="nt"&gt;&amp;lt;string&amp;gt;&lt;/span&gt;Reduce File Size Best&lt;span class="nt"&gt;&amp;lt;/string&amp;gt;&lt;/span&gt;
+&lt;span class="nt"&gt;&amp;lt;/dict&amp;gt;&lt;/span&gt;
+&lt;span class="nt"&gt;&amp;lt;/plist&amp;gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;You can then choose this new filter when you select 'export' from within Preview to export the large PDF to a smaller one:&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Screenshot of choose an output filter for PDFs" src="/public/screenshot_reduce_filesize_filter.png" /&gt;&lt;/p&gt;
+&lt;p&gt;This resulted in the PDF dropping from 22.7MB to 1.4MB and the text in the images all still being legible. Result!&lt;/p&gt;</summary><category term="osx"></category><category term="pdf"></category></entry><entry><title>Running Mailman on OpenBSD</title><link href="https://www.quernus.co.uk/2015/09/28/running-mailman-on-openbsd/" rel="alternate"></link><published>2015-09-28T00:00:00+01:00</published><author><name>Matt Hamilton</name></author><id>tag:www.quernus.co.uk,2015-09-28:2015/09/28/running-mailman-on-openbsd/</id><summary type="html">&lt;p&gt;I maintain a mailing list for the local web and digital community in Bristol and Bath. This mailing list is coming up to 18 years old and until now has been hosted at my previous company Netsight. It was running on their main mail server, which had evolved into quite a complex setup of Exim, Cyrus Imap, SpamAssassin, Mailman, Squirrelmail, and a number of related tools. All running on FreeBSD.&lt;/p&gt;
+&lt;p&gt;It came time to move the mailing list off onto it's own to simplify the complex setup and enable parts to be upgraded with less risk. So I thought I'd move it off onto it's own OpenBSD virtual machine, as it is pretty lightweight and running on it's own VM it would stay fairly self contained.&lt;/p&gt;
+&lt;p&gt;I wanted to try and use as much of the 'built in' components in OpenBSD as possible, namely the MTA (OpenSMTP) and the HTTP server (httpd). The mailing list runs Mailman version 2. There has since been a complete re-write of Mailman, version 3, which is a totally different beast, and based on Django app. As I wanted to keep this pretty minimal and try and move over as much of the setup as I could, I stuck with the legacy mailman 2 setup.&lt;/p&gt;
+&lt;p&gt;Oh, and just one more thing, as I'm currently doing a lot of experimentation with IPv6 at the moment I thought I'd try and set  it up with just IPv6. The VM is running on a server in my office, and my ISP has given me just a single IPv4 address, but an entire /60 IPv6 address space to play with. So by putting it on IPv6 I don't have to worry about NAT to get it accessible from the outside world. As the rest of the world is still mainly IPv4 I set up an SMTP route on my main mail server, hosted with Bytemark to forward mail from IPv4 to the IPv6 mailman server. Similarly with HTTP traffic.&lt;/p&gt;
+&lt;p&gt;OpenBSD's https server tries to chroot itself to &lt;code&gt;/var/www&lt;/code&gt; in order to limit the potential damage an exploit could do. Alas, mailman is quite tricky to get running in a chroot environment. As this whole VM will be exclusively running this mailman server and nothing else, I decided to forego the chroot side of things and get the httpd server to chroot to &lt;code&gt;/&lt;/code&gt; which effectively negates the benefits of chroot, but allows us to more easily run mailman.&lt;/p&gt;
+&lt;p&gt;I installed &lt;code&gt;mailman-2.1.17p0&lt;/code&gt; from OpenBSD's packages collection. Then for &lt;code&gt;/etc/mail/smtpd.conf&lt;/code&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;#&lt;/span&gt;&lt;span class="x"&gt; &lt;/span&gt;&lt;span class="p"&gt;$&lt;/span&gt;&lt;span class="nv"&gt;OpenBSD&lt;/span&gt;&lt;span class="x"&gt;: smtpd.conf,v 1.7 2014/03/12 18:21:34 tedu Exp &lt;/span&gt;&lt;span class="p"&gt;$&lt;/span&gt;&lt;span class="x"&gt;&lt;/span&gt;
+
+&lt;span class="err"&gt;#&lt;/span&gt;&lt;span class="x"&gt; This is the smtpd server system-wide configuration file.&lt;/span&gt;
+&lt;span class="err"&gt;#&lt;/span&gt;&lt;span class="x"&gt; See smtpd.conf(5) for more information.&lt;/span&gt;
+
+
+&lt;span class="x"&gt;listen on 2a01:500:6:200:2::2&lt;/span&gt;
+&lt;span class="x"&gt;listen on ::1&lt;/span&gt;
+
+&lt;span class="x"&gt;table aliases db:/etc/mail/aliases.db&lt;/span&gt;
+
+&lt;span class="x"&gt;accept from any for domain &amp;quot;under-score.org.uk&amp;quot; alias &amp;lt;aliases&amp;gt; deliver to mbox&lt;/span&gt;
+
+&lt;span class="x"&gt;accept from local for any relay via smtp://mail.quernus.co.uk&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;and in &lt;code&gt;/etc/mail/aliases&lt;/code&gt; appended the aliases for mailman:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;...
+# underscore mailing list
+underscore:              &amp;quot;|/usr/local/lib/mailman/mail/mailman post underscore&amp;quot;
+underscore-admin:        &amp;quot;|/usr/local/lib/mailman/mail/mailman admin underscore&amp;quot;
+underscore-bounces:      &amp;quot;|/usr/local/lib/mailman/mail/mailman bounces underscore&amp;quot;
+underscore-confirm:      &amp;quot;|/usr/local/lib/mailman/mail/mailman confirm underscore&amp;quot;
+underscore-join:         &amp;quot;|/usr/local/lib/mailman/mail/mailman join underscore&amp;quot;
+underscore-leave:        &amp;quot;|/usr/local/lib/mailman/mail/mailman leave underscore&amp;quot;
+underscore-owner:        &amp;quot;|/usr/local/lib/mailman/mail/mailman owner underscore&amp;quot;
+underscore-request:      &amp;quot;|/usr/local/lib/mailman/mail/mailman request underscore&amp;quot;
+underscore-subscribe:    &amp;quot;|/usr/local/lib/mailman/mail/mailman subscribe underscore&amp;quot;
+underscore-unsubscribe:  &amp;quot;|/usr/local/lib/mailman/mail/mailman unsubscribe underscore&amp;quot;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Then set up &lt;code&gt;/etc/httpd.conf&lt;/code&gt; to serve up the mailman web UI. This is based on classical CGI scripts. OpenBSD's httpd doesn't support the classical CGI setup, but only the newer 'fastcgi' which is a way of passing requests to a long running process, rather than spawn a process per request.&lt;/p&gt;
+&lt;p&gt;Luckily OpenBSD also includes &lt;code&gt;slowcgi&lt;/code&gt; a gateway from FastCGI to the traditional CGI process. So firstly &lt;code&gt;/etc/httpd.conf&lt;/code&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;ext_addr=&amp;quot;egress&amp;quot;
+chroot &amp;quot;/&amp;quot;
+logdir &amp;quot;/var/www/logs&amp;quot;
+
+server &amp;quot;default&amp;quot; {
+       listen on 2a01:500:6:200:2::2 port 80
+
+       root &amp;quot;/var/www/htdocs&amp;quot;
+
+       # The actual mailman CGI scripts
+       location &amp;quot;/mailman/*&amp;quot; {
+               fastcgi socket &amp;quot;/var/www/run/slowcgi.sock&amp;quot;
+               root { &amp;quot;/usr/local/lib/mailman/cgi-bin/&amp;quot;, strip 1 }
+       }
+
+       # The icons referred to by the web interface
+       location &amp;quot;/icons/*&amp;quot; {
+               root { &amp;quot;/usr/local/lib/mailman/icons/&amp;quot;, strip 1 }
+       }
+
+       # The mailing list archives
+       location &amp;quot;/pipermail/*&amp;quot; {
+               root { &amp;quot;/var/spool/mailman/archives/public/&amp;quot;, strip 1 }
+       }
+}
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Note that I set the chroot parameter to &lt;code&gt;/&lt;/code&gt;. This in effect disables the chroot security mechanism. You need to be OK with that. In theory you shouldn't need to do this, as only the slowcgi process needs to be able to see the actual mailman CGI scripts, but due to the way the path to the scripts is calculated, you have to disable the chroot in httpd too. The first location block above is the one that points to the main CGI scripts for mailman. It passes the location via the unix domain socket specified.&lt;/p&gt;
+&lt;p&gt;The slowcgi process doesn't need any setup, just starting. So my &lt;code&gt;/etc/rc.conf.local&lt;/code&gt; file looks like:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;ntpd_flags=&amp;quot;-s&amp;quot;
+smtpd_flags=&amp;quot;&amp;quot;
+slowcgi_flags=&amp;quot;-p /&amp;quot;
+httpd_flags=&amp;quot;&amp;quot;
+pkg_scripts=&amp;quot;mailman&amp;quot;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Passing the &lt;code&gt;-p /&lt;/code&gt; flag to slowcgi disables the chroot as well, so that it is able to find the mailman scripts to run.&lt;/p&gt;
+&lt;p&gt;So there we have a pretty minimal setup, just enough to accept mail via SMTP, process it in mailman and send mail out to smarthost relay, also access to the archives and web management interface via HTTP. &lt;/p&gt;
+&lt;p&gt;In total there are about 40 processes running:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;load averages:  0.15,  0.17,  0.14    linda.quernus.co.uk 21:34:22
+43 processes: 42 idle, 1 on processor
+CPU states:  0.0% user,  0.0% nice,  0.2% system,  0.0% interrupt, 99.8% idle
+Memory: Real: 173M/445M act/tot Free: 540M Cache: 187M Swap: 0K/480M
+
+  PID USERNAME PRI NICE  SIZE   RES STATE     WAIT      TIME    CPU COMMAND
+14917 _mailman   2    0   23M   32M sleep     select    0:43  0.00% python2.7
+25162 _mailman   2    0   21M   30M sleep     select    0:42  0.00% python2.7
+25278 _mailman   2    0   17M   25M sleep     select    0:40  0.00% python2.7
+14513 _mailman   2    0   20M   30M sleep     select    0:40  0.00% python2.7
+ 5857 _mailman   2    0   16M   24M sleep     select    0:39  0.00% python2.7
+26636 _mailman   2    0 8704K   15M sleep     select    0:38  0.00% python2.7
+ 7008 _mailman   2    0 8440K   15M sleep     select    0:38  0.00% python2.7
+13568 _pflogd    4    0  684K  404K sleep     bpf       0:20  0.00% pflogd
+19428 _smtpq     2    0 1900K 2876K idle      kqread    0:02  0.00% smtpd
+ 3726 _smtpd     2    0 2868K 5004K idle      kqread    0:01  0.00% smtpd
+11513 root       2    0  792K 1136K sleep     poll      0:01  0.00% cron
+    1 root      10    0  536K  552K sleep     wait      0:01  0.00% init
+12359 matt       2    0 3680K 3028K idle      select    0:01  0.00% sshd
+32041 _smtpd     2    0 1608K 2520K idle      kqread    0:00  0.00% smtpd
+  428 _smtpd     2    0 1756K 2644K idle      kqread    0:00  0.00% smtpd
+ 2484 www        2    0 1212K 2316K sleep     kqread    0:00  0.00% httpd
+ 8653 _mailman   2    0   16M   24M idle      select    0:00  0.00% python2.7
+19052 root       3    0  652K  760K idle      ttyin     0:00  0.00% ksh
+ 2330 www        2    0 1156K 2180K sleep     kqread    0:00  0.00% httpd
+ 1102 _smtpd     2    0 1668K 2476K idle      kqread    0:00  0.00% smtpd
+19445 _syslogd   2    0 1124K 1504K idle      kqread    0:00  0.00% syslogd
+16320 matt       2    0 3692K 3056K sleep     select    0:00  0.00% sshd
+28230 _ntp       2  -20 1084K 2896K idle      poll      0:00  0.00% ntpd
+26805 root       3    0  664K  772K idle      ttyin     0:00  0.00% ksh
+ 1199 www        2    0 1140K 2180K idle      kqread    0:00  0.00% httpd
+23519 www        2    0  996K 1884K idle      kqread    0:00  0.00% httpd
+19390 www        2    0  696K 1288K idle      kqread    0:00  0.00% slowcgi
+28522 root      18    0  656K  752K sleep     pause     0:00  0.00% ksh
+ 2809 root       2    0 3800K 3556K idle      poll      0:00  0.00% sshd
+30896 root       2    0 3792K 3564K idle      poll      0:00  0.00% sshd
+ 7317 root       2    0 1544K 2300K idle      kqread    0:00  0.00% smtpd
+14527 _smtpd     2    0 1396K 2104K idle      kqread    0:00  0.00% smtpd
+12559 _mailman  10    0 8484K 5232K idle      wait      0:00  0.00% python2.7
+ 9705 root       2    0 1036K 1436K idle      select    0:00  0.00% sshd
+ 3165 matt      18    0  632K  732K idle      pause     0:00  0.00% ksh
+ 6618 matt      18    0  628K  728K idle      pause     0:00  0.00% ksh
+18860 root       2    0 1124K 1336K idle      netio     0:00  0.00% syslogd
+ 5870 root       2    0 1136K 2164K idle      kqread    0:00  0.00% httpd
+17986 root       2  -20  668K 1528K idle      poll      0:00  0.00% ntpd
+23120 root       2    0  620K  600K idle      netio     0:00  0.00% pflogd
+17361 root      -6    0  236K  200K sleep     piperd    0:00  0.00% cat
+17714 root      28    0  592K 1760K onproc    -         0:00  0.00% top
+11321 _ntp       2    0  944K 1260K idle      poll      0:00  0.00% ntpd
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The VM has 1G of memory, but looks like it could probabaly get away with 512MB just fine.&lt;/p&gt;</summary><category term="mailman"></category><category term="openbsd"></category><category term="opensmtpd"></category><category term="httpd"></category></entry><entry><title>IPv6 Privacy Addresses</title><link href="https://www.quernus.co.uk/2015/09/22/ipv6-privacy-addresses/" rel="alternate"></link><published>2015-09-22T00:00:00+01:00</published><author><name>Matt Hamilton</name></author><id>tag:www.quernus.co.uk,2015-09-22:2015/09/22/ipv6-privacy-addresses/</id><summary type="html">&lt;p&gt;I'm starting to play with IPv6 at home and in the office. I'll be detailing some of what I've learnt here. &lt;/p&gt;
+&lt;p&gt;One thing I noticed, was that once configured I ended up with &lt;em&gt;two&lt;/em&gt; IPv6 addresses on my interfaces:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;en0&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;flags&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;8863&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;UP&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;BROADCAST&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;SMART&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;RUNNING&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;SIMPLEX&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;MULTICAST&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;mtu&lt;/span&gt; &lt;span class="mi"&gt;1500&lt;/span&gt;
+    &lt;span class="n"&gt;ether&lt;/span&gt; &lt;span class="mi"&gt;04&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="n"&gt;ce&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="n"&gt;e1&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;7&lt;/span&gt;&lt;span class="n"&gt;b&lt;/span&gt; 
+    &lt;span class="n"&gt;inet6&lt;/span&gt; &lt;span class="n"&gt;fe80&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="mi"&gt;60&lt;/span&gt;&lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="n"&gt;ceff&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="n"&gt;fee1&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="n"&gt;a9a&lt;/span&gt;&lt;span class="o"&gt;%&lt;/span&gt;&lt;span class="n"&gt;en0&lt;/span&gt; &lt;span class="n"&gt;prefixlen&lt;/span&gt; &lt;span class="mi"&gt;64&lt;/span&gt; &lt;span class="n"&gt;scopeid&lt;/span&gt; &lt;span class="mh"&gt;0x4&lt;/span&gt; 
+    &lt;span class="n"&gt;inet&lt;/span&gt; &lt;span class="mf"&gt;192.168&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="mf"&gt;1.19&lt;/span&gt; &lt;span class="n"&gt;net&lt;/span&gt; &lt;span class="n"&gt;mask&lt;/span&gt; &lt;span class="mh"&gt;0xffffff00&lt;/span&gt; &lt;span class="n"&gt;broadcast&lt;/span&gt; &lt;span class="mf"&gt;192.168&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="mf"&gt;1.255&lt;/span&gt;
+    &lt;span class="n"&gt;inet6&lt;/span&gt; &lt;span class="n"&gt;en0&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;flags&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;8863&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;UP&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;BROADCAST&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;SMART&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;RUNNING&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;SIMPLEX&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;MULTICAST&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;mtu&lt;/span&gt; &lt;span class="mi"&gt;1500&lt;/span&gt;
+    &lt;span class="n"&gt;ether&lt;/span&gt; &lt;span class="mi"&gt;04&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="n"&gt;ce&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="n"&gt;e1&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;9&lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt; 
+    &lt;span class="n"&gt;inet6&lt;/span&gt; &lt;span class="n"&gt;fe80&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="mi"&gt;60&lt;/span&gt;&lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="n"&gt;ceff&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="n"&gt;fee1&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="n"&gt;a9a&lt;/span&gt;&lt;span class="o"&gt;%&lt;/span&gt;&lt;span class="n"&gt;en0&lt;/span&gt; &lt;span class="n"&gt;prefixlen&lt;/span&gt; &lt;span class="mi"&gt;64&lt;/span&gt; &lt;span class="n"&gt;scopeid&lt;/span&gt; &lt;span class="mh"&gt;0x4&lt;/span&gt; 
+    &lt;span class="n"&gt;inet&lt;/span&gt; &lt;span class="mf"&gt;192.168&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="mf"&gt;1.19&lt;/span&gt; &lt;span class="n"&gt;netmask&lt;/span&gt; &lt;span class="mh"&gt;0xffffff00&lt;/span&gt; &lt;span class="n"&gt;broadcast&lt;/span&gt; &lt;span class="mf"&gt;192.168&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="mf"&gt;1.255&lt;/span&gt;
+    &lt;span class="n"&gt;inet6&lt;/span&gt; &lt;span class="mi"&gt;2001&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;470&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="n"&gt;f1d&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;33&lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;60&lt;/span&gt;&lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="n"&gt;ceff&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="n"&gt;fee1&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="n"&gt;a9a&lt;/span&gt; &lt;span class="n"&gt;prefixlen&lt;/span&gt; &lt;span class="mi"&gt;64&lt;/span&gt; &lt;span class="n"&gt;autoconf&lt;/span&gt; 
+    &lt;span class="n"&gt;inet6&lt;/span&gt; &lt;span class="mi"&gt;2001&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;470&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="n"&gt;f1d&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;33&lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;3826&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;36&lt;/span&gt;&lt;span class="n"&gt;d7&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="n"&gt;fbd6&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;16&lt;/span&gt;&lt;span class="n"&gt;f&lt;/span&gt; &lt;span class="n"&gt;prefixlen&lt;/span&gt; &lt;span class="mi"&gt;64&lt;/span&gt; &lt;span class="n"&gt;autoconf&lt;/span&gt; &lt;span class="n"&gt;temporary&lt;/span&gt; 
+    &lt;span class="n"&gt;nd6&lt;/span&gt; &lt;span class="n"&gt;options&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;PERFORMNUD&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;
+    &lt;span class="n"&gt;media&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;autoselect&lt;/span&gt;
+    &lt;span class="n"&gt;status&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;active&lt;/span&gt;
+ &lt;span class="n"&gt;prefixlen&lt;/span&gt; &lt;span class="mi"&gt;64&lt;/span&gt; &lt;span class="n"&gt;autoconf&lt;/span&gt; 
+    &lt;span class="n"&gt;inet6&lt;/span&gt; &lt;span class="mi"&gt;2001&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;470&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="n"&gt;f1d&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;33&lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;3826&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;36&lt;/span&gt;&lt;span class="n"&gt;d7&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="n"&gt;fbd6&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;16&lt;/span&gt;&lt;span class="n"&gt;f&lt;/span&gt; &lt;span class="n"&gt;prefixlen&lt;/span&gt; &lt;span class="mi"&gt;64&lt;/span&gt; &lt;span class="n"&gt;autoconf&lt;/span&gt; &lt;span class="n"&gt;temporary&lt;/span&gt; 
+    &lt;span class="n"&gt;nd6&lt;/span&gt; &lt;span class="n"&gt;options&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;PERFORMNUD&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;
+    &lt;span class="n"&gt;media&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;autoselect&lt;/span&gt;
+    &lt;span class="n"&gt;status&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;active&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The first IPv6 address &lt;code&gt;2001:470:1f1d:33a:60c:ceff:fee1:3a9a&lt;/code&gt; has been auto configured and includes the MAC address of the interface &lt;code&gt;04:0c:ce:e1:3a:9a&lt;/code&gt; encoded in it using the &lt;a href="https://en.wikipedia.org/wiki/IPv6_address#Modified_EUI-64"&gt;Modified EUI-64 format&lt;/a&gt;. But this means that the publicly visible source address of my connections can be tied directly to my hardware.&lt;/p&gt;
+&lt;p&gt;The second IPv6 address &lt;code&gt;2001:470:1f1d:33a:3826:36d7:fbd6:16f&lt;/code&gt; has been generated randomly by the OS and router and has the &lt;code&gt;temporary&lt;/code&gt; keyword attached. It is this address that the OS uses by default for outbound connections to that tracking is much harder.&lt;/p&gt;
+&lt;p&gt;The full detail of these privacy extensions are detailed in &lt;a href="https://tools.ietf.org/html/rfc4941"&gt;RFC4941 - Privacy Extensions for Stateless Address Autoconfiguration in IPv6&lt;/a&gt;.&lt;/p&gt;</summary><category term="ipv6"></category></entry><entry><title>Adding Photos to iOS Simulator</title><link href="https://www.quernus.co.uk/2015/09/03/adding-photos-to-ios-simulator/" rel="alternate"></link><published>2015-09-03T00:00:00+01:00</published><author><name>Matt Hamilton</name></author><id>tag:www.quernus.co.uk,2015-09-03:2015/09/03/adding-photos-to-ios-simulator/</id><summary type="html">&lt;p&gt;I'm currently using &lt;a href="https://github.com/KrauseFx/snapshot"&gt;Snapshot&lt;/a&gt;, part of Fastlane to automate the testing and screenshot capture of our app.&lt;/p&gt;
+&lt;p&gt;The problem I had, is that a part of our app involves capturing a photo from the camera or photo library for display in the app. And to do the screenshots justice I needed to use a specific image as opposed to the images shipped with the simulators. You can't use the camera on the simulator (obviously!).&lt;/p&gt;
+&lt;p&gt;You can simply just drag an image onto the simulator and it will put it into the Photos app on the device. But I needed to script the addition of the photos as the simulators are reset at the start of each run.&lt;/p&gt;
+&lt;p&gt;Well, I found a way to do it using the hooks provided in Snapshot to prepare the simulator before run, and &lt;code&gt;simctl&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Just add the following callback to your &lt;code&gt;fastlane/Snapfile&lt;/code&gt; file:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;setup_for_device_change&lt;/span&gt; &lt;span class="k"&gt;do&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt;&lt;span class="n"&gt;device&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;udid&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;language&lt;/span&gt;&lt;span class="o"&gt;|&lt;/span&gt;
+    &lt;span class="nb"&gt;puts&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Adding food photo to &lt;/span&gt;&lt;span class="si"&gt;#{&lt;/span&gt;&lt;span class="n"&gt;device&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
+    &lt;span class="nb"&gt;system&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;xcrun simctl boot &lt;/span&gt;&lt;span class="si"&gt;#{&lt;/span&gt;&lt;span class="n"&gt;udid&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="nb"&gt;system&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;xcrun simctl addphoto &lt;/span&gt;&lt;span class="si"&gt;#{&lt;/span&gt;&lt;span class="n"&gt;udid&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt; kale_salad_photo.jpg&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="k"&gt;end&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Obviously change the filename to the image you want to load. You could extend it to load all images from a directory if you wanted.&lt;/p&gt;</summary><category term="iOS"></category><category term="apple"></category><category term="fastlane"></category><category term="snapshot"></category></entry><entry><title>iOS Deployment and Provisioning - Part III - Tools in Detail - Fastlane</title><link href="https://www.quernus.co.uk/2015/09/01/ios-deployment-part-3/" rel="alternate"></link><published>2015-09-01T00:00:00+01:00</published><author><name>Matt Hamilton</name></author><id>tag:www.quernus.co.uk,2015-09-01:2015/09/01/ios-deployment-part-3/</id><summary type="html">&lt;p class="message"&gt;
+  This is the fourth in a series of blog posts about iOS deployment and experiences setting up a continuous testing and build server for iOS apps. These posts are of interest to individual developers wanting to understand more, but mainly targeting small development teams trying to manage their development, testing and deployment process.
+&lt;/p&gt;
+
+&lt;h2&gt;Fastlane&lt;/h2&gt;
+&lt;p&gt;Fastlane is a collection of about a dozen different tools for communicating with iTunes Connect, the Apple Developer Portal and 3&lt;sup&gt;rd&lt;/sup&gt; party services in a scriptable manner.&lt;/p&gt;
+&lt;p&gt;It has a concept of 'lanes' these are separate pipelines of tasks that can be run in sequence. In our configuration we have just three lanes, &lt;code&gt;test&lt;/code&gt;, &lt;code&gt;alpha&lt;/code&gt; and &lt;code&gt;release&lt;/code&gt;. It may seem odd to jump all the way from an alpha to release, with no apparent beta, but in fact there is no real distinction between a beta, a release candidate and a production release. When a &lt;code&gt;release&lt;/code&gt; build is uploaded to TestFlight it is marked as 'beta' meaning it is available for testing via TestFlight. But any one of those builds could be submitted to Apple for review for the App Store.&lt;/p&gt;
+&lt;p&gt;The test lane just builds the app for testing and runs the unit tests over the app. Both the alpha and release lanes also run the full test suite before building the app for being uploaded. We could keep the test and build lanes separate, but as we'd want to run the tests before any build, I thought I might as well include them in the lane.&lt;/p&gt;
+&lt;p&gt;So we have two convenience methods, &lt;code&gt;do_build&lt;/code&gt; and &lt;code&gt;run_tests&lt;/code&gt; that are called by the respective lanes:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;  &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;run_tests&lt;/span&gt;
+
+    &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;scheme&lt;/span&gt; &lt;span class="k"&gt;in&lt;/span&gt; &lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;Nutrition&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;NutritionAppTest&amp;#39;&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;
+
+      &lt;span class="n"&gt;xctest&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+        &lt;span class="ss"&gt;scheme&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;scheme&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="ss"&gt;workspace&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;Nutrition/Nutrition.xcworkspace&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="ss"&gt;destination&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;platform=iOS Simulator,name=iPhone 6&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="ss"&gt;reports&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="o"&gt;[&lt;/span&gt;
+          &lt;span class="p"&gt;{&lt;/span&gt;
+            &lt;span class="ss"&gt;report&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;junit&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+            &lt;span class="ss"&gt;output&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;build/reports/&lt;/span&gt;&lt;span class="si"&gt;#{&lt;/span&gt;&lt;span class="n"&gt;scheme&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;-tests.xml&amp;quot;&lt;/span&gt;
+          &lt;span class="p"&gt;}&lt;/span&gt;
+        &lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="ss"&gt;clean&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="kp"&gt;nil&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="ss"&gt;derivedDataPath&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;./build&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+      &lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="k"&gt;end&lt;/span&gt;
+
+  &lt;span class="k"&gt;end&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;We have multiple test suits that we want to run in isolation of each other, hence we loop over the two test suites: &lt;code&gt;Nutrition&lt;/code&gt; and &lt;code&gt;NutritionAppTest&lt;/code&gt;. It calls &lt;code&gt;xctest&lt;/code&gt; which fires up an iOS simulator on the Mac Mini and runs the tests on it. If you VNC into the Mac Mini you can see the simulator start up and the tests run. We output the tests in &lt;code&gt;junit&lt;/code&gt; format for Jenkins to be able to parse later. I've set &lt;code&gt;clean: nil&lt;/code&gt; as Jenkins is set to wipe the workspace between each build anyway, so no need to clean. The &lt;code&gt;derivedDataPath&lt;/code&gt; argument means all the build artefacts end up in the workspace, rather than put in a shared space in the user's home directory by default. This means they too are cleared when the workspace is wiped, and multiple Jenkins jobs don't taint each other with build artefacts.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;  &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;do_build&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;scheme&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;configuration&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+      &lt;span class="n"&gt;increment_build_number&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+        &lt;span class="ss"&gt;build_number&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="no"&gt;ENV&lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;BUILD_ID&amp;#39;&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;
+      &lt;span class="p"&gt;)&lt;/span&gt;
+
+      &lt;span class="n"&gt;profile&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;build/nutrition.mobileprovision&amp;#39;&lt;/span&gt;
+
+      &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;configuration&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;Release&amp;#39;&lt;/span&gt;     
+        &lt;span class="n"&gt;app_identifier&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;com.enquos.nutrition&amp;#39;&lt;/span&gt;
+        &lt;span class="n"&gt;display_name&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;enquos nutrition&amp;#39;&lt;/span&gt;
+        &lt;span class="n"&gt;set_istest_false&lt;/span&gt;
+        &lt;span class="n"&gt;sigh&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+          &lt;span class="ss"&gt;app_identifier&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;app_identifier&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+          &lt;span class="ss"&gt;filename&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;profile&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="p"&gt;)&lt;/span&gt;
+      &lt;span class="k"&gt;else&lt;/span&gt;
+        &lt;span class="n"&gt;app_identifier&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;com.enquos.Nutrition.alpha.&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="no"&gt;GIT_BRANCH_ID&lt;/span&gt;
+        &lt;span class="n"&gt;display_name&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;enquos nutrition &amp;#39;&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="no"&gt;GIT_BRANCH&lt;/span&gt;
+        &lt;span class="n"&gt;sigh&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+          &lt;span class="ss"&gt;app_identifier&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;*&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+          &lt;span class="ss"&gt;adhoc&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;1&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+          &lt;span class="ss"&gt;filename&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;profile&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="p"&gt;)&lt;/span&gt;
+      &lt;span class="k"&gt;end&lt;/span&gt;
+
+      &lt;span class="n"&gt;update_info_plist&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+        &lt;span class="ss"&gt;app_identifier&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;app_identifier&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="ss"&gt;display_name&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;display_name&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="ss"&gt;plist_path&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;Nutrition/Info.plist&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="ss"&gt;xcodeproj&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;Nutrition/Nutrition.xcodeproj&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+      &lt;span class="p"&gt;)&lt;/span&gt;
+
+      &lt;span class="n"&gt;update_project_provisioning&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+        &lt;span class="ss"&gt;xcodeproj&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Nutrition/Nutrition.xcodeproj&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="ss"&gt;build_configuration_filter&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;.*Nutrition.*&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="ss"&gt;profile&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;profile&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+      &lt;span class="p"&gt;)&lt;/span&gt;
+
+      &lt;span class="n"&gt;ipa&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+        &lt;span class="ss"&gt;scheme&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;scheme&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="ss"&gt;configuration&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;configuration&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="ss"&gt;embed&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;profile&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="ss"&gt;xcargs&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;-derivedDataPath ./build&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+      &lt;span class="p"&gt;)&lt;/span&gt;
+
+  &lt;span class="k"&gt;end&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The &lt;code&gt;do_build&lt;/code&gt; function does a number of steps:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Work out the build number, in this case we take it from an environment variable supplied by Jenkins.&lt;/li&gt;
+&lt;li&gt;Set the app identifier and the display name depending on whether this is a release build or alpha. It is is an alpha build then we create the app id and display name based on the Git branch. This allows us to have multiple distinct apps on a device at one time, each from a different branch of the code.&lt;/li&gt;
+&lt;li&gt;Download the correct provisioning profile from the Apple Developer Portal (&lt;code&gt;sigh&lt;/code&gt;). If this is a release, then use our main app store distribution profile. If it is an alpha, then use our wildcard adhoc profile. This profile contains the UDIDs of our developers and anyone we want to test the app. By downloading this each time, it means we always build with the latest list of devices.&lt;/li&gt;
+&lt;li&gt;Update the info.plist and provisioning files in the app to contain the information calculated above. This basically overrides any settings that might be already contained in the code from Xcode.&lt;/li&gt;
+&lt;li&gt;Finally, build the ipa file using the specified configuration and scheme. It should be possible to infer the configuration from the scheme, as that is where you set it in Xcode, but due to a bug in xcodebuild it picks the wrong configuration, so we specify it manually here.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Before we run any of the lanes, we set a few variables based on variables supplied by Git and we run the tests. We set the text to use for the testing notes shown by TestFlight / Hockey to be the git commit log. We explicitly choose which certificate ID to use as we have two registered in the Apple Developer Portal. And we munge the Git branch into something that looks like an id.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;  &lt;span class="n"&gt;before_all&lt;/span&gt; &lt;span class="k"&gt;do&lt;/span&gt;
+
+     &lt;span class="no"&gt;ENV&lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;DELIVER_WHAT_TO_TEST&amp;#39;&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;git_commit_log&lt;/span&gt;
+     &lt;span class="no"&gt;ENV&lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;SIGH_CERTIFICATE_ID&amp;#39;&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;XXXXXXXXXX&amp;#39;&lt;/span&gt;
+     &lt;span class="no"&gt;GIT_BRANCH&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="no"&gt;ENV&lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;GIT_BRANCH&amp;#39;&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt; &lt;span class="o"&gt;||&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;unknown&amp;#39;&lt;/span&gt;
+
+     &lt;span class="no"&gt;GIT_BRANCH_ID&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="no"&gt;GIT_BRANCH&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;dup&lt;/span&gt;
+     &lt;span class="no"&gt;GIT_BRANCH_ID&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;gsub!&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;/&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;.&amp;#39;&lt;/span&gt;
+     &lt;span class="no"&gt;GIT_BRANCH_ID&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;gsub!&lt;/span&gt; &lt;span class="sr"&gt;/[^A-Za-z0-9\-.]/&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;-&amp;quot;&lt;/span&gt;
+
+     &lt;span class="n"&gt;run_tests&lt;/span&gt;
+  &lt;span class="k"&gt;end&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Now we have the actual lanes themselves. The test lane is short and sweet. It doesn't actually do anything as the tests themselves are run in the &lt;code&gt;before_all&lt;/code&gt; block above:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;  &lt;span class="n"&gt;lane&lt;/span&gt; &lt;span class="ss"&gt;:test&lt;/span&gt; &lt;span class="k"&gt;do&lt;/span&gt;
+    &lt;span class="c1"&gt;# Tests run in before_all&lt;/span&gt;
+  &lt;span class="k"&gt;end&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The alpha lane is the first lane that does any real work:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;  &lt;span class="n"&gt;lane&lt;/span&gt; &lt;span class="ss"&gt;:alpha&lt;/span&gt; &lt;span class="k"&gt;do&lt;/span&gt;
+
+    &lt;span class="n"&gt;do_build&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;Nutrition&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;Beta&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+    &lt;span class="n"&gt;hockey&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+      &lt;span class="ss"&gt;api_token&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;deadbeefdeadbeefdeadbeef&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+      &lt;span class="ss"&gt;notes&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;git_commit_log&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+      &lt;span class="ss"&gt;notify&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;0&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="c1"&gt;# Means do not notify&lt;/span&gt;
+      &lt;span class="ss"&gt;status&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;2&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+      &lt;span class="ss"&gt;release_type&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;2&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="p"&gt;)&lt;/span&gt;
+
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="no"&gt;ENV&lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;SLACK_URL&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;
+      &lt;span class="n"&gt;slack&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+        &lt;span class="ss"&gt;message&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;New alpha build available for download&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="ss"&gt;success&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="kp"&gt;true&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="ss"&gt;payload&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+          &lt;span class="s1"&gt;&amp;#39;Build number&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="no"&gt;ENV&lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;BUILD_ID&amp;#39;&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+          &lt;span class="s1"&gt;&amp;#39;Git branch&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="no"&gt;ENV&lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;GIT_BRANCH&amp;#39;&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+          &lt;span class="s1"&gt;&amp;#39;Download URL&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="no"&gt;Actions&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;lane_context&lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt; &lt;span class="no"&gt;Actions&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="no"&gt;SharedValues&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="no"&gt;HOCKEY_DOWNLOAD_LINK&lt;/span&gt; &lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+          &lt;span class="s1"&gt;&amp;#39;What\&amp;#39;s new&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;git_commit_log&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+          &lt;span class="p"&gt;},&lt;/span&gt;
+        &lt;span class="ss"&gt;default_payloads&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="o"&gt;[]&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+     &lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="k"&gt;end&lt;/span&gt;
+
+  &lt;span class="k"&gt;end&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;First we call the &lt;code&gt;do_build&lt;/code&gt; routine with the schema &lt;code&gt;Nutrition&lt;/code&gt; and the configuration &lt;code&gt;Beta&lt;/code&gt;. Xcode projects start off by default with two configurations: &lt;code&gt;beta&lt;/code&gt; and &lt;code&gt;release&lt;/code&gt;. These control whether things like profiling and debugging symbols are left in or stripped. So we just use the default name of 'Beta' here.&lt;/p&gt;
+&lt;p&gt;Then we upload the build to Hockey. We pass in the release notes and tell Hockey what sort of build this is (2: alpha). Then, if we have a Slack URL environment variable defined, we post a message to Slack announcing the successful build and with a link to the download URL on Hockey.&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;release&lt;/code&gt; lane is very similar:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;  &lt;span class="n"&gt;lane&lt;/span&gt; &lt;span class="ss"&gt;:release&lt;/span&gt; &lt;span class="k"&gt;do&lt;/span&gt;
+
+    &lt;span class="n"&gt;do_build&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;Nutrition Release&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;Release&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+    &lt;span class="n"&gt;hockey&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+      &lt;span class="ss"&gt;api_token&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;deadbeefdeadbeefdeadbeef&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+      &lt;span class="ss"&gt;notes&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;git_commit_log&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+      &lt;span class="ss"&gt;notify&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;0&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="c1"&gt;# Means do not notify&lt;/span&gt;
+      &lt;span class="ss"&gt;status&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;1&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="c1"&gt;# Means do not make available for download&lt;/span&gt;
+      &lt;span class="ss"&gt;release_type&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;1&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+      &lt;span class="ss"&gt;public_identifier&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;deadbeefdeadbeefdeadbeef&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="p"&gt;)&lt;/span&gt;
+
+    &lt;span class="n"&gt;deliver&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+       &lt;span class="ss"&gt;beta&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="kp"&gt;true&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="p"&gt;)&lt;/span&gt;
+
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="no"&gt;ENV&lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;SLACK_URL&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;
+      &lt;span class="n"&gt;slack&lt;/span&gt;&lt;span class="p"&gt;({&lt;/span&gt;
+        &lt;span class="ss"&gt;message&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Nutrition Release build &lt;/span&gt;&lt;span class="si"&gt;#{&lt;/span&gt;&lt;span class="no"&gt;ENV&lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;BUILD_ID&amp;#39;&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt; uploaded to Testflight&amp;quot;&lt;/span&gt;
+      &lt;span class="p"&gt;})&lt;/span&gt;
+    &lt;span class="k"&gt;end&lt;/span&gt;
+
+ &lt;span class="k"&gt;end&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;We do the build with the &lt;code&gt;Release&lt;/code&gt; configuration. This strips out debug symbols and the likes. We upload it to Hockey, and set the release type to be a proper release (1) and we set the status so that it is not downloadable from Hockey. This is due to it being uploaded to TestFlight instead. As it will have been signed with an App Store provisioning profile, it can't be uploaded to Hockey for download anyway.&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;deliver&lt;/code&gt; command is the one that actually uploads to Testflight. &lt;/p&gt;
+&lt;p&gt;We then send a message to Slack. There is no point putting a public URL here as TestFlight will automatically notify testers on their device and by email that a new build is available.&lt;/p&gt;
+&lt;p&gt;After all this is done, we reset the Git repo. This is not necessary for the Jenkins run builds, as the workspace is wiped anyway, but is nice for when running manually as it means you are back to a clean slate:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;after_all&lt;/span&gt; &lt;span class="k"&gt;do&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt;&lt;span class="n"&gt;lane&lt;/span&gt;&lt;span class="o"&gt;|&lt;/span&gt;
+      &lt;span class="n"&gt;reset_git_repo&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+        &lt;span class="ss"&gt;force&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="kp"&gt;true&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="ss"&gt;files&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="o"&gt;[&lt;/span&gt;
+          &lt;span class="s2"&gt;&amp;quot;Nutrition/Nutrition.xcodeproj/project.pbxproj&amp;quot;&lt;/span&gt;
+        &lt;span class="o"&gt;]&lt;/span&gt;
+      &lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="k"&gt;end&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;In the next post I'll go into detail about Jenkins and how we automatically run Fastlane when changes are committed.&lt;/p&gt;</summary><category term="iOS"></category><category term="iPhone"></category><category term="apple"></category></entry><entry><title>Cloning a ZVol for a new VM</title><link href="https://www.quernus.co.uk/2015/08/30/cloning-zvol-for-vm/" rel="alternate"></link><published>2015-08-30T00:00:00+01:00</published><author><name>Matt Hamilton</name></author><id>tag:www.quernus.co.uk,2015-08-30:2015/08/30/cloning-zvol-for-vm/</id><summary type="html">&lt;p&gt;I am using bhyve as a VM system for OpenBSD, Linux and FreeBSD guests running on a FreeBSD host.&lt;/p&gt;
+&lt;p&gt;I wanted to create a new OpenBSD VM to set up a local mail server VM. And realised I could probably clone one of my existing OpenBSD VM's filesystem and just start with that. &lt;a href="https://www.geeklan.co.uk/?p=1521"&gt;I'm using ZFS zvols for the underlying data store for the VM&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;So, firstly I took a snapshot of the running OpenBSD VM:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;zfs snapshot storage/vms/openbsd@booted
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Then clone it:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;zfs clone -p storage/vms/openbsd@booted storage/vms/mailserver
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Listing the zvols you can see the new one:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;root@jenna:/storage/vms # zfs list -r storage/vms
+NAME                   USED  AVAIL  REFER  MOUNTPOINT
+storage/vms            111G  4.82T  4.54G  /storage/vms
+storage/vms/mailserver 1.93M 4.82T  2.92G  -
+storage/vms/openbsd    106G  4.92T  2.92G  -
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;What is interesting is the amount of storage used, in this case just 1.93M, so the new OpenBSD server seems to only consume space where different to the existing one. ZFS' copy on write is pretty awesome :)&lt;/p&gt;</summary><category term="FreeBSD"></category><category term="ZFS"></category></entry><entry><title>Upgrading HP Microserver G8 with a Xeon</title><link href="https://www.quernus.co.uk/2015/08/26/upgrading-hp-microserver-g8-with-xeon/" rel="alternate"></link><published>2015-08-26T00:00:00+01:00</published><author><name>Matt Hamilton</name></author><id>tag:www.quernus.co.uk,2015-08-26:2015/08/26/upgrading-hp-microserver-g8-with-xeon/</id><summary type="html">&lt;p&gt;I've got a small HP Microserver G8 in my office as a general office fileserver, VM host for software projects, network server etc.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="HP Microserver G8" src="/public/hp_microserver.jpg" /&gt;&lt;/p&gt;
+&lt;p&gt;It originally came with a 2.3 Ghz dual core Xeon. This server was insanely good value for money, at only £179 (inc VAT) for the bare server with a Celeron G1610T processor and 2GB RAM. I spent a further £350 on 4 x WD Red 4GB disks and £110 on a 16GB memory kit for it.&lt;/p&gt;
+&lt;p&gt;The way I have the server set up, it boots from an internal SD Card into FreeBSD and starts the internal network interfaces. The majority of the actual data is then on a 4-disk ZFS raidz2 with each disk being a GELI encrypted filesystem:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;root@jenna:~ # zpool list -v
+NAME             SIZE  ALLOC   FREE  EXPANDSZ   FRAG    CAP  DEDUP  HEALTH  ALTROOT
+storage         10.9T   384G  10.5T         -     1%     3%  1.00x  ONLINE  -
+  raidz2        10.9T   384G  10.5T         -     1%     3%
+    ada0p2.eli      -      -      -         -      -      -
+    ada1p2.eli      -      -      -         -      -      -
+    ada2p2.eli      -      -      -         -      -      -
+    ada3p2.eli      -      -      -         -      -      -
+  da0             58G   656K  58.0G         -     0%     0%
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;On boot, I SSH into the server from my desktop and manually run a script mount the main storage:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;root@jenna:~ # cat mountstorage.sh
+geli attach -k /root/storage.key ada0p2 || exit 
+geli attach -k /root/storage.key ada1p2 || exit
+geli attach -k /root/storage.key ada2p2 || exit
+geli attach -k /root/storage.key ada3p2 || exit
+zfs mount -a
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;I then run a script to start all the guest VMs (including &lt;a href="/2015/07/27/openbsd-as-freebsd-router/"&gt;The OpenBSD virtual router&lt;/a&gt;). This way if the server is ever stolen, the data is at least secure.&lt;/p&gt;
+&lt;p&gt;A while back I bought a more powerful CPU for it. After doing some searching around I found that an Intel BX80637E31230V2 processor at £181 should be a drop in replacement. It should run cool enough to still be OK in the small case of the server. This is a Xeon class processor which has some more virtualisation features:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Intel Turbo Boost Technology 2.0&lt;/li&gt;
+&lt;li&gt;Intel vPro Technology&lt;/li&gt;
+&lt;li&gt;Intel Hyper-Threading Technology&lt;/li&gt;
+&lt;li&gt;Intel Virtualization Technology (VT-x)&lt;/li&gt;
+&lt;li&gt;Intel Virtualization Technology for Directed I/O (VT-d)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Having VT-d means I can do PCI passthru on bhyve and pass PCI devices, such as network ports directly through to a guest OS on the VM. It also features AES-NI meaning it can do the AES crypto for the filesystem in hardware. I'm not entirely sure I trust onboard crypto these days, maybe me just being paranoid.&lt;/p&gt;
+&lt;p&gt;One great thing about this little server, is that it has an ethernet-based ILO port which gives you remote console access. When I replaced the CPU I was never expecting it to 'just work' first time. Inevitably &lt;em&gt;something&lt;/em&gt; was going to cause trouble. I was expecting some kind of 'New CPU detected, Press F1'-type message on the console. But as it was it just booted up straight away without even needing me to go into the ILO console.&lt;/p&gt;
+&lt;p&gt;Physically replacing the CPU was dead simple, and pretty much tool-less. Just a couple of thumb-screws on the back to get the case off. Then unplug about five cables from the motherboard and slide the motherboard tray out the back of the chassis. Then unbolting the CPU was a case of just undo-ing 4 torx bolts holding the heatsink on using the supplied torx wrench. Swap the CPU, then put it back together, and voila. Back and running about 10 minutes later.&lt;/p&gt;
+&lt;p&gt;But anyway, here is the relevent bits of dmesg output before and after the upgrade:&lt;/p&gt;
+&lt;p&gt;Before:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;CPU&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;Intel&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;R&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="n"&gt;Celeron&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;R&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="n"&gt;CPU&lt;/span&gt; &lt;span class="n"&gt;G1610T&lt;/span&gt; &lt;span class="err"&gt;@&lt;/span&gt; &lt;span class="mf"&gt;2.30&lt;/span&gt;&lt;span class="n"&gt;GHz&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="mf"&gt;2294.84&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;MHz&lt;/span&gt; &lt;span class="n"&gt;K8&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="kd"&gt;class&lt;/span&gt; &lt;span class="n"&gt;CPU&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;
+  &lt;span class="n"&gt;Origin&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;GenuineIntel&amp;quot;&lt;/span&gt;  &lt;span class="n"&gt;Id&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mh"&gt;0x306a9&lt;/span&gt;  &lt;span class="n"&gt;Family&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mh"&gt;0x6&lt;/span&gt;  &lt;span class="n"&gt;Model&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mh"&gt;0x3a&lt;/span&gt;  &lt;span class="n"&gt;Stepping&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;9&lt;/span&gt;
+  &lt;span class="n"&gt;Features&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mh"&gt;0xbfebfbff&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;FPU&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;VME&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;DE&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;PSE&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;TSC&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;MSR&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;PAE&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;MCE&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;CX8&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;APIC&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;SEP&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;MTRR&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;PGE&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;MCA&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;CMOV&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;PAT&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;PSE36&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;CLFLUSH&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;DTS&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;ACPI&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;MMX&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;FXSR&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;SSE&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;SSE2&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;SS&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;HTT&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;TM&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;PBE&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;
+  &lt;span class="n"&gt;Features2&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mh"&gt;0xd9ae3bf&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;SSE3&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;PCLMULQDQ&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;DTES64&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;MON&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;DS_CPL&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;VMX&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;EST&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;TM2&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;SSSE3&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;CX16&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;xTPR&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;PDCM&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;PCID&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;SSE4&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;SSE4&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;POPCNT&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;TSCDLT&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;XSAVE&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;OSXSAVE&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;
+  &lt;span class="n"&gt;AMD&lt;/span&gt; &lt;span class="n"&gt;Features&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mh"&gt;0x28100800&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;SYSCALL&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;NX&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;RDTSCP&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;LM&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;
+  &lt;span class="n"&gt;AMD&lt;/span&gt; &lt;span class="n"&gt;Features2&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mh"&gt;0x1&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;LAHF&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;
+  &lt;span class="n"&gt;Structured&lt;/span&gt; &lt;span class="n"&gt;Extended&lt;/span&gt; &lt;span class="n"&gt;Features&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mh"&gt;0x281&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;FSGSBASE&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;SMEP&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;ERMS&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;
+  &lt;span class="n"&gt;VT&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;PAT&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;HLT&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;MTF&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;PAUSE&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;EPT&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;UG&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;VPID&lt;/span&gt;
+  &lt;span class="n"&gt;TSC&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;P&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;state&lt;/span&gt; &lt;span class="n"&gt;invariant&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;performance&lt;/span&gt; &lt;span class="n"&gt;statistics&lt;/span&gt;
+
+&lt;span class="o"&gt;...&lt;/span&gt;
+&lt;span class="n"&gt;FreeBSD&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;SMP&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;Multiprocessor&lt;/span&gt; &lt;span class="n"&gt;System&lt;/span&gt; &lt;span class="n"&gt;Detected&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt; &lt;span class="n"&gt;CPUs&lt;/span&gt;
+&lt;span class="n"&gt;FreeBSD&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;SMP&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt; &lt;span class="kd"&gt;package&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;s&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="n"&gt;x&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt; &lt;span class="n"&gt;core&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;s&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;
+ &lt;span class="n"&gt;cpu0&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;BSP&lt;/span&gt;&lt;span class="o"&gt;):&lt;/span&gt; &lt;span class="n"&gt;APIC&lt;/span&gt; &lt;span class="n"&gt;ID&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;  &lt;span class="mi"&gt;0&lt;/span&gt;
+ &lt;span class="n"&gt;cpu1&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;AP&lt;/span&gt;&lt;span class="o"&gt;):&lt;/span&gt; &lt;span class="n"&gt;APIC&lt;/span&gt; &lt;span class="n"&gt;ID&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;  &lt;span class="mi"&gt;2&lt;/span&gt;
+&lt;span class="n"&gt;ioapic0&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;Changing&lt;/span&gt; &lt;span class="n"&gt;APIC&lt;/span&gt; &lt;span class="n"&gt;ID&lt;/span&gt; &lt;span class="n"&gt;to&lt;/span&gt; &lt;span class="mi"&gt;8&lt;/span&gt;
+&lt;span class="n"&gt;ioapic0&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;Version&lt;/span&gt; &lt;span class="mf"&gt;2.0&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;irqs&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;23&lt;/span&gt; &lt;span class="n"&gt;on&lt;/span&gt; &lt;span class="n"&gt;motherboard&lt;/span&gt;
+&lt;span class="n"&gt;random&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;Software&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;Yarrow&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;initialized&lt;/span&gt;
+&lt;span class="n"&gt;kbd1&lt;/span&gt; &lt;span class="n"&gt;at&lt;/span&gt; &lt;span class="n"&gt;kbdmux0&lt;/span&gt;
+&lt;span class="n"&gt;cryptosoft0&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;software&lt;/span&gt; &lt;span class="n"&gt;crypto&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;on&lt;/span&gt; &lt;span class="n"&gt;motherboard&lt;/span&gt;
+&lt;span class="n"&gt;acpi0&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;HP&lt;/span&gt; &lt;span class="n"&gt;ProLiant&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;on&lt;/span&gt; &lt;span class="n"&gt;motherboard&lt;/span&gt;
+&lt;span class="n"&gt;acpi0&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;Power&lt;/span&gt; &lt;span class="n"&gt;Button&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;fixed&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;cpu0&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;ACPI&lt;/span&gt; &lt;span class="n"&gt;CPU&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;on&lt;/span&gt; &lt;span class="n"&gt;acpi0&lt;/span&gt;
+&lt;span class="n"&gt;cpu1&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;ACPI&lt;/span&gt; &lt;span class="n"&gt;CPU&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;on&lt;/span&gt; &lt;span class="n"&gt;acpi0&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;After:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;CPU&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;Intel&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;R&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="n"&gt;Xeon&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;R&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="n"&gt;CPU&lt;/span&gt; &lt;span class="n"&gt;E3&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;1230&lt;/span&gt; &lt;span class="n"&gt;V2&lt;/span&gt; &lt;span class="err"&gt;@&lt;/span&gt; &lt;span class="mf"&gt;3.30&lt;/span&gt;&lt;span class="n"&gt;GHz&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="mf"&gt;3292.59&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;MHz&lt;/span&gt; &lt;span class="n"&gt;K8&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="kd"&gt;class&lt;/span&gt; &lt;span class="n"&gt;CPU&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;
+  &lt;span class="n"&gt;Origin&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;GenuineIntel&amp;quot;&lt;/span&gt;  &lt;span class="n"&gt;Id&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mh"&gt;0x306a9&lt;/span&gt;  &lt;span class="n"&gt;Family&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mh"&gt;0x6&lt;/span&gt;  &lt;span class="n"&gt;Model&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mh"&gt;0x3a&lt;/span&gt;  &lt;span class="n"&gt;Stepping&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;9&lt;/span&gt;
+  &lt;span class="n"&gt;Features&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mh"&gt;0xbfebfbff&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;FPU&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;VME&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;DE&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;PSE&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;TSC&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;MSR&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;PAE&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;MCE&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;CX8&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;APIC&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;SEP&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;MTRR&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;PGE&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;MCA&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;CMOV&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;PAT&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;PSE36&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;CLFLUSH&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;DTS&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;ACPI&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;MMX&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;FXSR&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;SSE&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;SSE2&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;SS&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;HTT&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;TM&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;PBE&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;
+  &lt;span class="n"&gt;Features2&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mh"&gt;0x7fbae3ff&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;SSE3&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;PCLMULQDQ&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;DTES64&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;MON&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;DS_CPL&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;VMX&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;SMX&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;EST&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;TM2&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;SSSE3&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;CX16&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;xTPR&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;PDCM&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;PCID&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;SSE4&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;SSE4&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;x2APIC&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;POPCNT&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;TSCDLT&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;AESNI&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;XSAVE&lt;/span&gt;&lt;span class="o"&gt;\&lt;/span&gt;
+&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;OSXSAVE&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;AVX&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;F16C&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;RDRAND&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;
+  &lt;span class="n"&gt;AMD&lt;/span&gt; &lt;span class="n"&gt;Features&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mh"&gt;0x28100800&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;SYSCALL&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;NX&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;RDTSCP&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;LM&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;
+  &lt;span class="n"&gt;AMD&lt;/span&gt; &lt;span class="n"&gt;Features2&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mh"&gt;0x1&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;LAHF&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;
+  &lt;span class="n"&gt;Structured&lt;/span&gt; &lt;span class="n"&gt;Extended&lt;/span&gt; &lt;span class="n"&gt;Features&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mh"&gt;0x281&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;FSGSBASE&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;SMEP&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;ERMS&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;
+  &lt;span class="n"&gt;XSAVE&lt;/span&gt; &lt;span class="n"&gt;Features&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mh"&gt;0x1&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;XSAVEOPT&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;
+  &lt;span class="n"&gt;VT&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;PAT&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;HLT&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;MTF&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;PAUSE&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;EPT&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;UG&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt;&lt;span class="n"&gt;VPID&lt;/span&gt;
+  &lt;span class="n"&gt;TSC&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;P&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;state&lt;/span&gt; &lt;span class="n"&gt;invariant&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;performance&lt;/span&gt; &lt;span class="n"&gt;statistics&lt;/span&gt;
+
+&lt;span class="n"&gt;FreeBSD&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;SMP&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;Multiprocessor&lt;/span&gt; &lt;span class="n"&gt;System&lt;/span&gt; &lt;span class="n"&gt;Detected&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;8&lt;/span&gt; &lt;span class="n"&gt;CPUs&lt;/span&gt;
+&lt;span class="n"&gt;FreeBSD&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;SMP&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt; &lt;span class="kd"&gt;package&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;s&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="n"&gt;x&lt;/span&gt; &lt;span class="mi"&gt;4&lt;/span&gt; &lt;span class="n"&gt;core&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;s&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="n"&gt;x&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt; &lt;span class="n"&gt;SMT&lt;/span&gt; &lt;span class="n"&gt;threads&lt;/span&gt;
+ &lt;span class="n"&gt;cpu0&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;BSP&lt;/span&gt;&lt;span class="o"&gt;):&lt;/span&gt; &lt;span class="n"&gt;APIC&lt;/span&gt; &lt;span class="n"&gt;ID&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;  &lt;span class="mi"&gt;0&lt;/span&gt;
+ &lt;span class="n"&gt;cpu1&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;AP&lt;/span&gt;&lt;span class="o"&gt;):&lt;/span&gt; &lt;span class="n"&gt;APIC&lt;/span&gt; &lt;span class="n"&gt;ID&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;  &lt;span class="mi"&gt;1&lt;/span&gt;
+ &lt;span class="n"&gt;cpu2&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;AP&lt;/span&gt;&lt;span class="o"&gt;):&lt;/span&gt; &lt;span class="n"&gt;APIC&lt;/span&gt; &lt;span class="n"&gt;ID&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;  &lt;span class="mi"&gt;2&lt;/span&gt;
+ &lt;span class="n"&gt;cpu3&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;AP&lt;/span&gt;&lt;span class="o"&gt;):&lt;/span&gt; &lt;span class="n"&gt;APIC&lt;/span&gt; &lt;span class="n"&gt;ID&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;  &lt;span class="mi"&gt;3&lt;/span&gt;
+ &lt;span class="n"&gt;cpu4&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;AP&lt;/span&gt;&lt;span class="o"&gt;):&lt;/span&gt; &lt;span class="n"&gt;APIC&lt;/span&gt; &lt;span class="n"&gt;ID&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;  &lt;span class="mi"&gt;4&lt;/span&gt;
+ &lt;span class="n"&gt;cpu5&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;AP&lt;/span&gt;&lt;span class="o"&gt;):&lt;/span&gt; &lt;span class="n"&gt;APIC&lt;/span&gt; &lt;span class="n"&gt;ID&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;  &lt;span class="mi"&gt;5&lt;/span&gt;
+ &lt;span class="n"&gt;cpu6&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;AP&lt;/span&gt;&lt;span class="o"&gt;):&lt;/span&gt; &lt;span class="n"&gt;APIC&lt;/span&gt; &lt;span class="n"&gt;ID&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;  &lt;span class="mi"&gt;6&lt;/span&gt;
+ &lt;span class="n"&gt;cpu7&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;AP&lt;/span&gt;&lt;span class="o"&gt;):&lt;/span&gt; &lt;span class="n"&gt;APIC&lt;/span&gt; &lt;span class="n"&gt;ID&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;  &lt;span class="mi"&gt;7&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Checking the IPMI sensors, and the processor is running at 40 degrees C at the moment, when fairly idle:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;root@jenna:~ # ipmitool sensor
+UID Light        | 0x0        | discrete   | 0x0080| na        | na        | na        | na        | na        | na        
+Health LED       | 0x0        | discrete   | 0x0080| na        | na        | na        | na        | na        | na        
+Power Supply 1   | 0x0        | discrete   | 0x0180| na        | na        | na        | na        | na        | na        
+Fan 1            | 12.544     | percent    | ok    | na        | na        | na        | na        | na        | na        
+01-Inlet Ambient | 22.000     | degrees C  | ok    | na        | na        | na        | na        | 42.000    | 46.000    
+02-CPU           | 40.000     | degrees C  | ok    | na        | na        | na        | na        | 70.000    | 0.000     
+03-P1 DIMM 1-2   | 37.000     | degrees C  | ok    | na        | na        | na        | na        | 87.000    | 0.000     
+04-HD Max        | na         |            | na    | na        | na        | na        | na        | 60.000    | 0.000     
+05-Chipset       | 59.000     | degrees C  | ok    | na        | na        | na        | na        | 105.000   | 0.000     
+06-Chipset Zone  | 46.000     | degrees C  | ok    | na        | na        | na        | na        | 68.000    | 73.000    
+07-VR P1 Zone    | 52.000     | degrees C  | ok    | na        | na        | na        | na        | 93.000    | 98.000    
+08-Supercap Max  | na         |            | na    | na        | na        | na        | na        | 65.000    | 0.000     
+09-iLO Zone      | 47.000     | degrees C  | ok    | na        | na        | na        | na        | 72.000    | 77.000    
+10-PCI 1         | na         |            | na    | na        | na        | na        | na        | 100.000   | 0.000     
+11-PCI 1 Zone    | 37.000     | degrees C  | ok    | na        | na        | na        | na        | 64.000    | 69.000    
+12-Sys Exhaust   | 50.000     | degrees C  | ok    | na        | na        | na        | na        | 68.000    | 73.000    
+13-LOM           | na         |            | na    | na        | na        | na        | na        | 100.000   | 0.000     
+Memory           | 0x0        | discrete   | 0x4080| na        | na        | na        | na        | na        | na        
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Any questions, then let me know in the comments below.&lt;/p&gt;</summary><category term="FreeBSD"></category><category term="Hardware"></category></entry><entry><title>iOS Deployment and Provisioning - Part II - Rational</title><link href="https://www.quernus.co.uk/2015/08/15/ios-deployment-part-2/" rel="alternate"></link><published>2015-08-15T00:00:00+01:00</published><author><name>Matt Hamilton</name></author><id>tag:www.quernus.co.uk,2015-08-15:2015/08/15/ios-deployment-part-2/</id><summary type="html">&lt;p class="message"&gt;
+  This is the third in a series of blog posts about iOS deployment and experiences setting up a continuous testing and build server for iOS apps. These posts are of interest to individual developers wanting to understand more, but mainly targeting small development teams trying to manage their development, testing and deployment process.
+&lt;/p&gt;
+
+&lt;h2&gt;The Deployment Process&lt;/h2&gt;
+&lt;p&gt;One of the first things I noticed when I first started getting involved in the development of an iOS application is just how insanely complex the deployment process is to a newcomer. Even regardless of me having to get my head around new programming languages (Objective C and Swift) and new APIs, the bigger hurdle was Xcode itself.&lt;/p&gt;
+&lt;p&gt;At first I was the liaison with the outsourced mobile app development agency. Every few weeks the agency would do a ‘Testflight’ build for us to try out. We’d give feedback and that would be rolled into their development as they went along. Speaking to them, the actual process of testing, building and deploying a release would take one of their developers most of an afternoon to do. Trying to get the releases more frequent would just tie up a valuable developer for longer.&lt;/p&gt;
+&lt;p&gt;Eventually we moved the development of the app in-house. We recruited a developer to work on the project. I was now more involved in the actual day-to-day management of the development process. And this was when I started to realised just how complex the deployment can be. The developer was fantastic and helped me to understand things a great deal, but the process of actually deploying the app was cumbersome. &lt;/p&gt;
+&lt;p&gt;I tried to do a build myself from Xcode. This required me to have the right certificates, keys, and provisioning profiles to work. Several times Xcode would come up with some error about the provisioning profile and just ask me if I wanted it to ‘fix it’. If I hit the button to fix it, it just went away and did it’s magic. I had no idea what it was actually doing. I just pressed an hoped. Sometimes it worked, sometimes it didn’t. In talking to other iOS developers this seemed like ‘normal’ behaviour. Most of them didn’t really know what was going on. They just hit the button in Xcode and hopes for the best. Kudos to Apple for hiding all the details and letting people get on with the task at hand, developing software, but when things went wrong it is hard to work out.&lt;/p&gt;
+&lt;p&gt;One of the main issues was that often a build would work on our developer’s machine, but not on mine. Or it would work on my desktop, but not my laptop. They should work the same. They had the same code checked out from Github, but alas one would work and one would not.&lt;/p&gt;
+&lt;p&gt;The time came for us to start hiring more developers, and soon we had a team of four developers working on the app, plus myself, a UX person, and a graphic designer. How would be handle the deployment process? In order to build the app we had to ensure that they keys and certificates required were on the machine the develop building it was using. Not only that, but we were developing in Swift, which takes forever to compile. A build could take up to half an hour to build on a modern machine. That is time that a developer is sat there with their machine ground to a halt compiling.&lt;/p&gt;
+&lt;h2&gt;What we needed&lt;/h2&gt;
+&lt;p&gt;We needed a deployment mechanism. We needed an automated way for the builds to happen independent of any one developer. We needed to ensure we didn’t need to distribute our company distribution key to everyone involved. It would be great if the process could happen automatically and frequently so that anyone could test out a build. This is not like the world of web development, where you can simply allow anyone with a browser to your dev/staging server. In order for someone to test a build they need to be able to access a properly signed app with their device’s UDID encoded in the provisioning profile.&lt;/p&gt;
+&lt;p&gt;The previous incarnation of the app had very little in the way of unit tests, and this was something I wanted to change too. All the developers we hired had a very strong interest in testing, and I needed to make it as easy as possible for their tests to be run.&lt;/p&gt;
+&lt;p&gt;We bought a small Mac Mini to sit in the office and act as our build server. In order to build iOS apps you need to be on a physical Mac. Alas you can’t use a VM or similar. We needed a way to automate the build process and so ended up assembling a number of tools to do so.&lt;/p&gt;
+&lt;h2&gt;Tools we used&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href="https://github.com/"&gt;Github&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;This is where all out code it stored. It is a number of private Github repos. At one point we were evaluating Github Enterprise, which was one of the reasons I wanted to have more control over the build server, rather than use one of the nascent cloud-based iOS build services.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href="https://fastlane.tools/"&gt;Fastlane&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Fastlane is a set of tools to interact with Apple’s developer services via the command line. I first heard about it from a talk by the author of the tools, Felix Krause, at NSConf 7 in Leicester, UK. He has done a remarkable job of making sane ways to interact with the App store process in a automatable way.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href="https://jenkins-ci.org/"&gt;Jenkins&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Jenkins is an Continuos Integration (CI) tool. I was familiar with it from previous projects I’d worked on, such as Plone. Jenkins can monitor Github and when code is pushed to github it can check it out and run automated tests on the code. In our case we wanted to take it further, and not just run the tests, but actually build and deploy the app.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href="http://hockeyapp.net/"&gt;Hockey&lt;/a&gt; / &lt;a href="https://developer.apple.com/testflight/"&gt;Testflight&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Hockey and TestFlight are two services that allow you to do deployments of apps to testers. Hockey (derived from the term ‘adhoc’ as one of the three types of provisioning profile Apple allow) is a 3rd party service. It also allows you to capture crash reports from devices. If the app crashes on a user’s phone then the next time they start the app it sends the crash report to Hockey. Hockey allows you to then browse the stack trace and other crash debugging information.&lt;/p&gt;
+&lt;p&gt;TestFlight is a similar service to Hockey, but now owned by Apple themselves. Rather then using an ‘adhoc’ provisioning profile, you actually use a ‘store’ profile and upload the app to iTunes Connect in a similar way to if you were submitting a final app to Apple for the App Store. By marking the app as ‘beta’ in the upload process it allows you to distribute the pre-release app to testers.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;table style="margin-left: 40px"&gt;
+&lt;tr&gt;&lt;th&gt;&lt;/th&gt;&lt;th&gt;Testflight&lt;/th&gt;&lt;th&gt;Hockey&lt;/th&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;Pros&lt;/td&gt;&lt;td&gt;
+&lt;!-- Testflight pros --&gt;
+&lt;ul&gt;
+&lt;li&gt;Uses an Appstore provisioning profile&lt;/li&gt;
+&lt;li&gt;Profile not tied to specific UDIDs&lt;/li&gt;
+&lt;li&gt;Ability to submit app to Apple for external beta review allowing up to 2000 external beta reviewers&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/td&gt;
+&lt;td&gt;
+&lt;!-- Hockey pros --&gt;
+&lt;ul&gt;
+&lt;li&gt;Rich API, allowing creation of multiple distinct apps easily (ie. one per feature branch of code)&lt;/li&gt;
+&lt;li&gt;Apps available for download immediately after upload&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;Cons&lt;/td&gt;&lt;td&gt;
+&lt;!-- Testflight cons --&gt;
+&lt;ul&gt;
+&lt;li&gt;Slow to process uploaded apps. Usually 30 minutes, may be hours&lt;/li&gt;
+&lt;li&gt;Cumbersome to create multiple apps&lt;/li&gt;
+&lt;li&gt;API changing regularly&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/td&gt;
+&lt;td&gt;
+&lt;!-- Hockey cons --&gt;
+&lt;ul&gt;
+&lt;li&gt;Can only use Adhoc profiles, so restricted to users/devices added into profile via Apple Developer Portal&lt;/li&gt;
+&lt;li&gt;Not the exact same binary that you would then release&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/td&gt;&lt;/tr&gt;
+
+&lt;/table&gt;
+
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href="https://slack.com/"&gt;Slack&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Slack is our internal communications tool. When a build happens on Jenkins the status of the tests and build and the link to the download are posted to Slack for the team to see.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;In the next post I’ll go into more detail about Fastlane.&lt;/p&gt;</summary><category term="iOS"></category><category term="iPhone"></category><category term="apple"></category></entry><entry><title>I Love our Build System</title><link href="https://www.quernus.co.uk/2015/08/05/i-love-our-build-system/" rel="alternate"></link><published>2015-08-05T00:00:00+01:00</published><author><name>Matt Hamilton</name></author><id>tag:www.quernus.co.uk,2015-08-05:2015/08/05/i-love-our-build-system/</id><summary type="html">&lt;p class="message"&gt;
+  This is part of a series of blog posts about iOS deployment and experiences setting up a continuous testing and build server for iOS apps. These posts are of interest to individual developers wanting to understand more, but mainly targeting small development teams trying to manage their development, testing and deployment process.
+&lt;/p&gt;
+
+&lt;h2&gt;Wednesday Morning, 7:30am&lt;/h2&gt;
+&lt;p&gt;I love our build system. Yes, I'm biased as I was the one the put it together (using awesome software written by others of course). And in this series I will be detailing how it was built. But I can't help but interject with this interlude as it just shows &lt;em&gt;why&lt;/em&gt; it is so awesome.&lt;/p&gt;
+&lt;p&gt;Yesterday we were working on polishing up a number of aspects of an app we are working on. One of our directors, Nicole, is at a trade show in New Orleans and will be wanting to show off the work-in-progress app. So we have been polishing up what is there and testing it all. Last night I pushed a build of the app to Apple's TestFlight service so Nicole can install it on her iPhone. For some unknown reason TestFlight was being slow in processing apps. As I was tucking up into bed last night, TestFlight had only just processed the app.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;7:30am&lt;/p&gt;
+&lt;p&gt;Wake up (my daughter is on school holiday, so a luxury of extra hour in bed), roll over and grab my iPhone to check Slack for any updates and feedback from Nicole. &lt;/p&gt;
+&lt;p&gt;There is a message from her. "There is an error in the app. Some of the numbers displayed are not correct". I check the app and sure enough, two of the numbers have been transposed in the display.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;7:37am&lt;/p&gt;
+&lt;p&gt;Due to TestFlight being slow last night, I want to get on this issue as soon as possible. It needs to be fixed before Nicole wakes up in a timezone 7 hours behind me. She needs the updated app before the trade show starts. &lt;/p&gt;
+&lt;p&gt;I file a bug in our Pivotal Tracker, and tag two of our developers on a message on Slack about it:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;@pablo or @marc whichever of you gets in first today could you please take the above ticket. Once fixed merge to master and it should start a new Testflight build. Hopefully will process quicker than last night's one.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;7:48am&lt;/p&gt;
+&lt;p&gt;Marc replies on Slack that he is on it. He is in a timezone an hour ahead of me and already started working. I jump into the shower.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;8:04am&lt;/p&gt;
+&lt;p&gt;Marc has found and fixed the bug. Seems just a display issue, rather than underlying data problem. Two labels transposed. He wonders why no-one has spotted it yet. This is why we have continuous builds, so the people with domain-specific knowledge in our team can spot things like this quicker... and we can deploy new, fixed, builds quicker.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;8:09am&lt;/p&gt;
+&lt;p&gt;Marc marks the bug finished in Pivotal. He pushes the feature branch he fixed this in to Github (note: I guess should be a fix/ branch rather than feature/ one? Oh well, does the same job). He issues a pull request for one of the other developers to check.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;8:18am&lt;/p&gt;
+&lt;p&gt;I'm now out of the shower, dressed, and brushing my teeth. Marc asks if he should go ahead and merge the pull request himself for a minor change. I tap on the link in Slack, and Github opens. I can see that the commit really is just transposing two labels and very low risk. Just as I'm about to reply, our build server sends a message on Slack:&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Slack notification of build by Jenkins / Fastlane" src="/public/fastlane_slack_notification.png" /&gt;&lt;/p&gt;
+&lt;p&gt;The build server saw the push of the feature branch by Marc and went ahead and built it, signed it, created a new app for it in Hockey, and uploaded the binary.&lt;/p&gt;
+&lt;p&gt;I tap on the link and the app downloads and installs on my iPhone. I check it out and see that the numbers are now in the correct place.&lt;/p&gt;
+&lt;p&gt;I reply to Marc to tell him it looks good, to merge the pull request himself.&lt;/p&gt;
+&lt;p&gt;I rinse off my toothbrush and put it down.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;8:29am&lt;/p&gt;
+&lt;p&gt;Marc confirms he has merged the PR into the develop/ branch. I tell him to go ahead and merge to master/. This will trigger our build server to do a beta build and upload it to TestFlight so Nicole can get it.&lt;/p&gt;
+&lt;p&gt;I finish getting dressed, head downstairs to get breakfast and help get my daughter ready for Summer Camp today.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;8:53am&lt;/p&gt;
+&lt;p&gt;I get an email from Apple saying that there is a new version of our app in TestFlight and available for download:&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Email from Apple iTunes Store about updated beta of app" src="/public/itunes_testflight_notification.png" /&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;8:55am&lt;/p&gt;
+&lt;p&gt;I get my daughter into the bike trailer and cycle off to drop her at summer camp for the day and head to the office. a great start to the day so far! The new app build is there waiting for Nicole when she wakes up in a few hours.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;</summary><category term="iOS"></category><category term="apple"></category></entry><entry><title>iOS Deployment and Provisioning - Part I - Terminology</title><link href="https://www.quernus.co.uk/2015/07/28/ios-deployment-part-1/" rel="alternate"></link><published>2015-07-28T00:00:00+01:00</published><author><name>Matt Hamilton</name></author><id>tag:www.quernus.co.uk,2015-07-28:2015/07/28/ios-deployment-part-1/</id><summary type="html">&lt;p class="message"&gt;
+  This is the first in a series of blog posts about iOS deployment and experiences setting up a continuous testing and build server for iOS apps. These posts are of interest to individual developers wanting to understand more, but mainly targeting small development teams trying to manage their development, testing and deployment process.
+&lt;/p&gt;
+
+&lt;h2&gt;Terminology&lt;/h2&gt;
+&lt;p&gt;One of the first things that hit me when I first stepped into the world of iOS development was the terminology around the deployment process. Apple have developed a system such that only cryptographically signed binaries can run on iPhones &amp;amp; iPads. However the whole process by which this is done seems at first completely arcane and bewildering. So here is, hopefully, some clarification based upon what I've learnt over the past few months.&lt;/p&gt;
+&lt;h3&gt;Certificate&lt;/h3&gt;
+&lt;p&gt;This is the basic piece of information that is used to sign the resultant binary of your app. If the binary is not signed by a certificate then it won't run on your device. End of story. &lt;/p&gt;
+&lt;p&gt;There are two types of certificate:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Development certificate&lt;/p&gt;
+&lt;p&gt;This is a certificate issued to you personally as a developer when you signed up to Apple's development program. This is the certificate that is used to sign the apps when you create something in Xcode and deploy it locally to your iPhone plugged into the USB port. Typically, each developer in your team would have one of these.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Distribution certificate&lt;/p&gt;
+&lt;p&gt;This is a certificate used by Apple to distribute your app to other people. This can be via the official Apple App store or via adhoc means such as &lt;a href="http://hockeyapp.net/"&gt;HockeyApp&lt;/a&gt;. Typically this would be for an organisation, not an individual. You can have two of these at a time, so you can manage rolling renewals of them. Whilst this cert is for the &lt;em&gt;organisation&lt;/em&gt;, the certificate and it's corresponding key have to live &lt;em&gt;somewhere&lt;/em&gt;. Typically this is on the computer of the developer that set it up (in their keychain) and only that developer can deploy apps. This soon becomes difficult to manage, as I'll explain later.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3&gt;Key&lt;/h3&gt;
+&lt;p&gt;The private part of the certificate. This is needed to cryptographically validate that you are the owner of the certificate. It is needed in order to sign a binary with the certificate. Again, this key is usually in a developer's keychain. &lt;/p&gt;
+&lt;p&gt;&lt;img alt="Keychain screenshot showing certificate and key" src="/public/keychain-screenshot.png" /&gt;&lt;/p&gt;
+&lt;p&gt;The person that has the key has the sole ability to sign apps for that organisation. This is where the headache begins. The key is on Bob's computer. Bob is on holiday. Jane needs to do a release. Now what?&lt;/p&gt;
+&lt;h3&gt;BundleID / AppID&lt;/h3&gt;
+&lt;p&gt;There are two strings that are used to identify apps and what they can do. They are the 'Bundle ID' and the 'App ID'. Just to confuse things, the Bundle ID is the unique identifier for an app, not the App ID.&lt;/p&gt;
+&lt;p&gt;A very thorough explanation can be found on this stackoverflow post:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="http://stackoverflow.com/questions/4271884/what-is-the-difference-between-the-app-id-and-the-bundle-id-where-is-the-app-i#answer-20557213"&gt;What is the difference between the app ID and the bundle ID ? Where is the app ID in the Xcode project?&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;But in short, the Bundle ID is used to uniquely identify the app. The App ID is used to associate an app with a provisioning profile. You can have wildcard App IDs. e.g. an App ID of &lt;code&gt;com.enquos.*&lt;/code&gt; would match an app with the Bundle ID of &lt;code&gt;com.enquos.fitness&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;The App ID is created in the Apple Developer Center (Xcode can do this for you) and specifies what 'entitlements' the app has. e.g. Access to HealthKit data, or VPN control. Hence whilst a wildcard App ID is great in the general case, you will want different App IDs later on when you want apps to have different entitlements.&lt;/p&gt;
+&lt;h3&gt;Provisioning Profile&lt;/h3&gt;
+&lt;p&gt;The provisioning profile is the piece of 'glue' metadata that associates a device with a certificate and App ID.&lt;/p&gt;
+&lt;p&gt;There are three types of provisioning profile:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Adhoc&lt;/p&gt;
+&lt;p&gt;This profile is the one used to distribute an app for testing by a &lt;em&gt;known&lt;/em&gt; set of developers. This profile has a list of Unique Device Ids (UDIDs) encoded in it. In order for someone to install an app using this profile, the UDID of their device needs to be in this profile. Adding devices to a profile is done in the Apple Developer Centre. This kind of profile is used when distributing via 3rd party services such as HockeyApp.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Store&lt;/p&gt;
+&lt;p&gt;The store provisioning profile is used when an app is submitted to Apple for submission to the App Store. It is also used for builds that are submitted to Apple for testing under their 'TestFlight' service. This used to be a 3rd party service, but has recently been bought and integrated into Apple's processes.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Enterprise&lt;/p&gt;
+&lt;p&gt;If you are a large enterprise and looking to distribute apps &lt;em&gt;within&lt;/em&gt; your organisation you can sign up to the Apple Developer Enterprise Program. This allows you to sign the apps as though you were Apple itself and you don't need to have all the UDIDs encoded into the app. It means you can distribute your apps via whatever means you want. E.g. putting them on an intranet.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Typically, when developing with Xcode, it will manage the provisioning profiles for you and select the appropriate one at the right time. However as we will see in later posts in this series there are times when we will want to manually select one.&lt;/p&gt;
+&lt;p&gt;Xcode will use the Bundle ID of the app you are working on and look it up in the Apple Developer Center to find the provisioning profile with an App ID that is compatible with the Bundle ID.&lt;/p&gt;
+&lt;h3&gt;UDIDs&lt;/h3&gt;
+&lt;p&gt;The UDID is the unique device id. Each Apple device has one, and they are used to identify a particular device. &lt;/p&gt;
+&lt;p&gt;In order to deploy an app via an adhoc profile you need to add the UDID of the device you want to deploy to into the provisioning profile. This is done in the Apple Developer Center. &lt;/p&gt;
+&lt;p&gt;&lt;img alt="Screenshot of added UDIDs to a provisioning profile in ADC" src="/public/adc_udid_add_screenshot.png" /&gt;&lt;/p&gt;
+&lt;p&gt;One thing to note, is that the provisioning profile is &lt;em&gt;bundled&lt;/em&gt; into the app when it is distributed. Hence once a version of an app had been distributed, you cannot add additional devices to that adhoc deployment. You need to add the new device in ADC, regenerate the provisioning profile, then re-build and re-distribute the app.&lt;/p&gt;
+&lt;p&gt;This is only an issue for &lt;em&gt;adhoc&lt;/em&gt; profiles and distribution. If you are using Apple's TestFlight service then you use a &lt;em&gt;store&lt;/em&gt; provisioning profile and you can add additional testers at any point. Even after a release has been uploaded to TestFlight. I'll talk about different distributions methods in a later post in this series.&lt;/p&gt;
+&lt;h3&gt;Scheme&lt;/h3&gt;
+&lt;p&gt;Two elements used to have different build behaviours: schemes and configurations. Apple's docs describe this best:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;An Xcode scheme defines a collection of targets to build, a configuration to use when building, and a collection of tests to execute.&lt;/p&gt;
+&lt;p&gt;You can have as many schemes as you want, but only one can be active at a time. You can specify whether a scheme should be stored in a project—in which case it’s available in every workspace that includes that project, or in the workspace—in which case it’s available only in that workspace. When you select an active scheme, you also select a run destination (that is, the architecture of the hardware for which the products are built).&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3&gt;Configurations&lt;/h3&gt;
+&lt;p&gt;When you start a new project in Xcode there are two configurations &lt;code&gt;debug&lt;/code&gt; and &lt;code&gt;release&lt;/code&gt;. They mainly differ in that they set different levels of compiler optimisation and debugging  information. You can create more configurations if you want, such as to set different icons or app titles. The scheme selects the configuration.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Custom configurations in Xcode" src="https://developer.apple.com/library/ios/recipes/xcode_help-project_editor/Art/project_editor-build_configurations_2x.png" /&gt;&lt;/p&gt;
+&lt;h2&gt;Conclusion&lt;/h2&gt;
+&lt;p&gt;I hope this helps to understand some of the parts of the development process. Much of this is handled automatically by Xcode for you, but in the subsequent posts in this series it will help to understand what is going on under the covers.&lt;/p&gt;
+&lt;p&gt;This is all based upon my experience of the past few months, if anyone spots anything I've got wrong, let me know in the comments below!&lt;/p&gt;</summary><category term="iOS"></category><category term="iPhone"></category><category term="apple"></category></entry><entry><title>Using OpenBSD as a FreeBSD Router</title><link href="https://www.quernus.co.uk/2015/07/27/openbsd-as-freebsd-router/" rel="alternate"></link><published>2015-07-27T00:00:00+01:00</published><author><name>Matt Hamilton</name></author><id>tag:www.quernus.co.uk,2015-07-27:2015/07/27/openbsd-as-freebsd-router/</id><summary type="html">&lt;h2&gt;FreeBSD is a Great Server&lt;/h2&gt;
+&lt;p&gt;&lt;a href="https://www.freebsd.org/"&gt;FreeBSD&lt;/a&gt; is a great OS. I use it for my office fileserver due to its ZFS implementation, and general robustness as a fileserver and general office server.&lt;/p&gt;
+&lt;p&gt;However one thing I don’t like about FreeBSD is that even though it has had IPSEC baked into it for many many years, it is still not enabled by default in the &lt;code&gt;GENERIC&lt;/code&gt; kernel. Most kernel options in FreeBSD can be loaded as loadable modules, but IPSEC is not one of them.&lt;/p&gt;
+&lt;p&gt;I’ve been using FreeBSD &lt;a href="http://marc.info/?l=freebsd-bugs&amp;amp;m=103030758511075&amp;amp;w=2"&gt;since 1996&lt;/a&gt; and used to sit there leaving it running a &lt;code&gt;make kernel&lt;/code&gt; overnight to build new kernel on my little 386sx-16 that I had at the time. In those days, any changes or options required compiling your own custom kernel. But this is 2015 now, and to be frank, I just don’t have the inclination or patience to do that any more. Even if hardware improvements mean what used to take 8 hours, takes minutes to do.&lt;/p&gt;
+&lt;p&gt;But more importantly FreeBSD now has a &lt;a href="https://www.freebsd.org/doc/handbook/updating-upgrading-freebsdupdate.html"&gt;binary updates system&lt;/a&gt; which means that interim binary security patches can be applied without needing to do a ‘build world’. But if I’ve compiled my own kernel to get IPSEC, this is no longer an option. It seemed FreeBSD update will clobber those changes. This what what I found updating my FreeBSD 10.1 office server using &lt;code&gt;freebsd-update&lt;/code&gt; when suddenly my IPSEC VPN from home to office stopped working.&lt;/p&gt;
+&lt;h2&gt;OpenBSD is a Great Router&lt;/h2&gt;
+&lt;p&gt;In 2004, whilst at &lt;a href="https://www.netsight.co.uk"&gt;Netsight&lt;/a&gt;, &lt;a href="http://marc.info/?l=openbsd-misc&amp;amp;m=110261323606356&amp;amp;w=2"&gt;I started looking&lt;/a&gt; at using &lt;a href="http://www.openbsd.org/"&gt;OpenBSD&lt;/a&gt; for routing. We were using big Cisco 5505 switches with Route Switch Modules in to provide routing. The problem was, they soon became quite slow. They were great if you wanted to do very simple routing, and they could do Layer 3 switching in silicon on the linecards. But as soon as you started to do access lists then they had to route the packets on the main CPU. Not only that, but Cisco’s ACL syntax quickly became very cumbersome as you had no way of doing any kind of macros or variables in the language.&lt;/p&gt;
+&lt;p&gt;OpenBSD on the other hand comes with the amazing &lt;code&gt;pf&lt;/code&gt; packet filter. This is a fantastic stateful packet filter that is extremely fast, and with a very nice expressive language to write firewall rules.&lt;/p&gt;
+&lt;p&gt;At Netsight’s datacentre we soon ended up with a pair of x86 boxes running as OpenBSD firewalls. They were configured with pf and &lt;a href="http://www.openbsd.org/faq/pf/carp.html"&gt;CARP&lt;/a&gt; to provide redundancy. These two boxes protected the entire datacentre network and acted as a main filter and choke point to sanitise our traffic. They ensured that spoofed packets were not leaving our network from any customers and that we could quickly and easily help protect against any attacks on the network.&lt;/p&gt;
+&lt;p&gt;After not long we replaced all the Cisco routers with OpenBSD boxes as they turned out to be extremely reliable, flexible and fast for gigabit-level L3 intra-vlan routing.&lt;/p&gt;
+&lt;h2&gt;FreeBSD &lt;em&gt;and&lt;/em&gt; OpenBSD?!&lt;/h2&gt;
+&lt;p&gt;FreeBSD has it’s own Hypervisor, &lt;a href="http://bhyve.org/"&gt;bhvye&lt;/a&gt;, allowing you to run FreeBSD, OpenBSD, or Linux guests as virtual machines on a FreeBSD host.&lt;/p&gt;
+&lt;p&gt;So could I potentially have my cake &lt;em&gt;and&lt;/em&gt; eat it? Could I have a FreeBSD host and run an OpenBSD guest to do the IPSEC termination? Well, virtualised routers have started to become quite a hot topic with the increase of virtualisation on servers. If you are virtualising a number or servers, why not virtualise the networking infrastructure too? You can leverage the redundancy you have in the VM cluster and also move the network functions closer to the hosts they are supporting.&lt;/p&gt;
+&lt;p&gt;As it turns out &lt;a href="https://forums.freebsd.org/threads/howto-bhyve-using-openbsd-as-main-firewall-in-freebsd.50470/"&gt;someone else has already done something similar&lt;/a&gt;. They are using PCI passthru that allows you to pass a PCI device to a guest and have them control it completely. I was not able to do that due to not having a processor with the required VT-d feature to do this. But also, my external network interface is actually a USB ethernet adapter. My server is a HP Microserver G8 with two built in gigabit ports. I wanted to use both those ports for internal connections — one to my desktop, an iMac and one to a Mac Mini iOS build server. In order to do passthru, I’d have to pass the entire USB hub through to the guest. In reality this would probably not be an issue, as there are four different USB hubs on the server, and so I could pass a USB 2.0 hub to the guest, and keep a USB 3.0 hub for the host to use for transferring data to/from USB sticks.&lt;/p&gt;
+&lt;p&gt;But for now I can achieve the same effect by bridging the physical interface on the host with the virtual interface to the guest. In fact I’ve got two bridges, one representing the ‘inside’ of the network, and one the ‘outside’.&lt;/p&gt;
+&lt;h2&gt;The Actual Configs&lt;/h2&gt;
+&lt;p&gt;So to boot the vm itself, I have a script that starts the OpenBSD VM and configures the devices for it. Due to needing GRUB to boot it, you need the &lt;code&gt;grub-bhyve&lt;/code&gt; packages and a custom script such as below:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;matt@jenna:~root % cat startvm.sh
+&lt;span class="nb"&gt;cd&lt;/span&gt; /storage/vms
+grub-bhyve -m /storage/vms/obsd.map -r cd0 -M 256M obsd57 &amp;lt; obsd57.in
+bhyve -m 256M -A -H -P -s 0:0,amd_hostbridge -s 1:0,lpc -s 3:0,virtio-net,tap0 -s 4:0,virtio-blk,/dev/zvol/storage/vms/openbsd -s 5:0,virtio-net,tap1 -l com1,stdio -W obsd57
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;matt@jenna:~root % cat /storage/vms/obsd57.in 
+kopenbsd -h com0 -r sd0a &lt;span class="o"&gt;(&lt;/span&gt;hd0,openbsd1&lt;span class="o"&gt;)&lt;/span&gt;/bsd
+boot
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;In the bhyve command above you can see I have configured two virtual ethernet adapters bound to &lt;code&gt;tap0&lt;/code&gt; and &lt;code&gt;tap1&lt;/code&gt; on the host FreeBSD server. &lt;/p&gt;
+&lt;p&gt;I have this as a manual script I run, as my server uses GELI to encrypt my main storage, a ZFS array over 4 disks. When my server boots, it boots to a minimal system with none of the ZFS mounted. I need to SSH in and start the ZFS array from another script and supply the passphrase to decrypt the disks. Once the ZFS array is up, I can run the script above to start the OpenBSD server and get connectivity to the outside world.&lt;/p&gt;
+&lt;p&gt;My complete &lt;code&gt;/etc/rc.conf&lt;/code&gt; file to set up the networking. Note I also have a wifi adapter and the server acts as a base station in the office for my phone and laptop. I also have two vlans to the iMac: a high MTU one for direct data between the iMac and the server, and a regular MTU one for external data and bridging to the wifi.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;matt@jenna:~root % cat /etc/rc.conf
+&lt;span class="nv"&gt;hostname&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;“jenna”
+&lt;span class="nv"&gt;keymap&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;“uk.iso-ctrl.kbd”
+
+&lt;span class="c1"&gt;# Configure wifi interface&lt;/span&gt;
+&lt;span class="nv"&gt;wlans_run0&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;“wlan0”
+&lt;span class="nv"&gt;create_args_wlan0&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;“wlanmode hostap country GB”
+&lt;span class="nv"&gt;ifconfig_wlan0&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;“ssid quernus indoor mode 11a channel 100”
+&lt;span class="nv"&gt;hostapd_enable&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;“YES”
+
+&lt;span class="c1"&gt;# Configure physcial interfaces&lt;/span&gt;
+&lt;span class="nv"&gt;ifconfig_bge0&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;“mtu &lt;span class="m"&gt;1500&lt;/span&gt; up”
+&lt;span class="nv"&gt;ifconfig_bge1&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;“mtu &lt;span class="m"&gt;9000&lt;/span&gt; up”
+&lt;span class="nv"&gt;ifconfig_ue0&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;“up”
+
+&lt;span class="c1"&gt;# bring up vlans on bge1 link to iMac&lt;/span&gt;
+&lt;span class="nv"&gt;vlans_bge1&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;“1 2”
+&lt;span class="nv"&gt;ifconfig_bge1_1&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;“inet 192.168.66.1 netmask 255.255.255.0 mtu 9000”
+&lt;span class="nv"&gt;ifconfig_bge1_2&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;“up mtu 1500”
+
+&lt;span class="c1"&gt;# Create cloned interfaces&lt;/span&gt;
+&lt;span class="nv"&gt;cloned_interfaces&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;“bridge0 bridge1 tap0 tap1”
+
+&lt;span class="c1"&gt;# Configure tap interfaces for OpenBSD router VM to use&lt;/span&gt;
+&lt;span class="nv"&gt;ifconfig_tap0&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;“up”
+&lt;span class="nv"&gt;ifconfig_tap1&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;“up”
+
+&lt;span class="c1"&gt;# Bring up bridges&lt;/span&gt;
+&lt;span class="c1"&gt;# bridge0 is internal facing bridge&lt;/span&gt;
+&lt;span class="nv"&gt;ifconfig_bridge0&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;“inet 192.168.64.2 netmask 255.255.255.0 addm wlan0 addm bge0 addm tap0 addm bge1.2”
+&lt;span class="c1"&gt;# bridge1 is external facing bridge&lt;/span&gt;
+&lt;span class="nv"&gt;ifconfig_bridge1&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;“addm ue0 addm tap1”
+
+&lt;span class="c1"&gt;# Route all traffic to OpenBSD VM&lt;/span&gt;
+&lt;span class="nv"&gt;defaultrouter&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;“192.168.64.1”
+
+&lt;span class="c1"&gt;# Configure services and ZFS&lt;/span&gt;
+&lt;span class="nv"&gt;sshd_enable&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;“YES”
+&lt;span class="nv"&gt;ntpd_enable&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;“YES”
+&lt;span class="nv"&gt;powerd_enable&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;“YES”
+&lt;span class="nv"&gt;dumpdev&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;“AUTO”
+&lt;span class="nv"&gt;zfs_enable&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;“YES”
+&lt;span class="nv"&gt;samba_server_enable&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;“YES”
+&lt;span class="nv"&gt;rsyncd_enable&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;“YES”
+&lt;span class="nv"&gt;avahi_daemon_enable&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;“YES”
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;One thing in particular to note, is that we are &lt;em&gt;not&lt;/em&gt; forwarding packet at all on the FreeBSD host:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;root@jenna:~ &lt;span class="c1"&gt;# sysctl net.inet.ip.forwarding&lt;/span&gt;
+net.inet.ip.forwarding: 0
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;That is because &lt;em&gt;all&lt;/em&gt; of the routing is happening on the OpenBSD box itself.&lt;/p&gt;
+&lt;p&gt;So lets look at the OpenBSD router VM. Firstly see that is has two virtual network interfaces as per the &lt;code&gt;bhyve&lt;/code&gt; command we ran to create it:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ dmesg &lt;span class="p"&gt;|&lt;/span&gt; grep virtio
+virtio0 at pci0 dev &lt;span class="m"&gt;3&lt;/span&gt; &lt;span class="k"&gt;function&lt;/span&gt; &lt;span class="m"&gt;0&lt;/span&gt; “Qumranet Virtio Network” rev 0x00: Virtio Network Device
+vio0 at virtio0: address 00:a0:98:52:db:56
+virtio0: msi
+virtio1 at pci0 dev &lt;span class="m"&gt;4&lt;/span&gt; &lt;span class="k"&gt;function&lt;/span&gt; &lt;span class="m"&gt;0&lt;/span&gt; “Qumranet Virtio Storage” rev 0x00: Virtio Block Device
+vioblk0 at virtio1
+virtio1: msi
+virtio2 at pci0 dev &lt;span class="m"&gt;5&lt;/span&gt; &lt;span class="k"&gt;function&lt;/span&gt; &lt;span class="m"&gt;0&lt;/span&gt; “Qumranet Virtio Network” rev 0x00: Virtio Network Device
+vio1 at virtio2: address 00:a0:98:e9:8d:9c
+virtio2: msi
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;I have configured the two virtual interfaces, one with an internal IP address, and one with my public static external address assigned to me by my upstream provider:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ cat /etc/hostname.vio0                                                                                                                                       
+inet 192.168.64.1 255.255.255.0
+$ cat /etc/hostname.vio1 
+inet 31.210.128.9 255.255.255.224
+$ cat /etc/mygate                                                                                                                                              
+31.210.128.1
+$ cat /etc/sysctl.conf                                                                                                                                         
+net.inet.ip.forwarding&lt;span class="o"&gt;=&lt;/span&gt;1
+ddb.panic&lt;span class="o"&gt;=&lt;/span&gt;0
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;I have configured &lt;code&gt;pf&lt;/code&gt; to do the NAT for me, and allow in some servers such as SSH. It also allows in IPSEC traffic from my home router. I also run a SIP proxy on here to allow my SIP client on my desktop to connect to my VOIP provider.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# cat /etc/pf.conf&lt;/span&gt;
+&lt;span class="nv"&gt;ext_if&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;“vio1”
+&lt;span class="nv"&gt;int_if&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;“vio0”
+&lt;span class="nv"&gt;home_ip&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;“x.x.x.x”
+
+&lt;span class="nb"&gt;set&lt;/span&gt; skip on lo
+&lt;span class="nb"&gt;set&lt;/span&gt; skip on &lt;span class="nv"&gt;$int_if&lt;/span&gt;
+
+match out on &lt;span class="nv"&gt;$ext_if&lt;/span&gt; from 192.168.0.0/16 to any nat-to &lt;span class="o"&gt;(&lt;/span&gt;egress:0&lt;span class="o"&gt;)&lt;/span&gt;
+
+block in log
+pass out        &lt;span class="c1"&gt;# establish keep-state&lt;/span&gt;
+
+
+&lt;span class="c1"&gt;# Allow ping etc&lt;/span&gt;
+pass in on &lt;span class="nv"&gt;$ext_if&lt;/span&gt; proto icmp from any to any
+
+&lt;span class="c1"&gt;# Allow ssh&lt;/span&gt;
+pass in on &lt;span class="nv"&gt;$ext_if&lt;/span&gt; proto tcp from any to port 22
+
+&lt;span class="c1"&gt;# Allow in IPSEC VPN traffic&lt;/span&gt;
+pass in on &lt;span class="nv"&gt;$ext_if&lt;/span&gt; proto esp from &lt;span class="nv"&gt;$home_ip&lt;/span&gt; to &lt;span class="o"&gt;(&lt;/span&gt;egress:0&lt;span class="o"&gt;)&lt;/span&gt;
+pass in on enc0
+
+&lt;span class="c1"&gt;# Allow in SIP traffic&lt;/span&gt;
+pass in on &lt;span class="nv"&gt;$ext_if&lt;/span&gt; proto udp from any to port &lt;span class="o"&gt;{&lt;/span&gt; 5060, 7070:7080 &lt;span class="o"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Looking at the output from &lt;code&gt;ifconfig -a&lt;/code&gt; we can see the two interfaces &lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ ifconfig -a  
+lo0: &lt;span class="nv"&gt;flags&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;8049&amp;lt;UP,LOOPBACK,RUNNING,MULTICAST&amp;gt; mtu 32768
+        priority: 0
+        groups: lo
+        inet6 fe80::1%lo0 prefixlen &lt;span class="m"&gt;64&lt;/span&gt; scopeid 0x4
+        inet6 ::1 prefixlen 128
+        inet 127.0.0.1 netmask 0xff000000
+vio0: &lt;span class="nv"&gt;flags&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;8b43&amp;lt;UP,BROADCAST,RUNNING,PROMISC,ALLMULTI,SIMPLEX,MULTICAST&amp;gt; mtu 1500
+        lladdr 00:a0:98:52:db:56
+        priority: 0
+        media: Ethernet autoselect
+        status: active
+        inet 192.168.64.1 net mask 0xffffff00 broadcast 192.168.64.255
+vio1: &lt;span class="nv"&gt;flags&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;8b43&amp;lt;UP,BROADCAST,RUNNING,PROMISC,ALLMULTI,SIMPLEX,MULTICAST&amp;gt; mtu 1500
+        lladdr 00:a0:98:e9:8d:9c
+        priority: 0
+        groups: egress
+        media: Ethernet autoselect
+        status: active
+        inet 31.210.128.9 net mask 0xffffffe0 broadcast 31.210.128.31
+enc0: &lt;span class="nv"&gt;flags&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;0&amp;lt;&amp;gt;
+        priority: 0
+        groups: enc
+        status: active
+pflog0: &lt;span class="nv"&gt;flags&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;141&amp;lt;UP,RUNNING,PROMISC&amp;gt; mtu 33144
+        priority: 0
+        groups: pflog
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;As for the actual IPSEC setup itself. This was a breeze on OpenBSD and detail in various places:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="http://www.symantec.com/connect/articles/zero-ipsec-4-minutes"&gt;Zero to IPSec in 4 minutes&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://www.kernel-panic.it/openbsd/vpn/vpn3.html"&gt;Building VPNs on OpenBSD&lt;/a&gt; &lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;My &lt;code&gt;/etc/ipsec.conf&lt;/code&gt; file is shown below. The remote end of this connection is a Draytek Vigor 2860 router at home.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# more ipsec.conf                                                                                                                                              &lt;/span&gt;
+ike dynamic  esp from 192.168.64.0/22 to 192.168.1.0/24 &lt;span class="nb"&gt;local&lt;/span&gt; 31.210.128.9 peer x.x.x.x &lt;span class="se"&gt;\&lt;/span&gt;
+         main auth hmac-sha1  enc aes group modp1024 &lt;span class="se"&gt;\&lt;/span&gt;
+         quick auth hmac-sha1 enc aes &lt;span class="se"&gt;\&lt;/span&gt;
+         srcid 31.210.128.9 dstid x.x.x.x &lt;span class="se"&gt;\&lt;/span&gt;
+         psk MYSECRET
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;Conclusion&lt;/h2&gt;
+&lt;p&gt;So, a few weeks on, and this is all working really well. Not had any issues with stability or performance with the network at all. I’ve since been able to set up OpenBSDs fantastic &lt;code&gt;relayd&lt;/code&gt; to proxy incoming HTTPS traffic to the Mac Mini build server in the office. &lt;/p&gt;
+&lt;p&gt;At some point I might try the PCI passthru route. I do have a new CPU sat on my desk with VT-d to plug into the server, but not got around to it yet. But for now the bridging route works well and also gives me an additional point at which to run &lt;code&gt;tcpdump&lt;/code&gt; to test anything.&lt;/p&gt;
+&lt;p&gt;Any questions, then let me know in the comments below.&lt;/p&gt;</summary><category term="OpenBSD"></category><category term="FreeBSD"></category><category term="networking"></category></entry><entry><title>Introducing New Blog</title><link href="https://www.quernus.co.uk/2015/07/26/new-blog/" rel="alternate"></link><published>2015-07-26T00:00:00+01:00</published><author><name>Matt Hamilton</name></author><id>tag:www.quernus.co.uk,2015-07-26:2015/07/26/new-blog/</id><summary type="html">&lt;p&gt;So it has been ages since I had a blog. I used to blog on the Netsight blog whilst I was there, but I’ve been up a lot of exciting things since then 
+and needed somewhere to start posting interesting stuff I’ve been working on. So this is it :)&lt;/p&gt;
+&lt;p&gt;For 15 years I’ve been working on some pretty heavy duty Python-based web systems and content management systems such as Plone. So I thought I’d try something very different. I wanted something extremely lightweight that would allow me to just do some very simple blogging and have a presence online.&lt;/p&gt;
+&lt;p&gt;I looked at a number of static website generation systems, and in the end settled on &lt;a href="http://jekyllrb.com/"&gt;Jekyll&lt;/a&gt; and starting with a simple foundation for &lt;a href="http://getpoole.com/"&gt;Poole&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;So some topics I will be blogging about here:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Python web development.&lt;/p&gt;
+&lt;p&gt;Python is still my ‘go to’ language for any web development or server scripting and integration jobs&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;iOS deployment and development&lt;/p&gt;
+&lt;p&gt;I’m currently working on a team doing iOS development, and I’ve managed to do a lot of battle with Apple’s, often arcane, provisioning system.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Networking &amp;amp; Security&lt;/p&gt;
+&lt;p&gt;I’m interested in getting data from A to B in a reliable and secure fashion&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;FreeBSD / OpenBSD&lt;/p&gt;
+&lt;p&gt;In my opinion, two of the best operating systems around. I’ve been working with them for nearly two decades now and both have their uses in different scenarios.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Quantified health, wearables and tracking&lt;/p&gt;
+&lt;p&gt;I’m currently working with enquos, building the best tools out there to track, measure and improve your health, fitness and wellbeing. I’ve developed a personal interest in this, as I’m currently working on improving my own health.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Embedded Development / Internet of Things&lt;/p&gt;
+&lt;p&gt;I like tinkering with Arduinos and the likes, so will probably be writing up some of the stuff I’ve been using them for here. We are moving to an ever-more connected world, and it’s exciting looking at how this interacts with our society and the way in which we deal with data (privacy and security).&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;</summary></entry></feed>
