@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Quernus</title><link href="https://www.quernus.co.uk/" rel="alternate"></link><link href="https://www.quernus.co.uk/feeds/talks.atom.xml" rel="self"></link><id>https://www.quernus.co.uk/</id><updated>2015-10-14T14:21:00+01:00</updated><entry><title>Adventures in Wonderland - A Plone Developer's Year in iOS</title><link href="https://www.quernus.co.uk/2015/10/14/adventures-in-wonderland-a-plone-developers-year-in-ios/" rel="alternate"></link><published>2015-10-14T14:21:00+01:00</published><author><name>hammertoe@slideshare.net(hammertoe)</name></author><id>tag:www.quernus.co.uk,2015-10-14:2015/10/14/adventures-in-wonderland-a-plone-developers-year-in-ios/</id><summary type="html">&lt;iframe src="//www.slideshare.net/slideshow/embed_code/key/dZMdjvqTcDgJYB" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen&gt; &lt;/iframe&gt;
+
+&lt;p&gt;&lt;div style="margin-bottom:5px"&gt; &lt;strong&gt; &lt;a href="//www.slideshare.net/hammertoe/adventures-in-wonderland-a-plone-developers-year-in-ios" title="Adventures in Wonderland - A Plone Developer&amp;#x27;s Year in iOS" target="_blank"&gt;Adventures in Wonderland - A Plone Developer&amp;#x27;s Year in iOS&lt;/a&gt; &lt;/strong&gt; from &lt;strong&gt;&lt;a href="//www.slideshare.net/hammertoe" target="_blank"&gt;Matt Hamilton&lt;/a&gt;&lt;/strong&gt; &lt;/div&gt;&lt;/p&gt;
+&lt;p&gt;The slides from my talk at Plone Conference 2015 in Bucharest.&lt;/p&gt;
+&lt;p&gt;After 15 years of working purely in Python, I was thrown head-first into
+the world of iOS development. Taking over the management of a mobile app
+being developed for a Python web application, I’ve had to deal with
+managing iOS developers, understanding the iOS ecosystem, and working
+out Apple’s byzantine procedures and processes.&lt;/p&gt;</summary></entry><entry><title>A Journey Through Open Source</title><link href="https://www.quernus.co.uk/2014/11/27/a-journey-through-open-source/" rel="alternate"></link><published>2014-11-27T13:20:00+00:00</published><author><name>hammertoe@slideshare.net(hammertoe)</name></author><id>tag:www.quernus.co.uk,2014-11-27:2014/11/27/a-journey-through-open-source/</id><summary type="html">&lt;iframe src="//www.slideshare.net/slideshow/embed_code/key/DrQdmJUNNQPgQH" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen&gt; &lt;/iframe&gt;
+
+&lt;p&gt;&lt;div style="margin-bottom:5px"&gt; &lt;strong&gt; &lt;a href="//www.slideshare.net/hammertoe/a-journey-through-open-source" title="A Journey Through Open Source" target="_blank"&gt;A Journey Through Open Source&lt;/a&gt; &lt;/strong&gt; from &lt;strong&gt;&lt;a href="//www.slideshare.net/hammertoe" target="_blank"&gt;Matt Hamilton&lt;/a&gt;&lt;/strong&gt; &lt;/div&gt;&lt;/p&gt;
+&lt;p&gt;This talk was given to the 2nd year MEng Computer Science students at
+the University of Bristol. It is a talk about my experiences in Open
+Source and working with a global community.&lt;/p&gt;
+&lt;p&gt;The audio and screencast of this presentation is at:&lt;/p&gt;
+&lt;p&gt;https://vimeo.com/113033350&lt;/p&gt;</summary></entry><entry><title>Plone Intranet talk at Plone Open Garden 2014, Sorrento</title><link href="https://www.quernus.co.uk/2014/04/29/plone-intranet-talk-at-plone-open-garden-2014-sorrento/" rel="alternate"></link><published>2014-04-29T03:47:00+01:00</published><author><name>hammertoe@slideshare.net(hammertoe)</name></author><id>tag:www.quernus.co.uk,2014-04-29:2014/04/29/plone-intranet-talk-at-plone-open-garden-2014-sorrento/</id><summary type="html">&lt;iframe src="//www.slideshare.net/slideshow/embed_code/key/Gp2G7EgRluNvye" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen&gt; &lt;/iframe&gt;
+
+&lt;p&gt;&lt;div style="margin-bottom:5px"&gt; &lt;strong&gt; &lt;a href="//www.slideshare.net/hammertoe/plone-intranet-talk-at-plone-open-garden-2014-sorrento" title="Plone Intranet talk at Plone Open Garden 2014, Sorrento" target="_blank"&gt;Plone Intranet talk at Plone Open Garden 2014, Sorrento&lt;/a&gt; &lt;/strong&gt; from &lt;strong&gt;&lt;a href="//www.slideshare.net/hammertoe" target="_blank"&gt;Matt Hamilton&lt;/a&gt;&lt;/strong&gt; &lt;/div&gt;&lt;/p&gt;
+&lt;p&gt;This is a talk I gave at Plone Open Garden 2014 on the Plone Intranet
+project. This is a collaborative project to develop an enhance platform
+for intranets on top of Plone&lt;/p&gt;</summary></entry><entry><title>Open Source, The Natural Fit for Content Management in the Enterprise</title><link href="https://www.quernus.co.uk/2013/12/04/open-source-the-natural-fit-for-content-management-in-the-enterprise/" rel="alternate"></link><published>2013-12-04T17:47:00+00:00</published><author><name>hammertoe@slideshare.net(hammertoe)</name></author><id>tag:www.quernus.co.uk,2013-12-04:2013/12/04/open-source-the-natural-fit-for-content-management-in-the-enterprise/</id><summary type="html">&lt;iframe src="//www.slideshare.net/slideshow/embed_code/key/3Kmj195ESwktsL" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen&gt; &lt;/iframe&gt;
+
+&lt;p&gt;&lt;div style="margin-bottom:5px"&gt; &lt;strong&gt; &lt;a href="//www.slideshare.net/hammertoe/open-source-the-natural-fit-for-cms-in-the-enterprise" title="Open Source, The Natural Fit for Content Management in the Enterprise" target="_blank"&gt;Open Source, The Natural Fit for Content Management in the Enterprise&lt;/a&gt; &lt;/strong&gt; from &lt;strong&gt;&lt;a href="//www.slideshare.net/hammertoe" target="_blank"&gt;Matt Hamilton&lt;/a&gt;&lt;/strong&gt; &lt;/div&gt;&lt;/p&gt;
+&lt;p&gt;This is a talk I gave at "Adopting Open Source Software within the
+corporate ICT strategy" in London on 5th December 2013.&lt;/p&gt;
+&lt;p&gt;* How OSS reduces long term risk for CM&lt;/p&gt;
+&lt;p&gt;* Integrating with the unknown&lt;/p&gt;
+&lt;p&gt;* Authentication in heterogeneous environments&lt;/p&gt;
+&lt;p&gt;* Case study - NHS Health and Social Care Information Centre Intranet&lt;/p&gt;</summary></entry><entry><title>Supercharge Your Career with Open Source</title><link href="https://www.quernus.co.uk/2013/11/27/supercharge-your-career-with-open-source/" rel="alternate"></link><published>2013-11-27T07:17:00+00:00</published><author><name>hammertoe@slideshare.net(hammertoe)</name></author><id>tag:www.quernus.co.uk,2013-11-27:2013/11/27/supercharge-your-career-with-open-source/</id><summary type="html">&lt;iframe src="//www.slideshare.net/slideshow/embed_code/key/ffzEeCS8LY0FXU" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen&gt; &lt;/iframe&gt;
+
+&lt;p&gt;&lt;div style="margin-bottom:5px"&gt; &lt;strong&gt; &lt;a href="//www.slideshare.net/hammertoe/supercharge-your" title="Supercharge Your Career with Open Source" target="_blank"&gt;Supercharge Your Career with Open Source&lt;/a&gt; &lt;/strong&gt; from &lt;strong&gt;&lt;a href="//www.slideshare.net/hammertoe" target="_blank"&gt;Matt Hamilton&lt;/a&gt;&lt;/strong&gt; &lt;/div&gt;&lt;/p&gt;
+&lt;p&gt;A talk I gave at the University of Bristol to the 2nd Year Computer
+Science Students on how to use Open Source Software to further your
+chances of getting a job. I draw upon the Plone community and software
+for examples.&lt;/p&gt;</summary></entry><entry><title>Plone and Sharepoint</title><link href="https://www.quernus.co.uk/2013/10/03/plone-and-sharepoint/" rel="alternate"></link><published>2013-10-03T16:30:00+01:00</published><author><name>hammertoe@slideshare.net(hammertoe)</name></author><id>tag:www.quernus.co.uk,2013-10-03:2013/10/03/plone-and-sharepoint/</id><summary type="html">&lt;iframe src="//www.slideshare.net/slideshow/embed_code/key/2m7piaMFvjVbGy" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen&gt; &lt;/iframe&gt;
+
+&lt;p&gt;&lt;div style="margin-bottom:5px"&gt; &lt;strong&gt; &lt;a href="//www.slideshare.net/hammertoe/plone-and-sharepoint" title="Plone and Sharepoint" target="_blank"&gt;Plone and Sharepoint&lt;/a&gt; &lt;/strong&gt; from &lt;strong&gt;&lt;a href="//www.slideshare.net/hammertoe" target="_blank"&gt;Matt Hamilton&lt;/a&gt;&lt;/strong&gt; &lt;/div&gt;&lt;/p&gt;
+&lt;p&gt;A talk on integrating Plone and Sharepoint. This talk was from Plone
+Conference 2013 in Brasilia.&lt;/p&gt;
+&lt;p&gt;It covers integrating the authentication, content, and search between
+Plone and Sharepoint. It showcases the collective.cmsbrowser addon for
+Plone.&lt;/p&gt;</summary></entry><entry><title>How to get started with the Pluggable Authentication System</title><link href="https://www.quernus.co.uk/2013/10/03/how-to-get-started-with-the-pluggable-authentication-system/" rel="alternate"></link><published>2013-10-03T08:11:00+01:00</published><author><name>hammertoe@slideshare.net(hammertoe)</name></author><id>tag:www.quernus.co.uk,2013-10-03:2013/10/03/how-to-get-started-with-the-pluggable-authentication-system/</id><summary type="html">&lt;iframe src="//www.slideshare.net/slideshow/embed_code/key/3MMwmhy5CPdTsZ" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen&gt; &lt;/iframe&gt;
+
+&lt;p&gt;&lt;div style="margin-bottom:5px"&gt; &lt;strong&gt; &lt;a href="//www.slideshare.net/hammertoe/how-to-get-started-with-the-pluggable-authentication-system" title="How to get started with the Pluggable Authentication System" target="_blank"&gt;How to get started with the Pluggable Authentication System&lt;/a&gt; &lt;/strong&gt; from &lt;strong&gt;&lt;a href="//www.slideshare.net/hammertoe" target="_blank"&gt;Matt Hamilton&lt;/a&gt;&lt;/strong&gt; &lt;/div&gt;&lt;/p&gt;
+&lt;p&gt;A presentation given at Plone Conference 2013 in Brasilia. This
+presentation explains Plone’s Pluggable Authentication System (PAS) and
+how to get started with writing your own PAS Plugin.&lt;/p&gt;</summary></entry><entry><title>Plone and Single-Sign On - Active Directory and the Holy Grail</title><link href="https://www.quernus.co.uk/2013/04/05/plone-and-single-sign-on-active-directory-and-the-holy-grail/" rel="alternate"></link><published>2013-04-05T15:53:00+01:00</published><author><name>hammertoe@slideshare.net(hammertoe)</name></author><id>tag:www.quernus.co.uk,2013-04-05:2013/04/05/plone-and-single-sign-on-active-directory-and-the-holy-grail/</id><summary type="html">&lt;iframe src="//www.slideshare.net/slideshow/embed_code/key/eI4Nyoq3LWQhNU" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen&gt; &lt;/iframe&gt;
+
+&lt;p&gt;&lt;div style="margin-bottom:5px"&gt; &lt;strong&gt; &lt;a href="//www.slideshare.net/hammertoe/plone-and-singlesign-on-active-directory-and-the-holy-grail" title="Plone and Single-Sign On - Active Directory and the Holy Grail" target="_blank"&gt;Plone and Single-Sign On - Active Directory and the Holy Grail&lt;/a&gt; &lt;/strong&gt; from &lt;strong&gt;&lt;a href="//www.slideshare.net/hammertoe" target="_blank"&gt;Matt Hamilton&lt;/a&gt;&lt;/strong&gt; &lt;/div&gt;&lt;/p&gt;
+&lt;p&gt;These are the slides of a talk I gave on Single Sign On in Plone via
+Active Directory using netsight.windowsauthplugin&lt;/p&gt;</summary></entry><entry><title>BathCamp #32 - CMS Smackdown! - Plone</title><link href="https://www.quernus.co.uk/2012/06/07/bathcamp-32-cms-smackdown-plone/" rel="alternate"></link><published>2012-06-07T10:38:00+01:00</published><author><name>hammertoe@slideshare.net(hammertoe)</name></author><id>tag:www.quernus.co.uk,2012-06-07:2012/06/07/bathcamp-32-cms-smackdown-plone/</id><summary type="html">&lt;iframe src="//www.slideshare.net/slideshow/embed_code/key/ymi5g5XxvDrUhw" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen&gt; &lt;/iframe&gt;
+
+&lt;p&gt;&lt;div style="margin-bottom:5px"&gt; &lt;strong&gt; &lt;a href="//www.slideshare.net/hammertoe/bathcamp-32-cms-smackdown-plone" title="BathCamp #32 - CMS Smackdown! - Plone" target="_blank"&gt;BathCamp #32 - CMS Smackdown! - Plone&lt;/a&gt; &lt;/strong&gt; from &lt;strong&gt;&lt;a href="//www.slideshare.net/hammertoe" target="_blank"&gt;Matt Hamilton&lt;/a&gt;&lt;/strong&gt; &lt;/div&gt;&lt;/p&gt;
+&lt;p&gt;A bit of a different format for BathCamp in June. We’ll be cage
+fighting.&lt;/p&gt;
+&lt;p&gt;No.&lt;/p&gt;
+&lt;p&gt;Actually, it’s a sort of follow on from our previous BathCamp – a
+comparison of as many CMS systems as we can get people to talk about.&lt;/p&gt;
+&lt;p&gt;Obviously any comparison of CMS system is heavily caveated with an “it
+depends…” but nonetheless we think it’ll be interesting to hear from
+people talking about the good, the bad and the ugly of the systems they
+use.&lt;/p&gt;
+&lt;p&gt;The format of the talks will be “5 things I love about this CMS and 5
+things I hate”, followed by time for questions and general CMS-like
+banter.&lt;/p&gt;
+&lt;p&gt;We’ve got the following lined up:&lt;/p&gt;
+&lt;p&gt;WordPress&lt;/p&gt;
+&lt;p&gt;Drupal&lt;/p&gt;
+&lt;p&gt;Expression Engine&lt;/p&gt;
+&lt;p&gt;Plone&lt;/p&gt;
+&lt;p&gt;PyroCMS&lt;/p&gt;
+&lt;p&gt;Perch&lt;/p&gt;
+&lt;p&gt;Umbraco&lt;/p&gt;
+&lt;p&gt;Defacto&lt;/p&gt;</summary></entry><entry><title>Online Information 2011: Global and Social A case study of the implementation of a large-scale social intranet</title><link href="https://www.quernus.co.uk/2011/12/05/online-information-2011-global-and-social-a-case-study-of-the-implementation-of-a-large-scale-social-intranet/" rel="alternate"></link><published>2011-12-05T06:26:00+00:00</published><author><name>hammertoe@slideshare.net(hammertoe)</name></author><id>tag:www.quernus.co.uk,2011-12-05:2011/12/05/online-information-2011-global-and-social-a-case-study-of-the-implementation-of-a-large-scale-social-intranet/</id><summary type="html">&lt;iframe src="//www.slideshare.net/slideshow/embed_code/key/3NJBTFdT3Ctbpe" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen&gt; &lt;/iframe&gt;
+
+&lt;p&gt;&lt;div style="margin-bottom:5px"&gt; &lt;strong&gt; &lt;a href="//www.slideshare.net/hammertoe/online-information-2011-global-and-social-a-case-study-of-the-implementation-of-a-largescale-social-intranet" title="Online Information 2011: Global and Social A case study of the implementation of a large-scale social intranet" target="_blank"&gt;Online Information 2011: Global and Social A case study of the implementation of a large-scale social intranet&lt;/a&gt; &lt;/strong&gt; from &lt;strong&gt;&lt;a href="//www.slideshare.net/hammertoe" target="_blank"&gt;Matt Hamilton&lt;/a&gt;&lt;/strong&gt; &lt;/div&gt;&lt;/p&gt;
+&lt;p&gt;Belron International is the global parent company of brands such as
+Autoglass and Carglass. With a turnover of nearly €3bn, they employ
+25,000 people in 32 countries, repairing or replacing a windscreen every
+3 seconds.&lt;/p&gt;
+&lt;p&gt;In 2007 the organisation developed an intranet based on the Open Source
+CMS Plone. This year the intranet was extended and re-focussed to add a
+range of social media functions to integrate with (and enhance) the
+existing suite of content management and workflow tools.&lt;/p&gt;
+&lt;p&gt;Over 5 years the intranet has evolved to provide features that are used
+on a daily basis by all functions within the organisation. The challenge
+with the introduction of ’social’ content creation and collaboration has
+been to manage and integrate these new ways of working into established
+processes.&lt;/p&gt;
+&lt;p&gt;In this talk we will show how a large, multinational organisation has
+overcome the common concerns relating to social media in the enterprise,
+including governance, loss of control and the risks of reliance on
+services outside the firewall. Once these concerns are mitigated, the
+social media model can be used to drive employee engagement and increase
+effective communication across the business.&lt;/p&gt;
+&lt;p&gt;You will hear about their top 5 tips to successfully deploying a social
+intranet, illustrated by real examples of these techniques in practice.&lt;/p&gt;</summary></entry><entry><title>Plone: The DNA of a Successful Open Source Community</title><link href="https://www.quernus.co.uk/2011/11/16/plone-the-dna-of-a-successful-open-source-community/" rel="alternate"></link><published>2011-11-16T09:19:00+00:00</published><author><name>hammertoe@slideshare.net(hammertoe)</name></author><id>tag:www.quernus.co.uk,2011-11-16:2011/11/16/plone-the-dna-of-a-successful-open-source-community/</id><summary type="html">&lt;iframe src="//www.slideshare.net/slideshow/embed_code/key/uBTZNHaJOLZhZ2" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen&gt; &lt;/iframe&gt;
+
+&lt;p&gt;&lt;div style="margin-bottom:5px"&gt; &lt;strong&gt; &lt;a href="//www.slideshare.net/hammertoe/plone-the-dna-of-a-successful-open-source-community" title="Plone: The DNA of a Successful Open Source Community" target="_blank"&gt;Plone: The DNA of a Successful Open Source Community&lt;/a&gt; &lt;/strong&gt; from &lt;strong&gt;&lt;a href="//www.slideshare.net/hammertoe" target="_blank"&gt;Matt Hamilton&lt;/a&gt;&lt;/strong&gt; &lt;/div&gt;&lt;/p&gt;
+&lt;p&gt;This is the slides and audio of a talk I gave at the University of
+Bristol to a class of 2nd year Computer Science students as part of an
+Advanced Software Engineering module.&lt;/p&gt;
+&lt;p&gt;The talk was on the symbiotic relationship between an SME software
+company (Netsight) and an Open Source Community (Plone).&lt;/p&gt;</summary></entry><entry><title>Mistakes Made and Lessons Learnt Scaling Plone post-Launch</title><link href="https://www.quernus.co.uk/2011/11/05/mistakes-made-and-lessons-learnt-scaling-plone-post-launch/" rel="alternate"></link><published>2011-11-05T16:53:00+00:00</published><author><name>hammertoe@slideshare.net(hammertoe)</name></author><id>tag:www.quernus.co.uk,2011-11-05:2011/11/05/mistakes-made-and-lessons-learnt-scaling-plone-post-launch/</id><summary type="html">&lt;iframe src="//www.slideshare.net/slideshow/embed_code/key/Lwqne072MT9Qtf" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen&gt; &lt;/iframe&gt;
+
+&lt;p&gt;&lt;div style="margin-bottom:5px"&gt; &lt;strong&gt; &lt;a href="//www.slideshare.net/hammertoe/mistakes-made-and-lessons-learnt-scaling-plone-postlaunch" title="Mistakes Made and Lessons Learnt Scaling Plone post-Launch" target="_blank"&gt;Mistakes Made and Lessons Learnt Scaling Plone post-Launch&lt;/a&gt; &lt;/strong&gt; from &lt;strong&gt;&lt;a href="//www.slideshare.net/hammertoe" target="_blank"&gt;Matt Hamilton&lt;/a&gt;&lt;/strong&gt; &lt;/div&gt;&lt;/p&gt;
+&lt;p&gt;This is a run down of the mistakes we made and the lessons we learnt
+trying to scale a big Plone site with un-anticipated traffic once the
+site had gone live and the budget all been spent. Find out what we did
+wrong, and how we fixed it.&lt;/p&gt;</summary></entry><entry><title>Plone Symposium East 2011 Keynote: Plone, A Solution not a Product</title><link href="https://www.quernus.co.uk/2011/05/19/plone-symposium-east-2011-keynote-plone-a-solution-not-a-product/" rel="alternate"></link><published>2011-05-19T13:57:00+01:00</published><author><name>hammertoe@slideshare.net(hammertoe)</name></author><id>tag:www.quernus.co.uk,2011-05-19:2011/05/19/plone-symposium-east-2011-keynote-plone-a-solution-not-a-product/</id><summary type="html">&lt;iframe src="//www.slideshare.net/slideshow/embed_code/key/qt3BYk4vMCUPVY" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen&gt; &lt;/iframe&gt;
+
+&lt;p&gt;&lt;div style="margin-bottom:5px"&gt; &lt;strong&gt; &lt;a href="//www.slideshare.net/hammertoe/plone-symposium-east-2011-keynote-plone-a-solution-not-a-product" title="Plone Symposium East 2011 Keynote: Plone, A Solution not a Product" target="_blank"&gt;Plone Symposium East 2011 Keynote: Plone, A Solution not a Product&lt;/a&gt; &lt;/strong&gt; from &lt;strong&gt;&lt;a href="//www.slideshare.net/hammertoe" target="_blank"&gt;Matt Hamilton&lt;/a&gt;&lt;/strong&gt; &lt;/div&gt;&lt;/p&gt;
+&lt;p&gt;Abstract: Looking at the market for content management systems, there
+are a whole slew of products out there, both proprietary and Open
+Source. Typically people choose a product from a vendor and then have to
+find a implementation company to implement it for them. With Plone the
+implementation company *is* the vendor. But unlike proprietary
+single-vendor solutions, Plone has hundreds of companies and individuals
+worldwide that can help you implement Plone. Sometimes we take for
+granted just what an amazing community we have and its diversity both
+geographically and in different industries. In this keynote I am going
+to look at Plone and its use around the world and the community that
+makes it so special&lt;/p&gt;</summary></entry><entry><title>Plone: Event Driven Programming</title><link href="https://www.quernus.co.uk/2010/06/08/plone-event-driven-programming/" rel="alternate"></link><published>2010-06-08T04:04:00+01:00</published><author><name>hammertoe@slideshare.net(hammertoe)</name></author><id>tag:www.quernus.co.uk,2010-06-08:2010/06/08/plone-event-driven-programming/</id><summary type="html">&lt;iframe src="//www.slideshare.net/slideshow/embed_code/key/4dHUXmDMrSryA7" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen&gt; &lt;/iframe&gt;
+
+&lt;p&gt;&lt;div style="margin-bottom:5px"&gt; &lt;strong&gt; &lt;a href="//www.slideshare.net/hammertoe/event-drivenprogrammingslides" title="Plone: Event Driven Programming" target="_blank"&gt;Plone: Event Driven Programming&lt;/a&gt; &lt;/strong&gt; from &lt;strong&gt;&lt;a href="//www.slideshare.net/hammertoe" target="_blank"&gt;Matt Hamilton&lt;/a&gt;&lt;/strong&gt; &lt;/div&gt;&lt;/p&gt;
+&lt;p&gt;A talk I gave at the European Plone Symposium 2010 in Sorrento.&lt;/p&gt;
+&lt;p&gt;Event Driven Programming in Plone - or how to extend Plone the lazy way&lt;/p&gt;
+&lt;p&gt;Ever wanted to extend Plone somehow but not wanted to change the
+existing code for a product? Want to learn the easy way to extend
+Plone’s functionality?&lt;/p&gt;
+&lt;p&gt;Events!&lt;/p&gt;
+&lt;p&gt;I will show you some examples of how to use Plone’s event subscriber and
+workflow systems to extend Plone without having to change any existing
+products. Using a number of common Plone products and the events system
+to combine them you can come up with unlimited possibilities. I’ll use
+examples from two websites I’ve been working on recently to show you how
+you can make authors have to pay (using GetPaid) to publish content on a
+site, and how to check the comments are not spam on your discussion
+board.&lt;/p&gt;</summary></entry><entry><title>Mountain Tops to Archipelagos - The People Behind Plone (+AUDIO)</title><link href="https://www.quernus.co.uk/2010/06/04/mountain-tops-to-archipelagos-the-people-behind-plone-audio/" rel="alternate"></link><published>2010-06-04T10:30:00+01:00</published><author><name>hammertoe@slideshare.net(hammertoe)</name></author><id>tag:www.quernus.co.uk,2010-06-04:2010/06/04/mountain-tops-to-archipelagos-the-people-behind-plone-audio/</id><summary type="html">&lt;iframe src="//www.slideshare.net/slideshow/embed_code/key/msSB9oiMxZx6TT" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen&gt; &lt;/iframe&gt;
+
+&lt;p&gt;&lt;div style="margin-bottom:5px"&gt; &lt;strong&gt; &lt;a href="//www.slideshare.net/hammertoe/mountain-tops-to-archipelagos-the-people-behind-plone" title="Mountain Tops to Archipelagos - The People Behind Plone (+AUDIO)" target="_blank"&gt;Mountain Tops to Archipelagos - The People Behind Plone (+AUDIO)&lt;/a&gt; &lt;/strong&gt; from &lt;strong&gt;&lt;a href="//www.slideshare.net/hammertoe" target="_blank"&gt;Matt Hamilton&lt;/a&gt;&lt;/strong&gt; &lt;/div&gt;&lt;/p&gt;
+&lt;p&gt;I was invited to give a talk at the Rotary Club Bristol about Plone. I
+spoke about the community and how an amazing group of people world wide
+gather across locations around the globe to develop software... and have
+a few beers in the process.&lt;/p&gt;
+&lt;p&gt;I’m afraid the audio quality is not that great, but hopefully you can
+turn the volume up and bit and still hear me&lt;/p&gt;</summary></entry><entry><title>The Flexibility of Open Source - Plone in the Public Sector</title><link href="https://www.quernus.co.uk/2010/01/12/the-flexibility-of-open-source-plone-in-the-public-sector/" rel="alternate"></link><published>2010-01-12T10:49:00+00:00</published><author><name>hammertoe@slideshare.net(hammertoe)</name></author><id>tag:www.quernus.co.uk,2010-01-12:2010/01/12/the-flexibility-of-open-source-plone-in-the-public-sector/</id><summary type="html">&lt;iframe src="//www.slideshare.net/slideshow/embed_code/key/366O4u01wizLQZ" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen&gt; &lt;/iframe&gt;
+
+&lt;p&gt;&lt;div style="margin-bottom:5px"&gt; &lt;strong&gt; &lt;a href="//www.slideshare.net/hammertoe/the-flexibility-of-open-source-plone-in-the-public-sector" title="The Flexibility of Open Source - Plone in the Public Sector" target="_blank"&gt;The Flexibility of Open Source - Plone in the Public Sector&lt;/a&gt; &lt;/strong&gt; from &lt;strong&gt;&lt;a href="//www.slideshare.net/hammertoe" target="_blank"&gt;Matt Hamilton&lt;/a&gt;&lt;/strong&gt; &lt;/div&gt;&lt;/p&gt;
+&lt;p&gt;A talk given by Matt Hamilton, Technical Director of Netsight.&lt;/p&gt;
+&lt;p&gt;This talk was part of the British Computer Society (BCS) event "Public
+Funds in the UK: Open Source for Document and Content Management" held
+in London on 7th January 2010.&lt;/p&gt;
+&lt;p&gt;http://ossg.bcs.org/category/ossg/ossg-events/&lt;/p&gt;
+&lt;p&gt;The talk is a case study of two specific public sector clients of the
+Open Source WCM, Plone: Warwickshire Police, and a large educational
+portal.&lt;/p&gt;</summary></entry><entry><title>The Flexibility of Open Source: A Case Study of a large Corporate Intranet</title><link href="https://www.quernus.co.uk/2009/12/10/the-flexibility-of-open-source-a-case-study-of-a-large-corporate-intranet/" rel="alternate"></link><published>2009-12-10T04:34:00+00:00</published><author><name>hammertoe@slideshare.net(hammertoe)</name></author><id>tag:www.quernus.co.uk,2009-12-10:2009/12/10/the-flexibility-of-open-source-a-case-study-of-a-large-corporate-intranet/</id><summary type="html">&lt;iframe src="//www.slideshare.net/slideshow/embed_code/key/oylFbeCt0EAU8" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen&gt; &lt;/iframe&gt;
+
+&lt;p&gt;&lt;div style="margin-bottom:5px"&gt; &lt;strong&gt; &lt;a href="//www.slideshare.net/hammertoe/the-flexibility-of-open-source-a-case-study-of-a-large-corporate-intranet" title="The Flexibility of Open Source: A Case Study of a large Corporate Intranet" target="_blank"&gt;The Flexibility of Open Source: A Case Study of a large Corporate Intranet&lt;/a&gt; &lt;/strong&gt; from &lt;strong&gt;&lt;a href="//www.slideshare.net/hammertoe" target="_blank"&gt;Matt Hamilton&lt;/a&gt;&lt;/strong&gt; &lt;/div&gt;&lt;/p&gt;
+&lt;p&gt;The advantages of Open Source systems go beyond simple cost savings.
+Content management by its very nature requires a significant level of
+customisation and integration to meet business requirements. By not
+prohibiting the inspection and modification of the source code, Open
+Source enables a level of flexibility not available with proprietary
+systems.&lt;/p&gt;
+&lt;p&gt;This talk will present a case study of the process one corporation,
+Belron®, went through in the development of a corporate Intranet based
+on Plone. Belron® is the world’s largest vehicle glass repair and
+replacement company, owning some of the best known brands in the
+industry including Carglass®, Autoglass®, O’Brien® and Safelite®.
+Belron® employs more than 19, 500 people working in 28 countries
+worldwide.&lt;/p&gt;
+&lt;p&gt;In this talk you will see how the flexibility of Open Source allowed an
+initial modest Intranet to adapt and grow over time to an organisation’s
+evolving requirements, and the development of multiple sub-sites,
+specific business processes and multilingual support. You will also see
+how Open Source’s licensing model allows un-fettered growth and
+deployment of the Intranet to multiple countries.&lt;/p&gt;</summary></entry><entry><title>Plone - Revised Roadmap: Plone 3,4,5 and beyond - Dutch Plone Users Day (+AUDIO)</title><link href="https://www.quernus.co.uk/2009/09/17/plone-revised-roadmap-plone-345-and-beyond-dutch-plone-users-day-audio/" rel="alternate"></link><published>2009-09-17T06:36:00+01:00</published><author><name>hammertoe@slideshare.net(hammertoe)</name></author><id>tag:www.quernus.co.uk,2009-09-17:2009/09/17/plone-revised-roadmap-plone-345-and-beyond-dutch-plone-users-day-audio/</id><summary type="html">&lt;iframe src="//www.slideshare.net/slideshow/embed_code/key/92ULFaagHC8AX1" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen&gt; &lt;/iframe&gt;
+
+&lt;p&gt;&lt;div style="margin-bottom:5px"&gt; &lt;strong&gt; &lt;a href="//www.slideshare.net/hammertoe/plone-revised-roadmap-plone-345-and-beyond-dutch-plone-users-day" title="Plone - Revised Roadmap: Plone 3,4,5 and beyond - Dutch Plone Users Day (+AUDIO)" target="_blank"&gt;Plone - Revised Roadmap: Plone 3,4,5 and beyond - Dutch Plone Users Day (+AUDIO)&lt;/a&gt; &lt;/strong&gt; from &lt;strong&gt;&lt;a href="//www.slideshare.net/hammertoe" target="_blank"&gt;Matt Hamilton&lt;/a&gt;&lt;/strong&gt; &lt;/div&gt;&lt;/p&gt;
+&lt;p&gt;A presentation to the Dutch Plone User Day (Gebruikersdag) in Arnhem,
+Netherlands in Sept 2009.&lt;/p&gt;
+&lt;p&gt;This roadmap details the current state of Plone, and the plan for the
+upcoming release of Plone 4 and the future Plone 5.&lt;/p&gt;</summary></entry><entry><title>An introduction to Zope Page Templates and their use outside of Zope (+Audio)</title><link href="https://www.quernus.co.uk/2009/07/01/an-introduction-to-zope-page-templates-and-their-use-outside-of-zope-audio/" rel="alternate"></link><published>2009-07-01T06:38:00+01:00</published><author><name>hammertoe@slideshare.net(hammertoe)</name></author><id>tag:www.quernus.co.uk,2009-07-01:2009/07/01/an-introduction-to-zope-page-templates-and-their-use-outside-of-zope-audio/</id><summary type="html">&lt;iframe src="//www.slideshare.net/slideshow/embed_code/key/lDwj6EeairpC7a" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen&gt; &lt;/iframe&gt;
+
+&lt;p&gt;&lt;div style="margin-bottom:5px"&gt; &lt;strong&gt; &lt;a href="//www.slideshare.net/hammertoe/an-introduction-to-zope-page-templates-and-their-use-outside-of-zope" title="An introduction to Zope Page Templates and their use outside of Zope (+Audio)" target="_blank"&gt;An introduction to Zope Page Templates and their use outside of Zope (+Audio)&lt;/a&gt; &lt;/strong&gt; from &lt;strong&gt;&lt;a href="//www.slideshare.net/hammertoe" target="_blank"&gt;Matt Hamilton&lt;/a&gt;&lt;/strong&gt; &lt;/div&gt;&lt;/p&gt;
+&lt;p&gt;Zope Page Templates have been around for a while, and used extensively
+in Zope and many Zope based apps and frameworks, but did you know you
+can use ZPT with any Python project? Indeed there are implementations of
+the syntax used, Template Attribute Language (TAL), for other languages
+too. Making it one of the most portable, cross platform templating
+languages there is. Find out why ZPT and TAL are so elegant, and how to
+use them with your Python project.&lt;/p&gt;
+&lt;p&gt;I will cover why TAL is a great choice for templating, the simple syntax
+of TAL and how to create and render page template objects in your code.&lt;/p&gt;</summary></entry><entry><title>Lipstick On a Pig (+Audio)</title><link href="https://www.quernus.co.uk/2009/07/01/lipstick-on-a-pig-audio/" rel="alternate"></link><published>2009-07-01T06:38:00+01:00</published><author><name>hammertoe@slideshare.net(hammertoe)</name></author><id>tag:www.quernus.co.uk,2009-07-01:2009/07/01/lipstick-on-a-pig-audio/</id><summary type="html">&lt;iframe src="//www.slideshare.net/slideshow/embed_code/key/qxjpHAfypyrT64" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen&gt; &lt;/iframe&gt;
+
+&lt;p&gt;&lt;div style="margin-bottom:5px"&gt; &lt;strong&gt; &lt;a href="//www.slideshare.net/hammertoe/lipstick-on-a-pig" title="Lipstick On a Pig (+Audio)" target="_blank"&gt;Lipstick On a Pig (+Audio)&lt;/a&gt; &lt;/strong&gt; from &lt;strong&gt;&lt;a href="//www.slideshare.net/hammertoe" target="_blank"&gt;Matt Hamilton&lt;/a&gt;&lt;/strong&gt; &lt;/div&gt;&lt;/p&gt;
+&lt;p&gt;Dynamically skinning a legacy portal using Python, WSGI (the Python Web
+Server Gateway Interface), and Deliverance.&lt;/p&gt;
+&lt;p&gt;So you have a big legacy portal application which you want to change the
+look of, but are contractually not allowed to touch?&lt;/p&gt;
+&lt;p&gt;Here is a case study on how we used the power and flexibility of Python
+and WSGI and the wonder lxml to dynamically re-skin a proprietary .NET
+portal without even touching it.&lt;/p&gt;
+&lt;p&gt;We take a giant lump of messy invalid HTML markup and dynamically strip
+it back, add semantic markup and CSS and present the user with a nice
+svelte valid site.&lt;/p&gt;
+&lt;p&gt;I will cover the history of the legacy portal, the problems encountered,
+our cunning plan to dynamically re-skin the site, a technical overview
+of the parts of the system (lxml, WSGI, etc), and what we learned along
+the way.&lt;/p&gt;</summary></entry></feed>
