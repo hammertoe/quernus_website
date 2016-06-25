@@ -12,10 +12,10 @@ FTP_HOST=localhost
 FTP_USER=anonymous
 FTP_TARGET_DIR=/
 
-SSH_HOST=localhost
+SSH_HOST=traci.quernus.co.uk
 SSH_PORT=22
 SSH_USER=matt
-SSH_TARGET_DIR=/var/www
+SSH_TARGET_DIR=/var/www/htdocs/www.quernus.co.uk/
 
 S3_BUCKET=my_s3_bucket
 

@@ -56,7 +56,6 @@ FAVICON_URL = '/theme/favicon.ico'
 
 GOOGLE_ANALYTICS = 'UA-65654046-1'
 
-DEFAULT_METADATA = {
-    'category': 'blog',
-}
+DEFAULT_CATEGORY = 'blog'
 
+STATIC_PATHS = ['public']
