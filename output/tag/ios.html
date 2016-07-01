@@ -33,6 +33,7 @@
                                 <li class="links"><a href="/">Home</a></li>
                                 <li class="links"><a href="/category/talks.html">Talks</a></li>
                                 <li class="links"><a href="/archives.html">Archives</a></li>
+                                <li class="links"><a href="/tags.html">Tags</a></li>
                                 <li class="links"><a href="../about">About Me / Contact</a></li>
                             </ul>
                                 <p class="social">
@@ -63,7 +64,49 @@ Posts tagged 'ios'                </h1>
                     <section class="post">
                         <header class="post-header">
                             <h3><a class="post-title" href="../2016/04/26/jenkins-utf8-pipeline-fastlane/">Getting Proper UTF-8 Output From Fastlane on Jenkins 2.0 Pipeline builds</a></h3>
-                            <p class="post-meta"><p>Jenkins 2.0 pipeline jobs get their locale from the master not slave, so you need to set the local on master to get UTF-8 output working correctly</p></p>
+                            <p class="post-meta"><p>I've just been upgrading our Jenkins 1.x server to Jenkins 2.0. I've been migrating our previous jobs to new Multibranch Pipeline Jobs.</p>
+<p>One of the snags I hit was that the previous nice ANSI sequences and UTF-8 symbols that we used to have were getting mangled and coming up as a series of escape characters and question marks.</p>
+<p><img alt="Screenshot of broken ANSI and UTF-8 in Jenkins 2.0 pipeline build jobs" src="/public/screenshot_utf8_ansi_broken.png" /></p>
+<p>There were actually two parts to fix this:</p>
+<ol>
+<li>The ANSI Color plugin needs to be called in the Pipeline code, you can't just select a checkbox</li>
+<li>The pipeline jobs start on the master and then get allocated a slave to run. So they take the locale of the <em>master</em> not the <em>slave</em></li>
+</ol>
+<p>So to fix:</p>
+<p>Call the ANSI color plugin using a wrap statement. e.g.:</p>
+<div class="highlight"><pre><span></span><span class="n">node</span><span class="o">(</span><span class="s1">&#39;xcode7&#39;</span><span class="o">)</span> <span class="o">{</span>
+   <span class="c1">// Manually set the workspace to deal with clang </span>
+   <span class="c1">// choking on %2f in the directory</span>
+   <span class="n">ws</span><span class="o">(</span><span class="n">getWorkspace</span><span class="o">())</span> <span class="o">{</span>
+     <span class="c1">// Wrap to enable ANSI escape sequences</span>
+     <span class="n">wrap</span><span class="o">([</span><span class="n">$class</span><span class="o">:</span> <span class="s1">&#39;AnsiColorBuildWrapper&#39;</span><span class="o">,</span> <span class="s1">&#39;colorMapName&#39;</span><span class="o">:</span> <span class="s1">&#39;XTerm&#39;</span><span class="o">,</span> <span class="s1">&#39;defaultFg&#39;</span><span class="o">:</span> <span class="mi">1</span><span class="o">,</span> <span class="s1">&#39;defaultBg&#39;</span><span class="o">:</span> <span class="mi">2</span><span class="o">])</span> <span class="o">{</span>
+       <span class="n">workspace</span> <span class="o">=</span> <span class="n">pwd</span><span class="o">()</span>
+       <span class="c1">// Mark the code checkout &#39;stage&#39;....</span>
+       <span class="n">stage</span> <span class="s1">&#39;Checkout&#39;</span>
+       <span class="c1">// Checkout code from repository</span>
+       <span class="n">checkout</span> <span class="n">scm</span>
+
+       <span class="o">...</span>
+     <span class="o">}</span>
+  <span class="o">}</span>
+<span class="o">}</span>   
+</pre></div>
+
+
+<p>Secondly, you need to ensure the master runs as UTF-8. To do this I passed in an argument to the start script for Jenkins:</p>
+<div class="highlight"><pre><span></span>-Dfile.encoding<span class="o">=</span>UTF-8
+</pre></div>
+
+
+<p>So, in my case on FreeBSD, the statements I have in <code>rc.conf</code> are:</p>
+<div class="highlight"><pre><span></span><span class="nv">jenkins_enable</span><span class="o">=</span><span class="s2">&quot;YES&quot;</span>
+<span class="nv">jenkins_args</span><span class="o">=</span><span class="s2">&quot;--webroot=/usr/local/jenkins/war --httpPort=8180&quot;</span>
+<span class="nv">jenkins_java_opts</span><span class="o">=</span><span class="s2">&quot;-Djava.net.preferIPv6Addresses=true -Dfile.encoding=UTF-8&quot;</span> 
+</pre></div>
+
+
+<p>Now it looks all pretty again and we get all the colouring and symbols from the output of Fastlane:</p>
+<p><img alt="Screenshot of working ANSI and UTF-8 in Jenkins 2.0 pipeline build jobs" src="/public/screenshot_utf8_ansi_working.png" /></p></p>
                             <p class="post-meta">
                                 in <a href="../category/blog.html">blog</a> &middot; Tue 26 April 2016
                             </p>
@@ -73,6 +116,7 @@ Posts tagged 'ios'                </h1>
                         <header class="post-header">
                             <h3><a class="post-title" href="../2015/10/25/NSScotland-conference/">NSScotland 2015 Conference</a></h3>
                             <p class="post-meta"><p>A write up of some of the talks I found interesting at the NSScotland conference in Edinburgh. Dealing with maps; Building a mental health app; Working with distributed teams; and a 30-year old calculator codebase</p></p>
+                            <p class="post-meta"><a href="../2015/10/25/NSScotland-conference/">Read full post...</a>
                             <p class="post-meta">
                                 in <a href="../category/blog.html">blog</a> &middot; Sun 25 October 2015
                             </p>
@@ -82,6 +126,7 @@ Posts tagged 'ios'                </h1>
                         <header class="post-header">
                             <h3><a class="post-title" href="../2015/10/22/force-git-to-use-ssh/">Force git to use ssh instead of HTTPS</a></h3>
                             <p class="post-meta"><p>Sometimes you have tools that reference a github url with https and you want them to use ssh instead so your ssh key works</p></p>
+                            <p class="post-meta"><a href="../2015/10/22/force-git-to-use-ssh/">Read full post...</a>
                             <p class="post-meta">
                                 in <a href="../category/blog.html">blog</a> &middot; Thu 22 October 2015
                             </p>
@@ -91,6 +136,7 @@ Posts tagged 'ios'                </h1>
                         <header class="post-header">
                             <h3><a class="post-title" href="../2015/10/19/plone-conference-2015-bucharest/">Plone Conference 2015 - Bucharest</a></h3>
                             <p class="post-meta"><p>The Plone Conference 2015 happened in Bucharest, Romania. Once again, an awesome event! Great keynotes on the state of Plone and accessibility.</p></p>
+                            <p class="post-meta"><a href="../2015/10/19/plone-conference-2015-bucharest/">Read full post...</a>
                             <p class="post-meta">
                                 in <a href="../category/blog.html">blog</a> &middot; Mon 19 October 2015
                             </p>
@@ -98,8 +144,24 @@ Posts tagged 'ios'                </h1>
                     </section>
                     <section class="post">
                         <header class="post-header">
+                            <h3><a class="post-title" href="../2015/10/14/adventures-in-wonderland-a-plone-developers-year-in-ios/">Adventures in Wonderland - A Plone Developer's Year in iOS</a></h3>
+                            <p class="post-meta"><iframe src="//www.slideshare.net/slideshow/embed_code/key/dZMdjvqTcDgJYB" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe>
+
+<p><div style="margin-bottom:5px"> <strong> <a href="//www.slideshare.net/hammertoe/adventures-in-wonderland-a-plone-developers-year-in-ios" title="Adventures in Wonderland - A Plone Developer&#x27;s Year in iOS" target="_blank">Adventures in Wonderland - A Plone Developer&#x27;s Year in iOS</a> </strong> from <strong><a href="//www.slideshare.net/hammertoe" target="_blank">Matt Hamilton</a></strong> </div></p>
+<p>The slides from my talk at Plone Conference 2015 in Bucharest.</p>
+<p>After 15 years of working purely in Python, I was thrown head-first into
+the world of iOS development. Taking over the management of a mobile app ...</p></p>
+                            <p class="post-meta"><a href="../2015/10/14/adventures-in-wonderland-a-plone-developers-year-in-ios/">Read full post...</a>
+                            <p class="post-meta">
+                                in <a href="../category/talks.html">talks</a> &middot; Wed 14 October 2015
+                            </p>
+                        </header>
+                    </section>
+                    <section class="post">
+                        <header class="post-header">
                             <h3><a class="post-title" href="../2015/09/03/adding-photos-to-ios-simulator/">Adding Photos to iOS Simulator</a></h3>
                             <p class="post-meta"><p>A simple way for scripting the adding of photos to the iOS simulator when using snapshot to take photos of your app</p></p>
+                            <p class="post-meta"><a href="../2015/09/03/adding-photos-to-ios-simulator/">Read full post...</a>
                             <p class="post-meta">
                                 in <a href="../category/blog.html">blog</a> &middot; Thu 03 September 2015
                             </p>
@@ -109,6 +171,7 @@ Posts tagged 'ios'                </h1>
                         <header class="post-header">
                             <h3><a class="post-title" href="../2015/09/01/ios-deployment-part-3/">iOS Deployment and Provisioning - Part III - Tools in Detail - Fastlane</a></h3>
                             <p class="post-meta"><p>Details of the specific fastlane configuration we use and how we arrange alpha and release builds</p></p>
+                            <p class="post-meta"><a href="../2015/09/01/ios-deployment-part-3/">Read full post...</a>
                             <p class="post-meta">
                                 in <a href="../category/blog.html">blog</a> &middot; Tue 01 September 2015
                             </p>
@@ -118,6 +181,7 @@ Posts tagged 'ios'                </h1>
                         <header class="post-header">
                             <h3><a class="post-title" href="../2015/08/15/ios-deployment-part-2/">iOS Deployment and Provisioning - Part II - Rational</a></h3>
                             <p class="post-meta"><p>The reasoning behind our build process, how it solves the problems of building and signing builds with a distributed team</p></p>
+                            <p class="post-meta"><a href="../2015/08/15/ios-deployment-part-2/">Read full post...</a>
                             <p class="post-meta">
                                 in <a href="../category/blog.html">blog</a> &middot; Sat 15 August 2015
                             </p>
@@ -127,6 +191,7 @@ Posts tagged 'ios'                </h1>
                         <header class="post-header">
                             <h3><a class="post-title" href="../2015/08/05/i-love-our-build-system/">I Love our Build System</a></h3>
                             <p class="post-meta"><p>It's 7:30am, a director has reported a problem with our app whilst at a trade show. Help! How our build system saved the day.</p></p>
+                            <p class="post-meta"><a href="../2015/08/05/i-love-our-build-system/">Read full post...</a>
                             <p class="post-meta">
                                 in <a href="../category/blog.html">blog</a> &middot; Wed 05 August 2015
                             </p>
@@ -136,6 +201,7 @@ Posts tagged 'ios'                </h1>
                         <header class="post-header">
                             <h3><a class="post-title" href="../2015/07/28/ios-deployment-part-1/">iOS Deployment and Provisioning - Part I - Terminology</a></h3>
                             <p class="post-meta"><p>The first problem I had coming into iOS development was working out how all the parts related - certs, profiles, keys, schemes, etc</p></p>
+                            <p class="post-meta"><a href="../2015/07/28/ios-deployment-part-1/">Read full post...</a>
                             <p class="post-meta">
                                 in <a href="../category/blog.html">blog</a> &middot; Tue 28 July 2015
                             </p>

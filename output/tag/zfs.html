@@ -33,6 +33,7 @@
                                 <li class="links"><a href="/">Home</a></li>
                                 <li class="links"><a href="/category/talks.html">Talks</a></li>
                                 <li class="links"><a href="/archives.html">Archives</a></li>
+                                <li class="links"><a href="/tags.html">Tags</a></li>
                                 <li class="links"><a href="../about">About Me / Contact</a></li>
                             </ul>
                                 <p class="social">
@@ -63,7 +64,28 @@ Posts tagged 'ZFS'                </h1>
                     <section class="post">
                         <header class="post-header">
                             <h3><a class="post-title" href="../2015/08/30/cloning-zvol-for-vm/">Cloning a ZVol for a new VM</a></h3>
-                            <p class="post-meta"><p>How to clone ZFS zvols to replicate VMs</p></p>
+                            <p class="post-meta"><p>I am using bhyve as a VM system for OpenBSD, Linux and FreeBSD guests running on a FreeBSD host.</p>
+<p>I wanted to create a new OpenBSD VM to set up a local mail server VM. And realised I could probably clone one of my existing OpenBSD VM's filesystem and just start with that. <a href="https://www.geeklan.co.uk/?p=1521">I'm using ZFS zvols for the underlying data store for the VM</a>.</p>
+<p>So, firstly I took a snapshot of the running OpenBSD VM:</p>
+<div class="highlight"><pre><span></span>zfs snapshot storage/vms/openbsd@booted
+</pre></div>
+
+
+<p>Then clone it:</p>
+<div class="highlight"><pre><span></span>zfs clone -p storage/vms/openbsd@booted storage/vms/mailserver
+</pre></div>
+
+
+<p>Listing the zvols you can see the new one:</p>
+<div class="highlight"><pre><span></span>root@jenna:/storage/vms # zfs list -r storage/vms
+NAME                   USED  AVAIL  REFER  MOUNTPOINT
+storage/vms            111G  4.82T  4.54G  /storage/vms
+storage/vms/mailserver 1.93M 4.82T  2.92G  -
+storage/vms/openbsd    106G  4.92T  2.92G  -
+</pre></div>
+
+
+<p>What is interesting is the amount of storage used, in this case just 1.93M, so the new OpenBSD server seems to only consume space where different to the existing one. ZFS' copy on write is pretty awesome :)</p></p>
                             <p class="post-meta">
                                 in <a href="../category/blog.html">blog</a> &middot; Sun 30 August 2015
                             </p>

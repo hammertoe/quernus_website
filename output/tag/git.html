@@ -33,6 +33,7 @@
                                 <li class="links"><a href="/">Home</a></li>
                                 <li class="links"><a href="/category/talks.html">Talks</a></li>
                                 <li class="links"><a href="/archives.html">Archives</a></li>
+                                <li class="links"><a href="/tags.html">Tags</a></li>
                                 <li class="links"><a href="../about">About Me / Contact</a></li>
                             </ul>
                                 <p class="social">
@@ -63,7 +64,25 @@ Posts tagged 'git'                </h1>
                     <section class="post">
                         <header class="post-header">
                             <h3><a class="post-title" href="../2015/10/22/force-git-to-use-ssh/">Force git to use ssh instead of HTTPS</a></h3>
-                            <p class="post-meta"><p>Sometimes you have tools that reference a github url with https and you want them to use ssh instead so your ssh key works</p></p>
+                            <p class="post-meta"><p>Sometimes you have tools that reference a github url with https and you want them to use ssh instead so your ssh key works.</p>
+<p>In my case it is Cocoapods trying to clone a spec repo. Since I just enabled two-factor auth on my account it now stopped working:</p>
+<div class="highlight"><pre><span></span>Matts-iMac:Nutrition matt$ pod install
+Cloning spec repo <span class="sb">`</span>enquos<span class="sb">`</span> from <span class="sb">`</span>https://github.com/enquos/mib.ios.pod.podspec<span class="sb">`</span>
+Username <span class="k">for</span> <span class="s1">&#39;https://github.com&#39;</span>: hammertoe
+Password <span class="k">for</span> <span class="s1">&#39;https://hammertoe@github.com&#39;</span>: 
+<span class="o">[</span>!<span class="o">]</span> Unable to add a <span class="nb">source</span> with url <span class="sb">`</span>https://github.com/enquos/mib.ios.pod.podspec<span class="sb">`</span> named <span class="sb">`</span>enquos<span class="sb">`</span>.
+You can try adding it manually in <span class="sb">`</span>~/.cocoapods/repos<span class="sb">`</span> or via <span class="sb">`</span>pod repo add<span class="sb">`</span>.
+</pre></div>
+
+
+<p>By putting the following in your <code>~/.gitconfig</code> file you can force git to use SSH whenever it is asked to use a HTTPS url:</p>
+<div class="highlight"><pre><span></span><span class="k">[url &quot;git@github.com:&quot;]</span>
+  <span class="na">insteadOf</span> <span class="o">=</span> <span class="s">https://github.com/</span>
+<span class="k">[url &quot;git@github.com:&quot;]</span>
+  <span class="na">pushInsteadOf</span> <span class="o">=</span> <span class="s">&quot;git://github.com/&quot;</span>
+<span class="k">[url &quot;git@github.com:&quot;]</span>
+  <span class="na">pushInsteadOf</span> <span class="o">=</span> <span class="s">&quot;https://github.com/&quot;</span>
+</pre></div></p>
                             <p class="post-meta">
                                 in <a href="../category/blog.html">blog</a> &middot; Thu 22 October 2015
                             </p>
