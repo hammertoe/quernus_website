@@ -49,12 +49,14 @@ FILENAME_METADATA = '(?P<date>\d{4}-\d{2}-\d{2})-(?P<slug>.*)'
 MENUITEMS = (('Home', '/'),
              ('Talks', '/category/talks.html'),
              ('Archives', '/archives.html'),
+             ('Tags', '/tags.html'),
 )
 THEME = 'pure-single'
 
 FAVICON_URL = '/theme/favicon.ico'
 
 GOOGLE_ANALYTICS = 'UA-65654046-1'
+DISQUS_SITENAME = 'quernus'
 
 DEFAULT_CATEGORY = 'blog'
 
