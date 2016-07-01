@@ -2,6 +2,7 @@ Title: Plone: The DNA of a Successful Open Source Community
 Date: 2011-11-16 09:19
 Author: hammertoe@slideshare.net(hammertoe)
 Slug: plone-the-dna-of-a-successful-open-source-community
+tags: open source, community, plone
 
 <iframe src="//www.slideshare.net/slideshow/embed_code/key/uBTZNHaJOLZhZ2" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe> <div style="margin-bottom:5px"> <strong> <a href="//www.slideshare.net/hammertoe/plone-the-dna-of-a-successful-open-source-community" title="Plone: The DNA of a Successful Open Source Community" target="_blank">Plone: The DNA of a Successful Open Source Community</a> </strong> from <strong><a href="//www.slideshare.net/hammertoe" target="_blank">Matt Hamilton</a></strong> </div>
 

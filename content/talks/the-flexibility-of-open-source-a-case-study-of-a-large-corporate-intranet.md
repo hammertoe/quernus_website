@@ -2,6 +2,7 @@ Title: The Flexibility of Open Source: A Case Study of a large Corporate Intrane
 Date: 2009-12-10 04:34
 Author: hammertoe@slideshare.net(hammertoe)
 Slug: the-flexibility-of-open-source-a-case-study-of-a-large-corporate-intranet
+tags: open source, enterprise, intranet, plone, wcm, content management
 
 <iframe src="//www.slideshare.net/slideshow/embed_code/key/oylFbeCt0EAU8" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe> <div style="margin-bottom:5px"> <strong> <a href="//www.slideshare.net/hammertoe/the-flexibility-of-open-source-a-case-study-of-a-large-corporate-intranet" title="The Flexibility of Open Source: A Case Study of a large Corporate Intranet" target="_blank">The Flexibility of Open Source: A Case Study of a large Corporate Intranet</a> </strong> from <strong><a href="//www.slideshare.net/hammertoe" target="_blank">Matt Hamilton</a></strong> </div>
 

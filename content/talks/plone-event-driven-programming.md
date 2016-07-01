@@ -2,6 +2,7 @@ Title: Plone: Event Driven Programming
 Date: 2010-06-08 04:04
 Author: hammertoe@slideshare.net(hammertoe)
 Slug: plone-event-driven-programming
+tags: plone, events, development
 
 <iframe src="//www.slideshare.net/slideshow/embed_code/key/4dHUXmDMrSryA7" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe> <div style="margin-bottom:5px"> <strong> <a href="//www.slideshare.net/hammertoe/event-drivenprogrammingslides" title="Plone: Event Driven Programming" target="_blank">Plone: Event Driven Programming</a> </strong> from <strong><a href="//www.slideshare.net/hammertoe" target="_blank">Matt Hamilton</a></strong> </div>
 

@@ -2,7 +2,7 @@ Title: Adventures in Wonderland - A Plone Developer's Year in iOS
 Date: 2015-10-14 14:21
 Author: hammertoe@slideshare.net(hammertoe)
 Slug: adventures-in-wonderland-a-plone-developers-year-in-ios
-
+tags: ios, plone, development, deployment, mobile
 
 <iframe src="//www.slideshare.net/slideshow/embed_code/key/dZMdjvqTcDgJYB" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe> <div style="margin-bottom:5px"> <strong> <a href="//www.slideshare.net/hammertoe/adventures-in-wonderland-a-plone-developers-year-in-ios" title="Adventures in Wonderland - A Plone Developer&#x27;s Year in iOS" target="_blank">Adventures in Wonderland - A Plone Developer&#x27;s Year in iOS</a> </strong> from <strong><a href="//www.slideshare.net/hammertoe" target="_blank">Matt Hamilton</a></strong> </div>
 

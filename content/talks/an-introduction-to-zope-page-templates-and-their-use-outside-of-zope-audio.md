@@ -2,6 +2,7 @@ Title: An introduction to Zope Page Templates and their use outside of Zope (+Au
 Date: 2009-07-01 06:38
 Author: hammertoe@slideshare.net(hammertoe)
 Slug: an-introduction-to-zope-page-templates-and-their-use-outside-of-zope-audio
+tags: zope, templating, europython, python
 
 <iframe src="//www.slideshare.net/slideshow/embed_code/key/lDwj6EeairpC7a" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe> <div style="margin-bottom:5px"> <strong> <a href="//www.slideshare.net/hammertoe/an-introduction-to-zope-page-templates-and-their-use-outside-of-zope" title="An introduction to Zope Page Templates and their use outside of Zope (+Audio)" target="_blank">An introduction to Zope Page Templates and their use outside of Zope (+Audio)</a> </strong> from <strong><a href="//www.slideshare.net/hammertoe" target="_blank">Matt Hamilton</a></strong> </div>
 

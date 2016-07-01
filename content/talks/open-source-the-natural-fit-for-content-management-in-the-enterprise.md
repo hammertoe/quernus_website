@@ -2,6 +2,7 @@ Title: Open Source, The Natural Fit for Content Management in the Enterprise
 Date: 2013-12-04 17:47
 Author: hammertoe@slideshare.net(hammertoe)
 Slug: open-source-the-natural-fit-for-content-management-in-the-enterprise
+tags: open source, content management, wcm, enterprise, case study, nhs
 
 <iframe src="//www.slideshare.net/slideshow/embed_code/key/3Kmj195ESwktsL" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe> <div style="margin-bottom:5px"> <strong> <a href="//www.slideshare.net/hammertoe/open-source-the-natural-fit-for-cms-in-the-enterprise" title="Open Source, The Natural Fit for Content Management in the Enterprise" target="_blank">Open Source, The Natural Fit for Content Management in the Enterprise</a> </strong> from <strong><a href="//www.slideshare.net/hammertoe" target="_blank">Matt Hamilton</a></strong> </div>
 

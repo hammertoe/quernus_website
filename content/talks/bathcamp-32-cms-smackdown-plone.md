@@ -2,6 +2,7 @@ Title: BathCamp #32 - CMS Smackdown! - Plone
 Date: 2012-06-07 10:38
 Author: hammertoe@slideshare.net(hammertoe)
 Slug: bathcamp-32-cms-smackdown-plone
+tags: plone, talk, community
 
 <iframe src="//www.slideshare.net/slideshow/embed_code/key/ymi5g5XxvDrUhw" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe> <div style="margin-bottom:5px"> <strong> <a href="//www.slideshare.net/hammertoe/bathcamp-32-cms-smackdown-plone" title="BathCamp #32 - CMS Smackdown! - Plone" target="_blank">BathCamp #32 - CMS Smackdown! - Plone</a> </strong> from <strong><a href="//www.slideshare.net/hammertoe" target="_blank">Matt Hamilton</a></strong> </div>
 

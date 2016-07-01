@@ -2,6 +2,7 @@ Title: Online Information 2011: Global and Social A case study of the implementa
 Date: 2011-12-05 06:26
 Author: hammertoe@slideshare.net(hammertoe)
 Slug: online-information-2011-global-and-social-a-case-study-of-the-implementation-of-a-large-scale-social-intranet
+tags: plone, intranets, social, case study
 
 <iframe src="//www.slideshare.net/slideshow/embed_code/key/3NJBTFdT3Ctbpe" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe> <div style="margin-bottom:5px"> <strong> <a href="//www.slideshare.net/hammertoe/online-information-2011-global-and-social-a-case-study-of-the-implementation-of-a-largescale-social-intranet" title="Online Information 2011: Global and Social A case study of the implementation of a large-scale social intranet" target="_blank">Online Information 2011: Global and Social A case study of the implementation of a large-scale social intranet</a> </strong> from <strong><a href="//www.slideshare.net/hammertoe" target="_blank">Matt Hamilton</a></strong> </div>
 

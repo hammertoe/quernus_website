@@ -2,6 +2,7 @@ Title: Lipstick On a Pig (+Audio)
 Date: 2009-07-01 06:38
 Author: hammertoe@slideshare.net(hammertoe)
 Slug: lipstick-on-a-pig-audio
+tags: plone, sharepoint, integration, diazo, theming
 
 <iframe src="//www.slideshare.net/slideshow/embed_code/key/qxjpHAfypyrT64" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe> <div style="margin-bottom:5px"> <strong> <a href="//www.slideshare.net/hammertoe/lipstick-on-a-pig" title="Lipstick On a Pig (+Audio)" target="_blank">Lipstick On a Pig (+Audio)</a> </strong> from <strong><a href="//www.slideshare.net/hammertoe" target="_blank">Matt Hamilton</a></strong> </div>
 

@@ -2,6 +2,7 @@ Title: Plone Symposium East 2011 Keynote: Plone, A Solution not a Product
 Date: 2011-05-19 13:57
 Author: hammertoe@slideshare.net(hammertoe)
 Slug: plone-symposium-east-2011-keynote-plone-a-solution-not-a-product
+tags: keynote, plone, community, open source
 
 <iframe src="//www.slideshare.net/slideshow/embed_code/key/qt3BYk4vMCUPVY" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe> <div style="margin-bottom:5px"> <strong> <a href="//www.slideshare.net/hammertoe/plone-symposium-east-2011-keynote-plone-a-solution-not-a-product" title="Plone Symposium East 2011 Keynote: Plone, A Solution not a Product" target="_blank">Plone Symposium East 2011 Keynote: Plone, A Solution not a Product</a> </strong> from <strong><a href="//www.slideshare.net/hammertoe" target="_blank">Matt Hamilton</a></strong> </div>
 
