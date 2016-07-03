@@ -27,6 +27,7 @@
                         <header class="post-header">
                             <h3><a class="post-title" href="{{ SITEURL }}/{{ article.url }}">{{ article.title }}</a></h3>
                             {% if loop.first %}
+                            <p class="post-meta">{{ article.date|strftime('%d %B %Y') }}</p>
                             <p class="post-meta">{{ article.content }}</p>
                             {% else %}
                             <p class="post-meta">{{ article.summary }}</p>
