@@ -78,9 +78,9 @@ if __name__ == "__main__":
 [The latest version of the code is available on Github](https://github.com/hammertoe/numberserver). 
 
 ```bash
-Matts-iMac:~ matt$ curl http://jenkins:9999/
-28Matts-iMac:~ matt$ curl http://jenkins:9999/
-29Matts-iMac:~ matt$ curl http://jenkins:9999/
+Matts-iMac:~ matt$ curl http://numberserver:9999/
+28Matts-iMac:~ matt$ curl http://numberserver:9999/
+29Matts-iMac:~ matt$ curl http://numberserver:9999/
 30Matts-iMac:~ matt$ 
 ```
 
