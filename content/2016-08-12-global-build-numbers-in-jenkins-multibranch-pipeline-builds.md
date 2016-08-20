@@ -124,3 +124,6 @@ And the end result is that the feature branch app on Fabric has a combination of
 ![Fabric Beta feature branch builds with unique build numbers across branches](/public/fabric_beta_unique_build_numbers.jpg)
 
 I can tap to install any previous build of this app from any of the feature branches for testing.
+
+Oh, and I suppose I can now cross ‘microservices’ off my buzzword bingo sheet now, right? ;)
+
