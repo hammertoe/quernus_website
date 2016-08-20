@@ -84,4 +84,43 @@ Matts-iMac:~ matt$ curl http://jenkins:9999/
 30Matts-iMac:~ matt$ 
 ```
 
-Testing it you can see it returns a new number each time: `28`, `29`, `30`. There is no 
+Testing it you can see it returns a new number each time: `28`, `29`, `30`. There is no newline returned as the output is intended to be consumed directly by a script.
+
+The `Jenkinsfile` has been modified to make a call to the URL and use the result in a variable for later use. Groovy makes this surprisingly easy and concise to do:
+
+```groovy
+env.BUILD_ID = 'http://numberserver.quernus.co.uk:9999/'.toURL().text
+```
+
+From the `Jenkinsfile` we can also set the build number displayed in Jenkins so that it matches the one we use:
+
+```groovy
+currentBuild.displayName = "#" + env.BUILD_ID
+```
+
+You can see then the global build numbers for a particular job as they show up non sequential as other jobs have run in-between these ones:
+
+![Jenkins 2.0 global build numbers](/public/jenkins_global_build_numbers.png)
+
+This puts the build number in an environment variable. This is then looked at later by both the Gradle build script for our Android builds: 
+
+```groovy
+int getVersionCodeFromEnv(String versionName) {
+    System.getenv("BUILD_ID”) as Integer ?: 0
+}
+```
+
+…and the Fastlane config for our iOS builds:
+
+```ruby
+      increment_build_number(
+        xcodeproj: project,
+        build_number: ENV['BUILD_ID']
+      )
+```
+
+And the end result is that the feature branch app on Fabric has a combination of jobs built from different branches, but that the build number is both unique and increasing for each build:
+
+![Fabric Beta feature branch builds with unique build numbers across branches](/public/fabric_beta_unique_build_numbers.jpg)
+
+I can tap to install any previous build of this app from any of the feature branches for testing.
