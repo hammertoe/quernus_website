@@ -41,7 +41,7 @@ I discovered that [if you set an environment variable with the prefix `ORG_GRADL
 
 We add in the Git branch to the top of the release notes so that when you look at the list of builds in the Fabric Beta app you can easily see which branch they came from.
 
-Then in out `build.gradle` file we can find this project property and put that where Crashlytics task will be expecting it:
+Then in our `build.gradle` file we can find this project property and put that where the Crashlytics task will be expecting it:
 
 ```Groovy
     buildTypes {
