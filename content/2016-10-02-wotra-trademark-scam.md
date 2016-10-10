@@ -25,3 +25,5 @@ However, at the bottom in the small print they even say:
 I’d imagine quite a few companies falling for it.
 
 In fact it seems that this process is pretty widespread and [even WIPO have had to publish official advice on the matter](http://www.wipo.int/pct/en/warning/pct_warning.html).
+
+EDIT: also the [UK government have published advice themselves on misleading invoices for IP protection](https://www.gov.uk/government/collections/warning-misleading-invoices)
