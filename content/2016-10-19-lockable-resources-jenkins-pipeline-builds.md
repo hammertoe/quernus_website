@@ -24,6 +24,7 @@ stage('Tests') {
 
 	  step([$class: 'JUnitResultArchiver', testResults: 'build/reports/*.xml'])
 	}
+}
 
 ...
 
