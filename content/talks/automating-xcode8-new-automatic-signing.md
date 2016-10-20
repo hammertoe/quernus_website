@@ -9,3 +9,5 @@ This was a talk I gave at the [SWMobile Meetup](http://www.meetup.com/swmobile/e
 In our case we use it with Jenkins and Fastlane to automate all our builds.
 
 Video hosted at [https://www.youtube.com/watch?v=nVDKZzN3zGk](https://www.youtube.com/watch?v=nVDKZzN3zGk)
+
+Slides hosted at [http://www.slideshare.net/hammertoe/automating-xcode-8s-new-automatic-signing](http://www.slideshare.net/hammertoe/automating-xcode-8s-new-automatic-signing)
