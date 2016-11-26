@@ -16,7 +16,7 @@ After a lot of playing about I managed to get it so that you could specify the n
 
 We have three different build configurations `develop`, `feature`, and `release`. The first two are AdHoc builds and are for testing. The latter uses an `AppStore` profile for uploading to TestFlight and the App Store.
 
-TotalHealth-develop.xcconfig:
+`TotalHealth-develop.xcconfig`:
 ```sh
 DEVELOPMENT_TEAM = 9Q5433VBYW
 PROVISIONING_PROFILE_SPECIFIER_app = com.enquos.totalhealth.develop AdHoc
@@ -25,7 +25,7 @@ CODE_SIGN_IDENTITY = iPhone Distribution: Legacy Parts Corporation (9Q5433VBYW)
 PROVISIONING_PROFILE = 
 ```
 
-TotalHealth-feature.xcconfig:
+`TotalHealth-feature.xcconfig`:
 ```sh
 DEVELOPMENT_TEAM = 9Q5433VBYW
 PROVISIONING_PROFILE_SPECIFIER_app = com.enquos.totalhealth.feature AdHoc
@@ -36,7 +36,7 @@ PROVISIONING_PROFILE =
 
 As the app store profile doesn't contain UUIDs and doesn't change regularly, we still refer to that one by UUID in our `xcconfig` file:
 
-TotalHealth-release.xcconfig:
+`TotalHealth-release.xcconfig`:
 ```sh
 DEVELOPMENT_TEAM = 9Q5433VBYW
 PROVISIONING_PROFILE_SPECIFIER =
