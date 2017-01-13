@@ -6,6 +6,8 @@ tags: jenkins, ci, keychain, ssh
 summary: I upgraded a build server to macOS Sierra and the keychain unlocking stopped working, here is how I fixed it.
 ---
 
+*Update: It looks like this issue has now been fixed in MacOS 10.12.2 (Darwin 16.3.0). Thanks to 'Kumazatheef' for the update.*
+
 I recently upgraded one of our Mac Mini build servers to macOS Sierra. This was needed in order to build for iOS 10 and Xcode 8. Well I could have held back on previous OSX version for a while, but with Apple it is an inevitable upgrade tide you are swimming against!
 
 The upgrade went well, however something broke when trying to get our Jenkins server (FreeBSD) to build our iOS app on the Mac Mini as a build slave.
