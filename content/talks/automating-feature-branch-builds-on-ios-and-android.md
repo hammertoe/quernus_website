@@ -1,5 +1,5 @@
 Title: Automating Feature Branch Builds on iOS and Android
-Date: 2016-04-25
+Date: 2017-04-25
 Author: hammertoe@slideshare.net(hammertoe)
 Slug: automating-feature-branch-builds-on-ios-and-android
 tags: iOS, Android, Jenkins, CI, Gradle, Fastlane, Talks, Codemobile
@@ -10,5 +10,6 @@ This is a talk given at Codemobile 2017 conference in Chester, UK. It was a 5 mi
 talk detailing how to automate the building of apps for each and every feature branch created
 as part of a git-flow workflow.
 
-https://www.youtube.com/watch?list=PLmEZjI7vcqERys79KTTcWQHEb-Kj0zman&v=S8m1ulvtfrw
+<iframe width="560" height="315" src="https://www.youtube.com/embed/S8m1ulvtfrw?list=PLmEZjI7vcqERys79KTTcWQHEb-Kj0zman" frameborder="0" allowfullscreen></iframe>
+
 
