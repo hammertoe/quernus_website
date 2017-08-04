@@ -8,7 +8,7 @@ summary: I found my university thesis from 17 years ago, along with the code for
 
 18 years ago as my final year project I wrote a full text indexer and business plan for a business in which to develop an online service to allow people to search through open source mailing lists. The service was to be called OSDigger as it allowed you to dig through Open Source mailing lists. My inspiration was what you could do with Dejanews and usenet groups.
 
-![Screenshot of OSDigger beta](public/osdigger-architecture.png)
+![Screenshot of OSDigger beta](/public/osdigger-architecture.png)
 
 The other day, whilst digging through an old hard disk looking for something, I stumbled across the code and my original thesis. Looking back at it now, the thesis itself seems to be more impressive that the code. In fact, it looks like half the code may indeed be missing, no idea why. 
 
@@ -18,7 +18,7 @@ I was also keeping an eye on an interesting startup web crawler from Stanford ca
 
 We managed to even get a beta of the site working, and you could search through mailing list posts. There was even a two-stage search feature in which it would suggest additional terms to narrow your search down.
 
-![Screenshot of OSDigger beta](public/osdigger-screenshot.png)
+![Screenshot of OSDigger beta](/public/osdigger-screenshot.png)
 
 In the end though, after graduating, we all went our separate ways and we never had to time to really take the site to its full commercial launch. Which was a shame looking back at it, but still, it was a good trip!
 
