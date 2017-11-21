@@ -11,11 +11,10 @@ slug: about
 <div style="float:left; width: 50%">
 <p style="text-align:right">
 Quernus Ltd.<br />
-Easton Business Centre<br />
-Felix Road<br />
-Easton<br />
+5 Thomas Way<br />
+Stapleton<br />
 Bristol<br />
-BS5 0HE<br />
+BS16 1WT<br />
 </p>
 <p style="text-align:right">
 tel: +44 117 325 3025<br />
