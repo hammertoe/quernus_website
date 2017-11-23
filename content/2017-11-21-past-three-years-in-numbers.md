@@ -30,6 +30,8 @@ When I first started, the iOS app I inherited from an outsourced app development
 
 In this time I have given **five talks** at **3 conferences and 2 user groups**. I have also given **four talks** at schools and universities as a STEM Ambassador.
 
+<img alt="Speaking at SWMobile on automating iOS code signing" src="/public/matt_speaking_swmobile2.jpg" style="float:left;  margin-right: 20px;" />
+
 I now know more about iOS app signing and provisioning profiles than any sane human should.
 
 <img alt="Global Festival of Ideas conference game" src="/public/gfi4sd-game.jpg" style="float:right" />
