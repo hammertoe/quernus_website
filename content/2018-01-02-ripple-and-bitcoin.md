@@ -2,7 +2,7 @@
 layout: post
 title: Ripple and Bitcoin, a use-case for collaboration
 comments: True
-tags: ripple, arp, bitcoin, blockchain
+tags: ripple, xrp, bitcoin, blockchain
 summary: There is a lot of hate out there for Ripple and XRP by some bitcoin fanatics, but they are solving different problems, and here is a use-case of how they compliment each other.
 ---
 
