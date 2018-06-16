@@ -1,0 +1,48 @@
+---
+layout: post
+title: Banks are Dead. Long Live Banks.
+comments: True
+tags: xrp, cryptocurrencies, rippe, banks, fintech
+summary: Just as the postal service evolved with the introduction of the internet and email, banking will need to evolved with cryptocurrencies.
+---
+
+
+I remember exactly where I was. I was sat upstairs in the 'den' on the family PC at my parent's house in upstate New York. It was the summer of 1995, and I was 18 years old. I had recently finished my A-levels at boarding school in the UK. I had studied Maths, Physics, CDT (Craft, Design and Technology), and German. I had always been interested in computers, and had learned to program BASIC when I was younger, and had been playing about on bulletin boards when I first got into my teens. We had a modem at home, a shiny silver, noisy Hayes Smartmodem 2400 baud modem. Later to be replaced with a super fast US Robotics 56K modem. I had used Prodigy, a US based online service which was one of the early 'walled garden' services along with America Online and the likes that eventually gave way to the open Internet as we now know it.
+
+I saw the headline, it was something like:
+
+"New company, Amazon, to sell books on the internet"
+
+Books on the internet? What an insane idea. How are you going to get the physical book to someone? Books are heavy, postal service is slow. Surely people are just going to read books online in the future? Or go to a book store?
+
+It was also around about this time that every so often a newspaper article would claim that this new internet thing and the growing use of email would kill the postal services of the world. If you could send an email to someone, why would anyone bother writing letters any more? Maybe the postal services should somehow get paid for emails sent to recompense them? Lots of crazy ideas were being floated, lots of hands were wringing at the thought of technological innovation destroying another sector. Protectionism was kicking in, maybe there should be a tax on emails?
+
+It is now 2018. Twenty Three years since Amazon launched with their crazy 'books over the internet' idea, and the prophesied doom of the postal services of the world. 
+
+![Colourful plant pots](/public/colourful_plant_pots.jpg)
+
+My wife has decided to re-do our front garden of our house. It has always been a bit derelict, and just a boring gravel area between the street and the house itself. She wanted to make it more colourful and plant various plants there. Also some herbs and the likes. And get my daughter into growing things. I've been feeling un-well, I think I might be coming down with the stomach bug that she has been suffering from the last few days, so I've been working from home today. The doorbell has rung four times so far, and it is not even lunch time. Each time I go downstairs it is another delivery person delivering something. Firstly a very very heavy bag. God knows what she has ordered... feels like a bag of rocks. Actually, it turns out that is exactly what it is. She has ordered a bag of gravel from eBay to fill the bottom of all the planters she has ordered. Next delivery, some large, but very light boxes. Plastic planters. All sorts of colours -- purple, green, yellow, red. The third delivery. Again, some heavy sacks. Compost -- from Amazon. The forth delivery (and yes, I have to admit I'm getting a bit annoyed now, traipsing up and down the stairs from my study to the front door)... some very tall narrow boxes with holes in. "Careful, live plants" they say on the side. I guess those will be some of the plants then.
+
+That bag of gravel weighed 20 kgs. It cost £12.75 including postage and packaging and was delivered the next day after ordering. That is significantly heavier than a book.
+
+And this is not actually an abnormal day in our house. We get a lot of things delivered. We have accounts with four of the main supermarkets and get our weekly grocery shopping delivered to us. We get a meat box from a butcher delivered to us. We used to get organic veg delivered in a box to us too. Not to mention all the random bits and bobs I order from eBay and Amazon. I needed an SD Card for my Raspberry Pi for a project. I ordered it at 9pm, and it arrived 8am the next morning.
+
+![Huge bag of foam packing chips](/public/vik_packing_chips.jpg)
+
+Oh, and turns out that for big planters, you don't want to fill them with stones completely as they are then too heavy to move... so guess what turned up now... a maaaaaaaassive bag of foam packing chips that is bigger than my wife (of course, if you are going to line the bottom of a planter with them, you need non-bio-degradable ones... hard to find these days it seems).
+
+So, what of the mail carrier services around the world that were going to be destroyed by email? They have grown even bigger. Yes, some of them have had margins squeezed. Some have gone bust, and new ones have arrived. But there is an even bigger market than before for shipping physical goods around fulfilling eCommerce. And newer players have developed new features and differentiators. Live tracking of deliveries ("Your driver has 8 stops before yours and will be with you in approx 40 minutes"), pickups as well as drop-offs. Amazon lockers so you can get things delivered to a known safe location even if you are not in during the day.
+
+The postal service industry did not die. It evolved.
+
+And so will banks.
+
+"Cryptocurrencies are going to kill the banks!" is the war cry of die-hard crypto anarchists. Bitcoin was originally launched in response to the 2008 financial crisis. "We won't need banks, we can do everything on the blockchain" they say. A lot of that sentiment tars the entire financial services industry with the same brush. Indeed, there are all manner of 'banks' out there. Some banks are the local banks that small businesses might go to to get finance. Some banks are huge corporations doing complex financial dealings that I can't begin to comprehend.
+
+Now, cryptocurrencies and FinTech in general are making a great many strides. I just completed a course on FinTech at the University of Oxford Saïd Business School, and one of the most common new terms I heard on that course was 'disintermediation' -- removing the intermediaries to getting something done. Getting rid of the middle-men and going direct. But is is naive to think that we can, or want, to get rid of all banks or financial services completely. People are always going to want financial services. But just like the postal services, I think the notion of a 'bank' is going to evolve.
+
+Whilst some people are going to be comfortable holding their life savings secured in a digital 'wallet' with a private key -- I think they will be in the minority. People generally want a friendlier 'wrapper' around their services. They will want a way to get access to their funds when they lose their private key. They are going to want to be able to get loans, mortgages, business finance etc. Now that is not to say that those services themselves might not be serviced underneath by cryptocurrencies, blockchains and smart contracts... but the end user will likely not even know. We are already seeing 'institutional custody' services being established for financial markets and how they can securely hold digital assets. On the surface this seems pretty absurd, I mean, you just need to keep a string of characters safe as a private key, right? It is not like you have a vault of physical gold that needs securing with armed guards, fences and dogs. But still there is a whole process around access to that key, audit trails, compliance, about insurance of assets, and all the other things the institutions need to deal with. Ultimately for the protection of the customer.
+
+And this is what excites me about XRP. Whilst many cryptocurrency projects are going down the more anarchistic route and trying to do everything themselves, XRP is being used in a more pragmatic approach. Ripple are building compliant banking services on top of the open, decentralised, permission-less XRP Ledger. So you have an open base layer that anyone can use, anyone can transact on or build a business on. And then you have companies such as Ripple, Coil and others building services on top of that open base. In the case of Ripple, this upper layer is where the regulatory compliance happens. Just like the internet doesn't have DRM or security at it's lower levels, they are provided by layers on top. The lower level is designed for interoperability and to do one thing well. Those technologies at the bottom such as the XRP Ledger and Interledger Protocol (ILP) are providing an open base on which value-added services can be built on top. By anyone.
+
+In a recent interview, David Schwartz, Ripple's Chief Cryptographer was asked "What new services do you see coming as a result of XRP" and his response was along the lines of "Services that no-one can even imagine right now". Just like when Amazon came out, no-one imagined that you would be able to get a bag of rocks shipped across the country to you next day. With XRP taking just a few seconds to transfer value around the world, what completely new business models could evolve from this? Imagine as a business being able to get a loan for 30 seconds. Not for a year. Not a month, or a week. But seconds. You get the loan, you are able to do the deal you need, and you are able to pay the loan back all in the time it took to write this paragraph. "Why would you want to do that?" you ask. I don't know... but then if you told me 23 years ago that I would be buying a bag of rocks on the internet I'd probably look at you strangely too.
