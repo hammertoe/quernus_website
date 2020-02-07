@@ -19,6 +19,8 @@ TRANSLATION_FEED_ATOM = None
 AUTHOR_FEED_ATOM = None
 AUTHOR_FEED_RSS = None
 
+SUMMARY_MAX_LENGTH = 200
+
 # Blogroll
 LINKS = (('Pelican', 'http://getpelican.com/'),
          ('Python.org', 'http://python.org/'),
@@ -60,4 +62,4 @@ DISQUS_SITENAME = 'quernus'
 
 DEFAULT_CATEGORY = 'blog'
 
-STATIC_PATHS = ['public']
+STATIC_PATHS = ['public', 'coil_images']
