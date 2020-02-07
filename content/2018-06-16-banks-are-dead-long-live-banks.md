@@ -6,7 +6,6 @@ tags: xrp, cryptocurrencies, rippe, banks, fintech
 summary: Just as the postal service evolved with the introduction of the internet and email, banking will need to evolved with cryptocurrencies.
 ---
 
-
 I remember exactly where I was. I was sat upstairs in the 'den' on the family PC at my parent's house in upstate New York. It was the summer of 1995, and I was 18 years old. I had recently finished my A-levels at boarding school in the UK. I had studied Maths, Physics, CDT (Craft, Design and Technology), and German. I had always been interested in computers, and had learned to program BASIC when I was younger, and had been playing about on bulletin boards when I first got into my teens. We had a modem at home, a shiny silver, noisy Hayes Smartmodem 2400 baud modem. Later to be replaced with a super fast US Robotics 56K modem. I had used Prodigy, a US based online service which was one of the early 'walled garden' services along with America Online and the likes that eventually gave way to the open Internet as we now know it.
 
 I saw the headline, it was something like:

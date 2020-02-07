@@ -4,6 +4,7 @@ title: Creating a Ripple Wallet with FreeBSD and Raspberry Pi 3
 comments: True
 tags: ripple, xrp, blockchain, freebsd, raspberry pi
 summary: Here are the steps I went through to create a secure Ripple Wallet on a Raspberry Pi
+status:  draft
 ---
 
 ## The Idea
