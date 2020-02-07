@@ -18,6 +18,20 @@ a:focus {
     padding: 50px 0 0;
 }
 
+.message {
+    background-color: #FFDD99;
+    padding: 1em;
+    font-size: 90%;
+}
+
+/* Coil */
+.elPbsX {
+    position: relative;
+    height: 0px;
+    margin: 10px 0px;
+    max-width: 600px;
+}
+
 .banner {
     background-position: center;
     background-size: cover;
