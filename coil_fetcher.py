@@ -20,7 +20,7 @@ post_id = path_parts[-1]
 gq_api_url = "https://coil.com/graphql"
 
 query = """query GetPost($author: String, $postId: String, $postPermanentId: String) {""" \
-        """    getPost(author: $author, postId: $postId, permanentId: $postPermanentId) { content publishedAt title}""" \
+        """    getPost(author: $author, postId: $postId, permanentId: $postPermanentId) { content publishedAt title image }""" \
         """}"""
 
 data =  {"operationName":"GetPost",
@@ -38,12 +38,23 @@ res = req.json()
 content = res['data']['getPost']['content']
 date = res['data']['getPost']['publishedAt']
 title = res['data']['getPost']['title']
+header_image = res['data']['getPost']['image']
 
 # format title to slug
 slug = title.lower()
 slug = re.sub(r"\W+", "-", slug)
 date = date.split("T")[0]
 slug = f"{date}-{slug}"
+
+# Fetch header image
+if header_image:
+    r = requests.get(header_image, allow_redirects=True)
+    path = urlparse(header_image).path
+    filename = path.split("/")[-1]
+    filename = f"/coil_images/{filename}"
+    with open(f"content{filename}", "wb") as f:
+        f.write(r.content)
+    header_image = filename
 
 # Find all image links, download the images and rewrite the local image links:
 soup = BeautifulSoup(content, features="html.parser")
@@ -71,6 +82,8 @@ comments: True
 tags: 
 summary: 
 ---
+
+<img src="{header_image}"</img>
 
 <p class="message">
 This post was originally written on my Coil site, which is currently my main blogging platform. 
